@@ -13,12 +13,10 @@ export type Term =
 // Representación de una fórmula.
 export type Formula =
     | { kind: "atom"; predicate: string; args: Term[] }
-    | { kind: "eq"; left: Term; right: Term }
     | { kind: "not"; inner: Formula }
     | { kind: "and"; left: Formula; right: Formula }
     | { kind: "or"; left: Formula; right: Formula }
     | { kind: "implies"; left: Formula; right: Formula }
-    | { kind: "iff"; left: Formula; right: Formula }
     | { kind: "forall"; variable: string; inner: Formula }
     | { kind: "exists"; variable: string; inner: Formula };
 
