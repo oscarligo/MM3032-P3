@@ -1,5 +1,5 @@
 import { Formula, Term } from "../types";
-import { Token, tokenize, TokenType } from "./tokenizer";
+import { Token, tokenize, TokenType } from "./lexer";
 
 /*
     Clase FormulaParser que implementa un parser para fórmulas de lógica 
