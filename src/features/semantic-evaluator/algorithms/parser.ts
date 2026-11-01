@@ -5,15 +5,14 @@ import { Token, tokenize, TokenType } from "./lexer";
     Clase FormulaParser que implementa un parser para fórmulas de lógica 
     de primer orden usando el algoritmo de Pratt. Contiene métodos para 
     parsear términos, fórmulas y manejar la precedencia de operadores lógicos.
-    La clase mantiene un cursor para recorrer la lista de tokens y un conjunto
-    de variables ligadas (se obtienen al parsear los cuantificadores) para manejar el alcance de los cuantificadores.
+    La clase mantiene un cursor para recorrer la lista de tokens y un mapa
+    de conteo de variables ligadas (se obtienen al parsear los cuantificadores)
+    para manejar el alcance de los cuantificadores y soportar sombreado (shadowing).
     Se incluyen métodos para parsear prefijos (negación, cuantificadores,
     paréntesis) e infijos (conjunción, disyunción, implicación), 
     así como un método de conveniencia para parsear directamente 
     desde una cadena de entrada.
-
 */
-
 
 // Niveles de precedencia para operadores lógicos
 const Precedence = {
@@ -25,9 +24,9 @@ const Precedence = {
 } as const;
 
 export class FormulaParser {
-    private tokens: Token[] 
-    private cursor: number = 0 
-    private boundVars: Set<string> = new Set() // Conjunto de variables ligadas.
+    private tokens: Token[];
+    private cursor: number = 0;
+    private boundVarCounts: Map<string, number> = new Map();
 
     constructor(tokens: Token[]) {
         this.tokens = tokens;
@@ -68,6 +67,25 @@ export class FormulaParser {
         return this.advance();
     }
 
+    // Registrar la entrada de una variable ligada al alcance actual
+    private pushBoundVar(name: string): void {
+        this.boundVarCounts.set(name, (this.boundVarCounts.get(name) ?? 0) + 1);
+    }
+
+    // Retirar una ocurrencia de variable ligada al salir del alcance del cuantificador
+    private popBoundVar(name: string): void {
+        const count = this.boundVarCounts.get(name) ?? 0;
+        if (count <= 1) {
+            this.boundVarCounts.delete(name);
+        } else {
+            this.boundVarCounts.set(name, count - 1);
+        }
+    }
+
+    // Comprobar si un identificador está ligado en el alcance actual
+    private isBound(name: string): boolean {
+        return this.boundVarCounts.has(name);
+    }
     
     // Parsear un término (variable, constante o función)
     // Funcion recursiva que maneja la gramática de términos:
@@ -87,10 +105,10 @@ export class FormulaParser {
         }
 
         // Convención semántica:
-        // 1. Si está ligada por ∀ o ∃, es una variable.
+        // 1. Si está ligada por ∀ o ∃ en el alcance actual, es una variable.
         // 2. Si empieza con u..z (minúscula o mayúscula), se toma como variable libre por convención estándar.
         // 3. De lo contrario (a..t, dígitos, etc.), se asume constante.
-        if (this.boundVars.has(ident) || /^[u-zU-Z]/.test(ident)) {
+        if (this.isBound(ident) || /^[u-zU-Z]/.test(ident)) {
             return { kind: "var", name: ident };
         }
         // De lo contrario, se asume constante.
@@ -142,9 +160,9 @@ export class FormulaParser {
             const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∀'");
             const variable: string = varToken.value;
 
-            this.boundVars.add(variable);
+            this.pushBoundVar(variable);
             const inner = this.parseExpression(Precedence.LOWEST);
-            this.boundVars.delete(variable);
+            this.popBoundVar(variable);
 
             return { kind: "forall", variable, inner };
         }
@@ -154,9 +172,9 @@ export class FormulaParser {
             const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∃'");
             const variable: string = varToken.value;
 
-            this.boundVars.add(variable);
+            this.pushBoundVar(variable);
             const inner = this.parseExpression(Precedence.LOWEST);
-            this.boundVars.delete(variable);
+            this.popBoundVar(variable);
 
             return { kind: "exists", variable, inner };
         }

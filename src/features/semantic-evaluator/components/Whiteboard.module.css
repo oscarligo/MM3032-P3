@@ -1,50 +1,29 @@
 .whiteboard {
   width: 100%;
-  min-height: 450px;
-  padding: 28px;
+  max-width: var(--whiteboard-max-width);
+  min-height: var(--whiteboard-min-height);
+  padding: var(--space-xl);
   box-sizing: border-box;
   position: relative;
 
-  background-color: #fcfdfe;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(244, 247, 250, 0.5) 50%,
-    rgba(235, 240, 245, 0.8) 100%
-  );
+  background-color: var(--color-whiteboard);
+  background-image: var(--whiteboard-surface);
 
-  /* Marco metálico cuadrado (Aluminio cepillado) */
   border-style: solid;
-  border-width: 8px;
-  border-radius: 0; /* Garantiza esquinas 100% cuadradas */
-  border-image: linear-gradient(
-    45deg,
-    #8a939b 0%,
-    #e2e6ea 20%,
-    #b8c0c8 45%,
-    #f8f9fa 50%,
-    #9aa2aa 75%,
-    #d5dade 90%,
-    #6c757d 100%
-  ) 1;
+  border-width: var(--whiteboard-frame-width);
+  border-radius: 0;
+  border-image: var(--whiteboard-frame) 1;
 
-  /* Sombras: relieve interior del marco + proyección exterior en la pared */
-  box-shadow: 
-    inset 0 2px 5px rgba(0, 0, 0, 0.28),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
-    0 12px 28px rgba(0, 0, 0, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--whiteboard-shadow);
 
-  /* Tipografía base por defecto para el contenido */
-  color: #1e293b;
+  color: var(--color-whiteboard-ink);
 }
 
-/* Detalle opcional: Esquinas de unión metálicas usando un pseudo-elemento */
 .whiteboard::after {
   content: "";
   position: absolute;
-  inset: -16px; /* Cubre exactamente el grosor del borde */
+  inset: calc(var(--whiteboard-frame-width) * -2);
   pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--whiteboard-joint);
+  box-shadow: inset 0 0 0 1px var(--whiteboard-joint-shadow);
 }

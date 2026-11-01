@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
 
@@ -6,13 +6,14 @@ const DEFAULT_FORMULA = "∀x (P(x) → ∃y Q(x, y))";
 
 export function useLexerVisualization() {
     const [input, setInput] = useState(DEFAULT_FORMULA);
-    // Inicia en -1: estado en reposo sin análisis activo
     const [stepIndex, setStepIndex] = useState(-1);
     const [isPlaying, setIsPlaying] = useState(false);
 
     const boardRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+    const tokenSlotRef = useRef<HTMLSpanElement>(null);
+    const [tokenOffset, setTokenOffset] = useState({ x: 0, y: 0 });
 
     const result = useMemo(() => {
         if (!input.trim()) return { tokens: [], steps: [], error: "" };
@@ -32,21 +33,17 @@ export function useLexerVisualization() {
         }
     }, [input]);
 
-    // currentStep solo existe si ya arrancó la visualización (stepIndex >= 0)
     const currentStep: LexerStep | undefined =
         stepIndex >= 0 ? result.steps[stepIndex] : undefined;
 
-    // Tokens consolidados antes del paso actual
     const settledTokens =
         stepIndex >= 0 ? result.steps.slice(0, stepIndex) : [];
 
-    // Reiniciar a estado inicial sin análisis
-    useEffect(() => {
+    useLayoutEffect(() => {
         setStepIndex(-1);
         setIsPlaying(false);
     }, [input]);
 
-    // Control de reproducción automática
     useEffect(() => {
         if (!isPlaying) return;
         if (stepIndex >= result.steps.length - 1) {
@@ -61,7 +58,6 @@ export function useLexerVisualization() {
         return () => window.clearTimeout(timer);
     }, [isPlaying, stepIndex, result.steps.length]);
 
-    // Dibujo del círculo con RoughJS: solo cuando stepIndex >= 0 y currentStep es válido
     useEffect(() => {
         const canvas = canvasRef.current;
         const board = boardRef.current;
@@ -75,7 +71,6 @@ export function useLexerVisualization() {
         canvas.height = boardRect.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Si estamos en reposo inicial, el canvas permanece 100% limpio
         if (!currentStep || stepIndex < 0) return;
 
         const startEl = charRefs.current[currentStep.cursor];
@@ -93,12 +88,22 @@ export function useLexerVisualization() {
         const height = Math.max(startRect.bottom, endRect.bottom) - boardRect.top - top;
 
         const rc = rough.canvas(canvas);
-        rc.ellipse(left + width / 2, top + height / 2, Math.max(width + 26, 46), Math.max(height + 22, 46), {
-            stroke: "#e11d48",
-            strokeWidth: 2.5,
-            roughness: 2.2,
-            bowing: 1.5,
-        });
+        const annotationColor = getComputedStyle(board).getPropertyValue("--color-annotation").trim() || getComputedStyle(board).color;
+        rc.ellipse(
+            left + width / 2, 
+            top + height / 2, 
+            Math.max(width, 36), 
+            Math.max(height, 36), 
+            { stroke: annotationColor, strokeWidth: 2, roughness: 1.8, bowing: 1.2 }
+        );
+
+        const tokenRect = tokenSlotRef.current?.getBoundingClientRect();
+        if (tokenRect) {
+            setTokenOffset({
+                x: left + width / 2 + boardRect.left - (tokenRect.left + tokenRect.width / 2),
+                y: top + height / 2 + boardRect.top - (tokenRect.top + tokenRect.height / 2),
+            });
+        }
     }, [currentStep, stepIndex, input]);
 
     return {
@@ -113,6 +118,8 @@ export function useLexerVisualization() {
         boardRef,
         canvasRef,
         charRefs,
+        tokenSlotRef,
+        tokenOffset,
         previous: () => setStepIndex((s) => Math.max(0, s - 1)),
         restart: () => {
             setStepIndex(-1);

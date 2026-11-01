@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
-
-.boardSection {
+.container {
     width: 100%;
-    padding: 1.25rem 2rem;
-    font-family: 'Caveat', cursive, sans-serif;
+    max-width: 100%;
+    font-family: var(--font-family-handwritten);
     color: inherit;
     box-sizing: border-box;
 }
@@ -15,21 +13,16 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--font-family);
     font-size: 0.9rem;
 }
 
-.titleGroup h1 {
+.title {
     font-size: 1.15rem;
     margin: 0;
 }
 
-.statusText {
-    font-size: 0.85rem;
-    opacity: 0.75;
-}
-
-.inputsRow {
+.inputGroup {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -38,21 +31,20 @@
 .input {
     padding: 0.35rem 0.65rem;
     border: 1px dashed currentColor;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: inherit;
-    font-family: monospace;
+    font-family: var(--font-family-monospace);
     font-size: 0.95rem;
 }
 
-/* Área principal del pizarrón */
-.canvasArea {
+.stage {
     position: relative;
-    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+    width: 100%;
     min-height: 240px;
 }
 
-.roughCanvas {
+.canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -61,150 +53,108 @@
     z-index: 3;
 }
 
-/* 1. Expresión superior con Tegaki + capa espejo de medición */
-.formulaWrapper {
+.formulaRow {
     position: relative;
-    display: inline-block;
-    font-size: 2.8rem;
-    line-height: 1.2;
-    letter-spacing: 0.06em;
-    margin-bottom: 4.5rem;
-}
-
-.formulaTegaki {
-    display: block;
-}
-
-.measureLayer {
-    position: absolute;
-    inset: 0;
     display: flex;
-    white-space: pre;
-    color: transparent;
-    pointer-events: none;
-    user-select: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.1rem;
+    font-size: 1.8rem;
+    line-height: 1.2;
+    padding-top: 0.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
-.measureChar {
+.char {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-whiteboard-ink);
+    min-width: 1.15em;
+    min-height: 1.35em;
+}
+
+.space {
     display: inline-block;
-    white-space: pre;
+    width: 0.4em;
+    min-height: 1.35em;
 }
 
-/* 2. Animación: Copia que baja y hace cross-fade al nombre del Token */
-.floatingClone {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    pointer-events: none;
-    font-family: 'Caveat', cursive;
-    font-size: 2.4rem;
-    font-weight: 700;
-    transform: translate(var(--start-x), var(--start-y));
-    animation: moveDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes moveDown {
-    0% {
-        transform: translate(var(--start-x), var(--start-y)) scale(1);
-    }
-    100% {
-        transform: translate(var(--end-x), var(--end-y)) scale(0.95);
-    }
-}
-
-.cloneSymbol {
-    display: inline-block;
-    color: #e11d48;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    opacity: 1;
-}
-
-.cloneToken {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    opacity: 0;
-    transform: scale(0.85);
-}
-
-/* Estado 'morph': desvanece el símbolo y aparece el nombre del Token */
-.morphing {
-    transform: translate(var(--end-x), var(--end-y));
-}
-
-.morphing .cloneSymbol {
-    opacity: 0;
-    transform: scale(0.7);
-}
-
-.morphing .cloneToken {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* 3. Lista inferior estilo pizarrón: [FORALL, IDENT, ...] */
 .tokensRow {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
-    font-size: 2.2rem;
+    color: var(--color-whiteboard-ink);
+    font-size: 1.2rem;
     min-height: 3.2rem;
 }
 
 .bracket {
-    font-size: 2.6rem;
+    font-size: 1.2rem;
     font-weight: 700;
+    color: var(--color-whiteboard-ink);
     line-height: 1;
 }
 
-.settledToken {
+.token {
     display: inline-flex;
     align-items: center;
 }
 
-.landingSlot {
-    display: inline-block;
-    min-width: 90px;
-    height: 2rem;
+.activeSlot {
+    position: relative;
+    display: inline-flex;
+    min-width: 4.5rem;
+    min-height: 2.8rem;
+    align-items: center;
+    justify-content: flex-start;
+    color: var(--color-annotation);
+    z-index: 4;
 }
 
-.ellipsis {
-    opacity: 0.6;
-    letter-spacing: 0.1em;
+.activeSlot > span:last-child {
+    position: absolute;
+    inset: 0;
+    display: inline-flex;
+    align-items: center;
 }
 
-/* Controles de paso */
+.glyphMorph {
+    display: inline-flex;
+    align-items: center;
+}
+
 .controls {
     display: flex;
     gap: 0.6rem;
     margin-top: 2rem;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--font-family);
 }
 
-.controls button {
+.btn {
     background: transparent;
     border: 1px dashed currentColor;
     color: inherit;
     padding: 0.3rem 0.75rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 0.85rem;
 }
 
-.controls button:disabled {
+.btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
 }
 
-.error, .empty {
+.error,
+.empty {
     margin-top: 1rem;
     font-size: 1.4rem;
 }
 
 .error {
-    color: #e11d48;
+    color: var(--color-annotation);
 }
