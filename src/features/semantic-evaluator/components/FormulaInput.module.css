@@ -1,0 +1,5 @@
+.container { display: grid; align-content: center; gap: clamp(var(--space-xs), 2cqi, var(--space-md)); min-height: calc(var(--whiteboard-min-height) - 2 * var(--space-xl)); font-family: var(--font-family); }
+.label { color: var(--color-whiteboard-ink); font-size: clamp(.8rem, 2.5cqi, 1rem); font-weight: 700; }
+.input { width: 100%; min-width: 0; padding: clamp(.4rem, 1.5cqi, .75rem); border: 1px dashed var(--color-whiteboard-ink); border-radius: var(--radius-sm); color: var(--color-whiteboard-ink); background: transparent; font-family: var(--font-family-monospace); font-size: clamp(.85rem, 3.5cqi, 1.25rem); }
+.input:focus { outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent); }
+.hint { color: var(--color-text-muted); font-size: clamp(.7rem, 2cqi, .875rem); }

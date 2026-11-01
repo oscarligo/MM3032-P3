@@ -9,6 +9,7 @@ const es = {
 	semanticEvaluator: {
 		title: 'Evaluador semántico',
 		description: 'Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.',
+		leftBoard: 'Pizarrón izquierdo', centerBoard: 'Pizarrón central', rightBoard: 'Pizarrón derecho',
 	},
 	procedure: {
 		controls: 'Controles del procedimiento', progress: 'Paso {current:number} de {total:number}',

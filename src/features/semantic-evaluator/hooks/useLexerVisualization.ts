@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
 import { useProcedureStore } from "../../../store/store_control";
-
-const DEFAULT_FORMULA = "∀x (P(x) → ∃y Q(x, y))";
+import { useFormulaStore } from "../../../store/store_formula";
 
 export function useLexerVisualization() {
-    const [input, setInput] = useState(DEFAULT_FORMULA);
+    const input = useFormulaStore((state) => state.formula);
     const stepIndex = useProcedureStore((state) => state.stepIndex);
     const setProcedure = useProcedureStore((state) => state.setProcedure);
     const clearProcedure = useProcedureStore((state) => state.clearProcedure);
@@ -84,8 +83,8 @@ export function useLexerVisualization() {
         rc.ellipse(
             left + width / 2,
             top + height / 2,
-            Math.max(width, 36),
-            Math.max(height, 36),
+            Math.max(width, height * 0.75),
+            height,
             { stroke: annotationColor, strokeWidth: 2, roughness: 1.8, bowing: 1.2 }
         );
 
@@ -93,7 +92,6 @@ export function useLexerVisualization() {
 
     return {
         input,
-        setInput,
         result,
         currentStep,
         settledTokens,

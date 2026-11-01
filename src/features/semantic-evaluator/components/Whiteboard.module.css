@@ -1,10 +1,12 @@
 .whiteboard {
   width: 100%;
-  max-width: var(--whiteboard-max-width);
+  max-width: 100%;
   min-height: var(--whiteboard-min-height);
   padding: var(--space-xl);
   box-sizing: border-box;
   position: relative;
+  container-type: inline-size;
+  container-name: whiteboard;
 
   background-color: var(--color-whiteboard);
   background-image: var(--whiteboard-surface);

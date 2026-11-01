@@ -45,7 +45,6 @@
     font-size: 0.875rem;
 }
 
-/* Selects y botones con acabado redondeado y microinteracciones */
 .controls select,
 .controls button {
     padding: 0.4rem 0.85rem;

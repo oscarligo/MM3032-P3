@@ -21,7 +21,7 @@ const StaticChalk = ({ children }: { children: string | number }) => (
 export default function Lexer() {
     const { LL } = useI18nContext();
     const {
-        input, setInput, result, currentStep, settledTokens,
+        input, result, currentStep, settledTokens,
         hasStarted, boardRef, canvasRef, charRefs,
     } = useLexerVisualization();
 
@@ -31,18 +31,6 @@ export default function Lexer() {
                 <h1 className={styles.title} id="lexer-title">
                     <StaticChalk>{LL.lexer.title()}</StaticChalk>
                 </h1>
-                <div className={styles.inputGroup}>
-                    <label htmlFor="lexer-input">
-                        <StaticChalk>{LL.lexer.inputLabel()}</StaticChalk>
-                    </label>
-                    <input
-                        id="lexer-input"
-                        className={styles.input}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        spellCheck={false}
-                    />
-                </div>
             </header>
 
             {result.error ? (

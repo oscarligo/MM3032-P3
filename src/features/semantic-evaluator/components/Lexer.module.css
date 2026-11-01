@@ -11,37 +11,21 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: clamp(var(--space-xs), 2.5cqi, var(--space-md));
+    margin-bottom: clamp(var(--space-sm), 3cqi, var(--space-lg));
     font-family: var(--font-family);
-    font-size: 0.9rem;
+    font-size: clamp(0.7rem, 2.2cqi, 0.9rem);
 }
 
 .title {
-    font-size: 1.15rem;
+    font-size: clamp(0.85rem, 3cqi, 1.15rem);
     margin: 0;
-}
-
-.inputGroup {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.input {
-    padding: 0.35rem 0.65rem;
-    border: 1px dashed currentColor;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: inherit;
-    font-family: var(--font-family-monospace);
-    font-size: 0.95rem;
 }
 
 .stage {
     position: relative;
     width: 100%;
-    min-height: 240px;
+    min-height: clamp(10rem, 45cqi, 15rem);
 }
 
 .canvas {
@@ -58,13 +42,11 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.1rem;
-    font-size: 1.8rem;
+    gap: clamp(0.03rem, 0.3cqi, 0.1rem);
+    font-size: clamp(1rem, 4.5cqi, 1.8rem);
     line-height: 1.2;
-    margin-bottom: 1.0rem;
-    padding-top: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    margin-bottom: clamp(var(--space-xs), 2.5cqi, var(--space-md));
+    padding: clamp(var(--space-xs), 1.5cqi, var(--space-sm));
 }
 
 .char {
@@ -86,14 +68,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.4rem;
+    gap: clamp(0.1rem, 1cqi, 0.4rem);
     color: var(--color-whiteboard-ink);
-    font-size: 1.2rem;
-    min-height: 3.2rem;
+    font-size: clamp(0.8rem, 3cqi, 1.2rem);
+    min-height: clamp(2rem, 8cqi, 3.2rem);
 }
 
 .bracket {
-    font-size: 1.2rem;
+    font-size: inherit;
     font-weight: 700;
     color: var(--color-whiteboard-ink);
     line-height: 1;
@@ -119,10 +101,17 @@
 
 .error,
 .empty {
-    margin-top: 1rem;
-    font-size: 1.4rem;
+    margin-top: clamp(var(--space-xs), 2.5cqi, var(--space-md));
+    font-size: clamp(0.9rem, 3.5cqi, 1.4rem);
 }
 
 .error {
     color: var(--color-annotation);
+}
+
+@container whiteboard (max-width: 28rem) {
+    .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
 }

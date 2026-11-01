@@ -1,0 +1,15 @@
+.boards {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.8fr) minmax(24rem, 1.4fr) minmax(12rem, 0.8fr);
+    align-items: center;
+    width: 100%;
+    padding: var(--space-lg);
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+@media (max-width: 960px) {
+    .boards {
+        grid-template-columns: 1fr;
+    }
+}

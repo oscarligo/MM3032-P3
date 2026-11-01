@@ -57,6 +57,18 @@ type RootTranslation = {
 		 * E​s​t​a​ ​s​e​c​c​i​ó​n​ ​p​e​r​m​i​t​e​ ​e​v​a​l​u​a​r​ ​f​ó​r​m​u​l​a​s​ ​l​ó​g​i​c​a​s​ ​y​ ​v​i​s​u​a​l​i​z​a​r​ ​s​u​ ​e​s​t​r​u​c​t​u​r​a​.
 		 */
 		description: string
+		/**
+		 * P​i​z​a​r​r​ó​n​ ​i​z​q​u​i​e​r​d​o
+		 */
+		leftBoard: string
+		/**
+		 * P​i​z​a​r​r​ó​n​ ​c​e​n​t​r​a​l
+		 */
+		centerBoard: string
+		/**
+		 * P​i​z​a​r​r​ó​n​ ​d​e​r​e​c​h​o
+		 */
+		rightBoard: string
 	}
 	procedure: {
 		/**
@@ -242,6 +254,18 @@ export type TranslationFunctions = {
 		 * Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.
 		 */
 		description: () => LocalizedString
+		/**
+		 * Pizarrón izquierdo
+		 */
+		leftBoard: () => LocalizedString
+		/**
+		 * Pizarrón central
+		 */
+		centerBoard: () => LocalizedString
+		/**
+		 * Pizarrón derecho
+		 */
+		rightBoard: () => LocalizedString
 	}
 	procedure: {
 		/**

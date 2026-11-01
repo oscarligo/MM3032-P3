@@ -2,8 +2,6 @@
     position: sticky;
     bottom: var(--space-lg, 1.5rem);
     z-index: 50;
-
-    /* Centrado horizontal robusto para elementos sticky */
     margin-inline: auto;
     width: max-content;
     max-width: calc(100vw - 2rem);
