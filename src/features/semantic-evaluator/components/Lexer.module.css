@@ -61,8 +61,8 @@
     gap: 0.1rem;
     font-size: 1.8rem;
     line-height: 1.2;
+    margin-bottom: 1.0rem;
     padding-top: 0.5rem;
-    padding-bottom: 1.5rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
@@ -104,27 +104,17 @@
     align-items: center;
 }
 
-.activeSlot {
-    position: relative;
+.slotContainer {
     display: inline-flex;
-    min-width: 4.5rem;
-    min-height: 2.8rem;
     align-items: center;
-    justify-content: flex-start;
-    color: var(--color-annotation);
+    line-height: 1;
     z-index: 4;
 }
 
-.activeSlot > span:last-child {
-    position: absolute;
-    inset: 0;
+.previewSymbol {
     display: inline-flex;
     align-items: center;
-}
-
-.glyphMorph {
-    display: inline-flex;
-    align-items: center;
+    color: var(--color-annotation);
 }
 
 .controls {

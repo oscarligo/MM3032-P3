@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
 
@@ -7,13 +7,12 @@ const DEFAULT_FORMULA = "∀x (P(x) → ∃y Q(x, y))";
 export function useLexerVisualization() {
     const [input, setInput] = useState(DEFAULT_FORMULA);
     const [stepIndex, setStepIndex] = useState(-1);
+    const [settledCount, setSettledCount] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
     const boardRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
-    const tokenSlotRef = useRef<HTMLSpanElement>(null);
-    const [tokenOffset, setTokenOffset] = useState({ x: 0, y: 0 });
 
     const result = useMemo(() => {
         if (!input.trim()) return { tokens: [], steps: [], error: "" };
@@ -34,30 +33,40 @@ export function useLexerVisualization() {
     }, [input]);
 
     const currentStep: LexerStep | undefined =
-        stepIndex >= 0 ? result.steps[stepIndex] : undefined;
+        stepIndex >= 0 && stepIndex < result.steps.length
+            ? result.steps[stepIndex]
+            : undefined;
 
-    const settledTokens =
-        stepIndex >= 0 ? result.steps.slice(0, stepIndex) : [];
+    const settledTokens = result.steps.slice(0, settledCount);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         setStepIndex(-1);
+        setSettledCount(0);
         setIsPlaying(false);
     }, [input]);
 
+    const advance = () => {
+        if (stepIndex < 0) {
+            setStepIndex(0);
+            return;
+        }
+        if (stepIndex < result.steps.length) {
+            setSettledCount(Math.min(stepIndex + 1, result.steps.length));
+            setStepIndex(stepIndex + 1);
+        }
+    };
+
     useEffect(() => {
         if (!isPlaying) return;
-        if (stepIndex >= result.steps.length - 1) {
+        if (stepIndex >= result.steps.length) {
             setIsPlaying(false);
             return;
         }
-
-        const timer = window.setTimeout(() => {
-            setStepIndex((prev) => (prev < 0 ? 0 : prev + 1));
-        }, 1100);
-
+        const timer = window.setTimeout(advance, 650);
         return () => window.clearTimeout(timer);
     }, [isPlaying, stepIndex, result.steps.length]);
 
+    // Renderizado del círculo de RoughJS y cálculo de coordenadas hacia el slot destino
     useEffect(() => {
         const canvas = canvasRef.current;
         const board = boardRef.current;
@@ -71,7 +80,7 @@ export function useLexerVisualization() {
         canvas.height = boardRect.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (!currentStep || stepIndex < 0) return;
+        if (!currentStep || stepIndex < 0 || stepIndex >= result.steps.length) return;
 
         const startEl = charRefs.current[currentStep.cursor];
         const endEl =
@@ -88,23 +97,53 @@ export function useLexerVisualization() {
         const height = Math.max(startRect.bottom, endRect.bottom) - boardRect.top - top;
 
         const rc = rough.canvas(canvas);
-        const annotationColor = getComputedStyle(board).getPropertyValue("--color-annotation").trim() || getComputedStyle(board).color;
+        const annotationColor =
+            getComputedStyle(board).getPropertyValue("--color-annotation").trim() ||
+            getComputedStyle(board).color;
+
         rc.ellipse(
-            left + width / 2, 
-            top + height / 2, 
-            Math.max(width, 36), 
-            Math.max(height, 36), 
+            left + width / 2,
+            top + height / 2,
+            Math.max(width, 36),
+            Math.max(height, 36),
             { stroke: annotationColor, strokeWidth: 2, roughness: 1.8, bowing: 1.2 }
         );
 
-        const tokenRect = tokenSlotRef.current?.getBoundingClientRect();
-        if (tokenRect) {
-            setTokenOffset({
-                x: left + width / 2 + boardRect.left - (tokenRect.left + tokenRect.width / 2),
-                y: top + height / 2 + boardRect.top - (tokenRect.top + tokenRect.height / 2),
-            });
-        }
     }, [currentStep, stepIndex, input]);
+
+    const next = () => {
+        advance();
+    };
+
+    const previous = () => {
+        if (stepIndex <= 0) {
+            setStepIndex(-1);
+            setSettledCount(0);
+            return;
+        }
+        setStepIndex((s) => s - 1);
+        setSettledCount((c) => Math.max(0, c - 1));
+    };
+
+    const restart = () => {
+        setStepIndex(-1);
+        setSettledCount(0);
+        setIsPlaying(false);
+    };
+
+    const togglePlaying = () => {
+        if (stepIndex >= result.steps.length) {
+            setStepIndex(0);
+            setSettledCount(0);
+            setIsPlaying(true);
+            return;
+        }
+        if (stepIndex < 0) {
+            setStepIndex(0);
+            setSettledCount(0);
+        }
+        setIsPlaying((p) => !p);
+    };
 
     return {
         input,
@@ -118,17 +157,9 @@ export function useLexerVisualization() {
         boardRef,
         canvasRef,
         charRefs,
-        tokenSlotRef,
-        tokenOffset,
-        previous: () => setStepIndex((s) => Math.max(0, s - 1)),
-        restart: () => {
-            setStepIndex(-1);
-            setIsPlaying(false);
-        },
-        togglePlaying: () => {
-            if (stepIndex < 0) setStepIndex(0);
-            setIsPlaying((p) => !p);
-        },
-        next: () => setStepIndex((s) => (s < 0 ? 0 : Math.min(result.steps.length - 1, s + 1))),
+        previous,
+        restart,
+        togglePlaying,
+        next,
     };
 }
