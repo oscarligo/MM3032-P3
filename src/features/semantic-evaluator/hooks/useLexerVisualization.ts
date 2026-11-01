@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
+import { useProcedureStore } from "../../../store/store_control";
 
 const DEFAULT_FORMULA = "∀x (P(x) → ∃y Q(x, y))";
 
 export function useLexerVisualization() {
     const [input, setInput] = useState(DEFAULT_FORMULA);
-    const [stepIndex, setStepIndex] = useState(-1);
-    const [settledCount, setSettledCount] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const stepIndex = useProcedureStore((state) => state.stepIndex);
+    const setProcedure = useProcedureStore((state) => state.setProcedure);
+    const clearProcedure = useProcedureStore((state) => state.clearProcedure);
 
     const boardRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,34 +38,13 @@ export function useLexerVisualization() {
             ? result.steps[stepIndex]
             : undefined;
 
-    const settledTokens = result.steps.slice(0, settledCount);
+    const settledTokens = result.steps.slice(0, Math.max(0, stepIndex));
 
     useEffect(() => {
-        setStepIndex(-1);
-        setSettledCount(0);
-        setIsPlaying(false);
-    }, [input]);
+        setProcedure("lexer", result.steps.length);
+    }, [input, result.steps.length, setProcedure]);
 
-    const advance = () => {
-        if (stepIndex < 0) {
-            setStepIndex(0);
-            return;
-        }
-        if (stepIndex < result.steps.length) {
-            setSettledCount(Math.min(stepIndex + 1, result.steps.length));
-            setStepIndex(stepIndex + 1);
-        }
-    };
-
-    useEffect(() => {
-        if (!isPlaying) return;
-        if (stepIndex >= result.steps.length) {
-            setIsPlaying(false);
-            return;
-        }
-        const timer = window.setTimeout(advance, 650);
-        return () => window.clearTimeout(timer);
-    }, [isPlaying, stepIndex, result.steps.length]);
+    useEffect(() => () => clearProcedure("lexer"), [clearProcedure]);
 
     // Renderizado del círculo de RoughJS y cálculo de coordenadas hacia el slot destino
     useEffect(() => {
@@ -111,40 +91,6 @@ export function useLexerVisualization() {
 
     }, [currentStep, stepIndex, input]);
 
-    const next = () => {
-        advance();
-    };
-
-    const previous = () => {
-        if (stepIndex <= 0) {
-            setStepIndex(-1);
-            setSettledCount(0);
-            return;
-        }
-        setStepIndex((s) => s - 1);
-        setSettledCount((c) => Math.max(0, c - 1));
-    };
-
-    const restart = () => {
-        setStepIndex(-1);
-        setSettledCount(0);
-        setIsPlaying(false);
-    };
-
-    const togglePlaying = () => {
-        if (stepIndex >= result.steps.length) {
-            setStepIndex(0);
-            setSettledCount(0);
-            setIsPlaying(true);
-            return;
-        }
-        if (stepIndex < 0) {
-            setStepIndex(0);
-            setSettledCount(0);
-        }
-        setIsPlaying((p) => !p);
-    };
-
     return {
         input,
         setInput,
@@ -152,14 +98,9 @@ export function useLexerVisualization() {
         currentStep,
         settledTokens,
         stepIndex,
-        isPlaying,
         hasStarted: stepIndex >= 0,
         boardRef,
         canvasRef,
         charRefs,
-        previous,
-        restart,
-        togglePlaying,
-        next,
     };
 }

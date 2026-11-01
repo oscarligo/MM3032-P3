@@ -117,28 +117,6 @@
     color: var(--color-annotation);
 }
 
-.controls {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 2rem;
-    font-family: var(--font-family);
-}
-
-.btn {
-    background: transparent;
-    border: 1px dashed currentColor;
-    color: inherit;
-    padding: 0.3rem 0.75rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
 .error,
 .empty {
     margin-top: 1rem;

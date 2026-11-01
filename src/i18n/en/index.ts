@@ -10,6 +10,10 @@ const en = {
 		title: 'Semantic evaluator',
 		description: 'This section evaluates logical formulas and visualizes their structure.',
 	},
+	procedure: {
+		controls: 'Procedure controls', progress: 'Step {current} of {total}',
+		previous: 'Previous', restart: 'Restart', play: 'Play', pause: 'Pause', next: 'Next',
+	},
 	lexer: {
 		title: 'Lexical analyzer', subtitle: 'See how the formula becomes tokens, one step at a time.',
 		language: 'Language', spanish: 'Spanish', english: 'English', inputLabel: 'Logical formula',

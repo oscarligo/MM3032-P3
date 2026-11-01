@@ -18,18 +18,11 @@ const StaticChalk = ({ children }: { children: string | number }) => (
     </TegakiRenderer>
 );
 
-const CtrlBtn = ({ onClick, disabled, label }: { onClick: () => void; disabled?: boolean; label: string }) => (
-    <button className={styles.btn} onClick={onClick} disabled={disabled}>
-        <StaticChalk>{label}</StaticChalk>
-    </button>
-);
-
 export default function Lexer() {
     const { LL } = useI18nContext();
     const {
-        input, setInput, result, currentStep, settledTokens, stepIndex,
-        isPlaying, hasStarted, boardRef, canvasRef, charRefs,
-        previous, restart, togglePlaying, next,
+        input, setInput, result, currentStep, settledTokens,
+        hasStarted, boardRef, canvasRef, charRefs,
     } = useLexerVisualization();
 
     return (
@@ -99,28 +92,6 @@ export default function Lexer() {
                         </div>
                     )}
 
-                    <div className={styles.controls}>
-                        <CtrlBtn
-                            onClick={previous}
-                            disabled={stepIndex < 0}
-                            label={LL.lexer.previous()}
-                        />
-                        <CtrlBtn
-                            onClick={restart}
-                            disabled={stepIndex < 0 && !isPlaying}
-                            label={LL.lexer.restart()}
-                        />
-                        <CtrlBtn
-                            onClick={togglePlaying}
-                            disabled={result.steps.length < 1}
-                            label={isPlaying ? LL.lexer.pause() : LL.lexer.play()}
-                        />
-                        <CtrlBtn
-                            onClick={next}
-                            disabled={stepIndex >= result.steps.length}
-                            label={LL.lexer.next()}
-                        />
-                    </div>
                 </div>
             ) : (
                 <p className={styles.empty}><Chalk>{LL.lexer.empty()}</Chalk></p>

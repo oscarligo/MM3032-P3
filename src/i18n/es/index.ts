@@ -10,6 +10,10 @@ const es = {
 		title: 'Evaluador semántico',
 		description: 'Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.',
 	},
+	procedure: {
+		controls: 'Controles del procedimiento', progress: 'Paso {current:number} de {total:number}',
+		previous: 'Anterior', restart: 'Reiniciar', play: 'Reproducir', pause: 'Pausar', next: 'Siguiente',
+	},
 	lexer: {
 		title: 'Analizador léxico', subtitle: 'Observa cómo la fórmula se convierte en tokens, paso a paso.',
 		language: 'Idioma', spanish: 'Español', english: 'Inglés', inputLabel: 'Fórmula lógica',

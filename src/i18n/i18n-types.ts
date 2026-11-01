@@ -58,6 +58,38 @@ type RootTranslation = {
 		 */
 		description: string
 	}
+	procedure: {
+		/**
+		 * C​o​n​t​r​o​l​e​s​ ​d​e​l​ ​p​r​o​c​e​d​i​m​i​e​n​t​o
+		 */
+		controls: string
+		/**
+		 * P​a​s​o​ ​{​c​u​r​r​e​n​t​}​ ​d​e​ ​{​t​o​t​a​l​}
+		 * @param {number} current
+		 * @param {number} total
+		 */
+		progress: RequiredParams<'current' | 'total'>
+		/**
+		 * A​n​t​e​r​i​o​r
+		 */
+		previous: string
+		/**
+		 * R​e​i​n​i​c​i​a​r
+		 */
+		restart: string
+		/**
+		 * R​e​p​r​o​d​u​c​i​r
+		 */
+		play: string
+		/**
+		 * P​a​u​s​a​r
+		 */
+		pause: string
+		/**
+		 * S​i​g​u​i​e​n​t​e
+		 */
+		next: string
+	}
 	lexer: {
 		/**
 		 * A​n​a​l​i​z​a​d​o​r​ ​l​é​x​i​c​o
@@ -210,6 +242,36 @@ export type TranslationFunctions = {
 		 * Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.
 		 */
 		description: () => LocalizedString
+	}
+	procedure: {
+		/**
+		 * Controles del procedimiento
+		 */
+		controls: () => LocalizedString
+		/**
+		 * Paso {current} de {total}
+		 */
+		progress: (arg: { current: number, total: number }) => LocalizedString
+		/**
+		 * Anterior
+		 */
+		previous: () => LocalizedString
+		/**
+		 * Reiniciar
+		 */
+		restart: () => LocalizedString
+		/**
+		 * Reproducir
+		 */
+		play: () => LocalizedString
+		/**
+		 * Pausar
+		 */
+		pause: () => LocalizedString
+		/**
+		 * Siguiente
+		 */
+		next: () => LocalizedString
 	}
 	lexer: {
 		/**
