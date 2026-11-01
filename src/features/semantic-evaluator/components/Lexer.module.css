@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
+
+.boardSection {
+    width: 100%;
+    padding: 1.25rem 2rem;
+    font-family: 'Caveat', cursive, sans-serif;
+    color: inherit;
+    box-sizing: border-box;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.9rem;
+}
+
+.titleGroup h1 {
+    font-size: 1.15rem;
+    margin: 0;
+}
+
+.statusText {
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.inputsRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.input {
+    padding: 0.35rem 0.65rem;
+    border: 1px dashed currentColor;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+/* Área principal del pizarrón */
+.canvasArea {
+    position: relative;
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+    min-height: 240px;
+}
+
+.roughCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* 1. Expresión superior con Tegaki + capa espejo de medición */
+.formulaWrapper {
+    position: relative;
+    display: inline-block;
+    font-size: 2.8rem;
+    line-height: 1.2;
+    letter-spacing: 0.06em;
+    margin-bottom: 4.5rem;
+}
+
+.formulaTegaki {
+    display: block;
+}
+
+.measureLayer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    white-space: pre;
+    color: transparent;
+    pointer-events: none;
+    user-select: none;
+}
+
+.measureChar {
+    display: inline-block;
+    white-space: pre;
+}
+
+/* 2. Animación: Copia que baja y hace cross-fade al nombre del Token */
+.floatingClone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    pointer-events: none;
+    font-family: 'Caveat', cursive;
+    font-size: 2.4rem;
+    font-weight: 700;
+    transform: translate(var(--start-x), var(--start-y));
+    animation: moveDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes moveDown {
+    0% {
+        transform: translate(var(--start-x), var(--start-y)) scale(1);
+    }
+    100% {
+        transform: translate(var(--end-x), var(--end-y)) scale(0.95);
+    }
+}
+
+.cloneSymbol {
+    display: inline-block;
+    color: #e11d48;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 1;
+}
+
+.cloneToken {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 0;
+    transform: scale(0.85);
+}
+
+/* Estado 'morph': desvanece el símbolo y aparece el nombre del Token */
+.morphing {
+    transform: translate(var(--end-x), var(--end-y));
+}
+
+.morphing .cloneSymbol {
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+.morphing .cloneToken {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 3. Lista inferior estilo pizarrón: [FORALL, IDENT, ...] */
+.tokensRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 2.2rem;
+    min-height: 3.2rem;
+}
+
+.bracket {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.settledToken {
+    display: inline-flex;
+    align-items: center;
+}
+
+.landingSlot {
+    display: inline-block;
+    min-width: 90px;
+    height: 2rem;
+}
+
+.ellipsis {
+    opacity: 0.6;
+    letter-spacing: 0.1em;
+}
+
+/* Controles de paso */
+.controls {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 2rem;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.controls button {
+    background: transparent;
+    border: 1px dashed currentColor;
+    color: inherit;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.controls button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.error, .empty {
+    margin-top: 1rem;
+    font-size: 1.4rem;
+}
+
+.error {
+    color: #e11d48;
+}
