@@ -1,11 +1,20 @@
 .boards {
     display: grid;
-    grid-template-columns: minmax(12rem, 0.8fr) minmax(24rem, 1.4fr) minmax(12rem, 0.8fr);
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
     align-items: center;
     width: 100%;
     padding: var(--space-lg);
-    padding-left: 5rem;
-    padding-right: 5rem;
+    padding-inline: clamp(1rem, 5vw, 5rem);
+    gap: var(--space-md);
+}
+
+.boards > section {
+    min-width: 0;
+}
+
+.procedureBoard,
+.secondaryBoard {
+    overflow: hidden;
 }
 
 @media (max-width: 960px) {

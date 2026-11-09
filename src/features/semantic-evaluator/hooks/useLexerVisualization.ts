@@ -1,14 +1,18 @@
 import { useEffect, useMemo, useRef } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
-import { useProcedureStore } from "../../../store/store_control";
+import { procedureOffset, useProcedureStore } from "../../../store/store_control";
 import { useFormulaStore } from "../../../store/store_formula";
 
 export function useLexerVisualization() {
     const input = useFormulaStore((state) => state.formula);
-    const stepIndex = useProcedureStore((state) => state.stepIndex);
-    const setProcedure = useProcedureStore((state) => state.setProcedure);
-    const clearProcedure = useProcedureStore((state) => state.clearProcedure);
+    const globalStep = useProcedureStore((state) => state.stepIndex);
+    const procedures = useProcedureStore((state) => state.procedures);
+    const registerProcedure = useProcedureStore((state) => state.registerProcedure);
+    const unregisterProcedure = useProcedureStore((state) => state.unregisterProcedure);
+    const stepIndex = globalStep - procedureOffset(procedures, "lexer");
+    const parserOffset = procedureOffset(procedures, "parser");
+    const parserStepIndex = globalStep - parserOffset;
 
     const boardRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -36,14 +40,18 @@ export function useLexerVisualization() {
         stepIndex >= 0 && stepIndex < result.steps.length
             ? result.steps[stepIndex]
             : undefined;
+    const parserFocusStep = procedures.parser && parserStepIndex >= 0
+        ? result.steps[parserStepIndex]
+        : undefined;
+    const focusStep = procedures.parser && parserStepIndex >= 0 ? parserFocusStep : currentStep;
 
     const settledTokens = result.steps.slice(0, Math.max(0, stepIndex));
 
     useEffect(() => {
-        setProcedure("lexer", result.steps.length);
-    }, [input, result.steps.length, setProcedure]);
+        registerProcedure("lexer", result.steps.length, 0);
+    }, [input, result.steps.length, registerProcedure]);
 
-    useEffect(() => () => clearProcedure("lexer"), [clearProcedure]);
+    useEffect(() => () => unregisterProcedure("lexer"), [unregisterProcedure]);
 
     // Renderizado del círculo de RoughJS y cálculo de coordenadas hacia el slot destino
     useEffect(() => {
@@ -51,44 +59,56 @@ export function useLexerVisualization() {
         const board = boardRef.current;
         if (!canvas || !board) return;
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+        const draw = () => {
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
 
-        const boardRect = board.getBoundingClientRect();
-        canvas.width = boardRect.width;
-        canvas.height = boardRect.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const boardRect = board.getBoundingClientRect();
+            const scaleX = boardRect.width / board.offsetWidth || 1;
+            const scaleY = boardRect.height / board.offsetHeight || 1;
+            canvas.width = board.offsetWidth;
+            canvas.height = board.offsetHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!focusStep) return;
 
-        if (!currentStep || stepIndex < 0 || stepIndex >= result.steps.length) return;
+            const rc = rough.canvas(canvas);
+            const annotationColor =
+                getComputedStyle(board).getPropertyValue("--color-annotation").trim() ||
+                getComputedStyle(board).color;
+            const lines = new Map<number, { left: number; right: number; top: number; bottom: number }>();
+            const characters = charRefs.current.slice(focusStep.cursor, focusStep.cursor + focusStep.matchedText.length);
+            for (const character of characters) {
+                if (!character) continue;
+                const rect = character.getBoundingClientRect();
+                const top = (rect.top - boardRect.top) / scaleY;
+                const left = (rect.left - boardRect.left) / scaleX;
+                const right = (rect.right - boardRect.left) / scaleX;
+                const bottom = (rect.bottom - boardRect.top) / scaleY;
+                const key = Math.round(top);
+                const line = lines.get(key);
+                lines.set(key, {
+                    left: Math.min(line?.left ?? left, left),
+                    right: Math.max(line?.right ?? right, right),
+                    top,
+                    bottom: Math.max(line?.bottom ?? bottom, bottom),
+                });
+            }
+            // A token can wrap onto multiple lines on a narrow board.
+            for (const { left, right, top, bottom } of lines.values()) {
+                const width = right - left;
+                const height = bottom - top;
+                rc.ellipse(left + width / 2, top + height / 2, Math.max(width, height * 0.75), height, {
+                    stroke: annotationColor, strokeWidth: 2, roughness: 1.8, bowing: 1.2,
+                });
+            }
+        };
+        draw();
+        const observer = new ResizeObserver(draw);
+        observer.observe(board);
+        charRefs.current.forEach((character) => { if (character) observer.observe(character); });
+        return () => observer.disconnect();
 
-        const startEl = charRefs.current[currentStep.cursor];
-        const endEl =
-            charRefs.current[currentStep.cursor + Math.max(0, currentStep.matchedText.length - 1)] ||
-            startEl;
-        if (!startEl || !endEl) return;
-
-        const startRect = startEl.getBoundingClientRect();
-        const endRect = endEl.getBoundingClientRect();
-
-        const left = startRect.left - boardRect.left;
-        const width = endRect.right - boardRect.left - left;
-        const top = Math.min(startRect.top, endRect.top) - boardRect.top;
-        const height = Math.max(startRect.bottom, endRect.bottom) - boardRect.top - top;
-
-        const rc = rough.canvas(canvas);
-        const annotationColor =
-            getComputedStyle(board).getPropertyValue("--color-annotation").trim() ||
-            getComputedStyle(board).color;
-
-        rc.ellipse(
-            left + width / 2,
-            top + height / 2,
-            Math.max(width, height * 0.75),
-            height,
-            { stroke: annotationColor, strokeWidth: 2, roughness: 1.8, bowing: 1.2 }
-        );
-
-    }, [currentStep, stepIndex, input]);
+    }, [focusStep, input]);
 
     return {
         input,

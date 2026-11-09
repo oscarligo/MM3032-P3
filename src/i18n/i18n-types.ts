@@ -102,6 +102,132 @@ type RootTranslation = {
 		 */
 		next: string
 	}
+	parser: {
+		/**
+		 * E​s​t​r​u​c​t​u​r​a​ ​g​e​n​e​r​a​d​a
+		 */
+		structure: string
+		/**
+		 * Á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o
+		 */
+		tree: string
+		/**
+		 * E​l​ ​p​a​r​s​e​r​ ​c​o​m​e​n​z​a​r​á​ ​d​e​s​p​u​é​s​ ​d​e​l​ ​l​e​x​e​r​.
+		 */
+		waiting: string
+		/**
+		 * C​o​n​s​t​r​u​y​e​n​d​o​ ​e​l​ ​á​r​b​o​l​…
+		 */
+		building: string
+		/**
+		 * V​a​r​i​a​b​l​e​ ​l​i​g​a​d​a
+		 */
+		bound: string
+		/**
+		 * V​a​r​i​a​b​l​e​ ​l​i​b​r​e
+		 */
+		free: string
+		/**
+		 * N​o​ ​s​e​ ​p​u​d​o​ ​c​o​n​s​t​r​u​i​r​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​.
+		 */
+		invalid: string
+		/**
+		 * L​l​a​m​a​d​a
+		 */
+		call: string
+		/**
+		 * C​o​i​n​c​i​d​e​n​c​i​a
+		 */
+		match: string
+		/**
+		 * A​v​a​n​c​e
+		 */
+		shift: string
+		/**
+		 * R​e​d​u​c​c​i​ó​n
+		 */
+		reduce: string
+		/**
+		 * L​i​g​a​r​ ​v​a​r​i​a​b​l​e
+		 */
+		bind: string
+		/**
+		 * C​e​r​r​a​r​ ​a​l​c​a​n​c​e
+		 */
+		unbind: string
+		/**
+		 * F​u​n​c​i​ó​n​ ​a​c​t​u​a​l
+		 */
+		currentFunction: string
+		/**
+		 * L​l​a​m​a​d​a​s​ ​d​e​l​ ​t​o​k​e​n
+		 */
+		functionHistory: string
+		/**
+		 * T​o​k​e​n​s​ ​d​e​l​ ​l​e​x​e​r
+		 */
+		tokenStream: string
+		/**
+		 * T​o​k​e​n​ ​a​c​t​u​a​l
+		 */
+		currentToken: string
+		/**
+		 * D​e​c​i​s​i​ó​n
+		 */
+		decision: string
+		/**
+		 * A​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​u​n​i​v​e​r​s​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
+		 */
+		openUniversal: string
+		/**
+		 * A​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​e​x​i​s​t​e​n​c​i​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
+		 */
+		openExistential: string
+		/**
+		 * C​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​n​e​g​a​c​i​ó​n​ ​y​ ​a​n​a​l​i​z​a​ ​s​u​ ​o​p​e​r​a​n​d​o​.
+		 */
+		buildNegation: string
+		/**
+		 * C​r​e​a​ ​u​n​a​ ​i​m​p​l​i​c​a​c​i​ó​n​;​ ​e​l​ ​á​r​b​o​l​ ​i​z​q​u​i​e​r​d​o​ ​s​e​r​á​ ​e​l​ ​a​n​t​e​c​e​d​e​n​t​e​ ​y​ ​e​l​ ​d​e​r​e​c​h​o​ ​e​l​ ​c​o​n​s​e​c​u​e​n​t​e​.
+		 */
+		buildImplication: string
+		/**
+		 * C​r​e​a​ ​u​n​a​ ​d​i​s​y​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
+		 */
+		buildDisjunction: string
+		/**
+		 * C​r​e​a​ ​u​n​a​ ​c​o​n​j​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
+		 */
+		buildConjunction: string
+		/**
+		 * A​b​r​e​ ​u​n​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​y​ ​c​o​m​i​e​n​z​a​ ​a​ ​a​n​a​l​i​z​a​r​l​a​.
+		 */
+		openGroup: string
+		/**
+		 * C​i​e​r​r​a​ ​l​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​a​c​t​u​a​l​.
+		 */
+		closeGroup: string
+		/**
+		 * T​e​r​m​i​n​a​ ​e​l​ ​a​r​g​u​m​e​n​t​o​ ​a​c​t​u​a​l​ ​y​ ​c​o​m​i​e​n​z​a​ ​e​l​ ​s​i​g​u​i​e​n​t​e​.
+		 */
+		nextArgument: string
+		/**
+		 * C​o​n​f​i​r​m​a​ ​E​O​F​:​ ​l​a​ ​f​ó​r​m​u​l​a​ ​y​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​ ​e​s​t​á​n​ ​c​o​m​p​l​e​t​o​s​.
+		 */
+		finishFormula: string
+		/**
+		 * R​e​g​i​s​t​r​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​v​a​r​i​a​b​l​e​ ​l​i​g​a​d​a​ ​d​e​l​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​a​c​t​i​v​o​.
+		 */
+		bindVariable: string
+		/**
+		 * I​n​t​e​r​p​r​e​t​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​t​é​r​m​i​n​o​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​o​ ​f​u​n​c​i​ó​n​.
+		 */
+		readTerm: string
+		/**
+		 * C​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​p​r​e​d​i​c​a​d​o​ ​y​ ​p​r​e​p​a​r​a​ ​l​a​ ​l​e​c​t​u​r​a​ ​d​e​ ​s​u​s​ ​a​r​g​u​m​e​n​t​o​s​.
+		 */
+		buildPredicate: string
+	}
 	lexer: {
 		/**
 		 * A​n​a​l​i​z​a​d​o​r​ ​l​é​x​i​c​o
@@ -296,6 +422,132 @@ export type TranslationFunctions = {
 		 * Siguiente
 		 */
 		next: () => LocalizedString
+	}
+	parser: {
+		/**
+		 * Estructura generada
+		 */
+		structure: () => LocalizedString
+		/**
+		 * Árbol sintáctico
+		 */
+		tree: () => LocalizedString
+		/**
+		 * El parser comenzará después del lexer.
+		 */
+		waiting: () => LocalizedString
+		/**
+		 * Construyendo el árbol…
+		 */
+		building: () => LocalizedString
+		/**
+		 * Variable ligada
+		 */
+		bound: () => LocalizedString
+		/**
+		 * Variable libre
+		 */
+		free: () => LocalizedString
+		/**
+		 * No se pudo construir el árbol sintáctico.
+		 */
+		invalid: () => LocalizedString
+		/**
+		 * Llamada
+		 */
+		call: () => LocalizedString
+		/**
+		 * Coincidencia
+		 */
+		match: () => LocalizedString
+		/**
+		 * Avance
+		 */
+		shift: () => LocalizedString
+		/**
+		 * Reducción
+		 */
+		reduce: () => LocalizedString
+		/**
+		 * Ligar variable
+		 */
+		bind: () => LocalizedString
+		/**
+		 * Cerrar alcance
+		 */
+		unbind: () => LocalizedString
+		/**
+		 * Función actual
+		 */
+		currentFunction: () => LocalizedString
+		/**
+		 * Llamadas del token
+		 */
+		functionHistory: () => LocalizedString
+		/**
+		 * Tokens del lexer
+		 */
+		tokenStream: () => LocalizedString
+		/**
+		 * Token actual
+		 */
+		currentToken: () => LocalizedString
+		/**
+		 * Decisión
+		 */
+		decision: () => LocalizedString
+		/**
+		 * Abre un cuantificador universal y espera la variable que quedará ligada.
+		 */
+		openUniversal: () => LocalizedString
+		/**
+		 * Abre un cuantificador existencial y espera la variable que quedará ligada.
+		 */
+		openExistential: () => LocalizedString
+		/**
+		 * Crea un nodo de negación y analiza su operando.
+		 */
+		buildNegation: () => LocalizedString
+		/**
+		 * Crea una implicación; el árbol izquierdo será el antecedente y el derecho el consecuente.
+		 */
+		buildImplication: () => LocalizedString
+		/**
+		 * Crea una disyunción con las subfórmulas izquierda y derecha.
+		 */
+		buildDisjunction: () => LocalizedString
+		/**
+		 * Crea una conjunción con las subfórmulas izquierda y derecha.
+		 */
+		buildConjunction: () => LocalizedString
+		/**
+		 * Abre una subfórmula agrupada y comienza a analizarla.
+		 */
+		openGroup: () => LocalizedString
+		/**
+		 * Cierra la subfórmula agrupada actual.
+		 */
+		closeGroup: () => LocalizedString
+		/**
+		 * Termina el argumento actual y comienza el siguiente.
+		 */
+		nextArgument: () => LocalizedString
+		/**
+		 * Confirma EOF: la fórmula y el árbol sintáctico están completos.
+		 */
+		finishFormula: () => LocalizedString
+		/**
+		 * Registra el identificador como variable ligada del cuantificador activo.
+		 */
+		bindVariable: () => LocalizedString
+		/**
+		 * Interpreta el identificador como término del predicado o función.
+		 */
+		readTerm: () => LocalizedString
+		/**
+		 * Crea un nodo de predicado y prepara la lectura de sus argumentos.
+		 */
+		buildPredicate: () => LocalizedString
 	}
 	lexer: {
 		/**

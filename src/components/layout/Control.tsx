@@ -15,7 +15,7 @@ export default function Control() {
 
     useEffect(() => {
         if (!isPlaying) return;
-        if (stepIndex >= totalSteps) {
+        if (stepIndex >= totalSteps - 1) {
             next();
             return;
         }
@@ -34,7 +34,7 @@ export default function Control() {
                 <button type="button" onClick={previous} disabled={stepIndex < 0}>{LL.procedure.previous()}</button>
                 <button type="button" onClick={restart} disabled={stepIndex < 0 && !isPlaying}>{LL.procedure.restart()}</button>
                 <button type="button" onClick={togglePlaying}>{isPlaying ? LL.procedure.pause() : LL.procedure.play()}</button>
-                <button type="button" onClick={next} disabled={stepIndex >= totalSteps}>{LL.procedure.next()}</button>
+                <button type="button" onClick={next} disabled={stepIndex >= totalSteps - 1}>{LL.procedure.next()}</button>
             </div>
         </footer>
     );

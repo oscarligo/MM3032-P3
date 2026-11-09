@@ -1,25 +1,35 @@
 import Whiteboard from "./components/Whiteboard";
 import Lexer from "./components/Lexer";
 import FormulaInput from "./components/FormulaInput";
+import ParseTree from "./components/ParseTree";
+import FitContent from "./components/FitContent";
+import { useParserVisualization } from "./hooks/useParserVisualization";
 import { useI18nContext } from "../../i18n/i18n-react";
 import styles from "./SemanticEvaluator.module.css";
 
 
 export default function SemanticEvaluator() {
     const { LL } = useI18nContext();
+    const parser = useParserVisualization();
 
     return (
         <div className={styles.boards}>
             <Whiteboard
                 width="100%"
-                minHeight="22rem"
+                height="24rem"
+                minHeight="24rem"
                 padding="var(--space-lg)"
+                className={styles.procedureBoard}
                 ariaLabel={LL.semanticEvaluator.leftBoard()}
             >
-                <Lexer />
+                <FitContent>
+                    <Lexer />
+                    <ParseTree mode="procedure" visualization={parser} />
+                </FitContent>
             </Whiteboard>
             <Whiteboard
                 width="100%"
+                height="var(--whiteboard-min-height)"
                 minHeight="var(--whiteboard-min-height)"
                 ariaLabel={LL.semanticEvaluator.centerBoard()}
             >
@@ -27,8 +37,10 @@ export default function SemanticEvaluator() {
             </Whiteboard>
             <Whiteboard
                 width="100%"
-                minHeight="22rem"
+                height="24rem"
+                minHeight="24rem"
                 padding="var(--space-lg)"
+                className={styles.secondaryBoard}
                 ariaLabel={LL.semanticEvaluator.rightBoard()}
             />
         </div>

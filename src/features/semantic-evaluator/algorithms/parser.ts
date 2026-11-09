@@ -2,33 +2,53 @@ import { Formula, Term } from "../types";
 import { Token, tokenize, TokenType } from "./lexer";
 
 /*
-    Clase FormulaParser que implementa un parser para fórmulas de lógica 
-    de primer orden usando el algoritmo de Pratt. Contiene métodos para 
-    parsear términos, fórmulas y manejar la precedencia de operadores lógicos.
+    Clase FormulaParser que implementa un parser para fórmulas de lógica
+    de primer orden usando descenso recursivo (Top-Down). Cada nivel de
+    precedencia de operadores está estratificado en métodos gramaticales dedicados:
+      - parseImplication (→, asociativo a la derecha)
+      - parseDisjunction (∨, asociativo a la izquierda)
+      - parseConjunction (∧, asociativo a la izquierda)
+      - parseUnary (¬, ∀, ∃)
+      - parsePrimary (átomos predicativos y subexpresiones entre paréntesis)
+
     La clase mantiene un cursor para recorrer la lista de tokens y un mapa
     de conteo de variables ligadas (se obtienen al parsear los cuantificadores)
     para manejar el alcance de los cuantificadores y soportar sombreado (shadowing).
-    Se incluyen métodos para parsear prefijos (negación, cuantificadores,
-    paréntesis) e infijos (conjunción, disyunción, implicación), 
-    así como un método de conveniencia para parsear directamente 
+    Se incluye además un método de conveniencia para parsear directamente
     desde una cadena de entrada.
 */
 
-// Niveles de precedencia para operadores lógicos
-const Precedence = {
-    LOWEST: 0, // Nivel más bajo, usado para iniciar el parseo  
-    IMPLIES: 1, 
-    OR: 2,      
-    AND: 3,     
-    NOT: 4,     
-} as const;
+export type ParserTrace = {
+    cursor: number;
+    token: Token;
+    callStack: string[];
+    activeScopeVars: string[];
+};
 
 export class FormulaParser {
+    public readonly nodeTokens = new WeakMap<Formula | Term, number>();
+    private callStack: string[] = [];
+
+    private inRule<T>(name: string, parse: () => T): T {
+        this.callStack.push(name);
+        try {
+            return parse();
+        } finally {
+            this.callStack.pop();
+        }
+    }
+
+    private atToken<T extends Formula | Term>(node: T, cursor: number): T {
+        this.nodeTokens.set(node, cursor);
+        return node;
+    }
+
     private tokens: Token[];
     private cursor: number = 0;
+    // Mapa de frecuencias de variables ligadas para soportar anidamiento y sombreado (shadowing)
     private boundVarCounts: Map<string, number> = new Map();
 
-    constructor(tokens: Token[]) {
+    constructor(tokens: Token[], private onRead?: (trace: ParserTrace) => void) {
         this.tokens = tokens;
     }
 
@@ -40,6 +60,12 @@ export class FormulaParser {
     // Avanzar al siguiente token y devolver el token actual
     private advance(): Token {
         const token = this.peek();
+        this.onRead?.({
+            cursor: this.cursor,
+            token,
+            callStack: [...this.callStack],
+            activeScopeVars: [...this.boundVarCounts.keys()],
+        });
         if (token.type !== "EOF") {
             this.cursor++;
         }
@@ -86,162 +112,168 @@ export class FormulaParser {
     private isBound(name: string): boolean {
         return this.boundVarCounts.has(name);
     }
-    
+
     // Parsear un término (variable, constante o función)
-    // Funcion recursiva que maneja la gramática de términos:
+    // Función recursiva que maneja la gramática de términos:
     private parseTerm(): Term {
-        const ident = this.expect("IDENT", "Se esperaba un identificador para el término").value;
+        return this.inRule("term", () => {
+            const start = this.cursor;
+            const ident = this.expect("IDENT", "Se esperaba un identificador para el término").value;
 
-        // Si viene seguido de '(', es una función: f(t1, t2)
-        if (this.match("LPAREN")) {
-            const args: Term[] = [];
-            if (!this.match("RPAREN")) {
-                do {
-                    args.push(this.parseTerm());
-                } while (this.match("COMMA"));
-                this.expect("RPAREN", `Se esperaba ')' al cerrar los argumentos de la función '${ident}'`);
-            }
-            return { kind: "func", name: ident, args };
-        }
-
-        // Convención semántica:
-        // 1. Si está ligada por ∀ o ∃ en el alcance actual, es una variable.
-        // 2. Si empieza con u..z (minúscula o mayúscula), se toma como variable libre por convención estándar.
-        // 3. De lo contrario (a..t, dígitos, etc.), se asume constante.
-        if (this.isBound(ident) || /^[u-zU-Z]/.test(ident)) {
-            return { kind: "var", name: ident };
-        }
-        // De lo contrario, se asume constante.
-        return { kind: "const", name: ident };
-    }
-
-    // Entrypoint para parsear una fórmula completa desde la lista de tokens
-    public parse(): Formula {
-        const formula = this.parseExpression(Precedence.LOWEST);
-        this.expect("EOF", `Tokens no reconocidos tras el final de la fórmula: '${this.peek().value}'`);
-        return formula;
-    }
-
-    // Algoritmo de Pratt para fórmulas
-    private parseExpression(minPrecedence: number): Formula {
-        let left = this.parsePrefix();
-
-        while (true) {
-            const currentToken = this.peek();
-            const prec: number | null = this.getInfixPrecedence(currentToken.type);
-
-            // Si el siguiente token no es operador binario 
-            // o su precedencia es menor, se detiene.
-            if (prec === null || prec < minPrecedence) {
-                break;
-            }
-
-            this.advance();
-            left = this.parseInfix(currentToken.type, left, prec);
-        }
-
-        return left;
-    }
-
-    // Función que parsea la parte prefija de la expresión, 
-    // incluyendo negación, cuantificadores, paréntesis 
-    // y predicados atómicos
-    private parsePrefix(): Formula {
-        const token = this.peek();
-
-        // Negación
-        if (this.match("NOT")) {
-            const inner = this.parseExpression(Precedence.NOT);
-            return { kind: "not", inner };
-        }
-
-        // Cuantificador Universal
-        if (this.match("FORALL")) {
-            const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∀'");
-            const variable: string = varToken.value;
-
-            this.pushBoundVar(variable);
-            const inner = this.parseExpression(Precedence.LOWEST);
-            this.popBoundVar(variable);
-
-            return { kind: "forall", variable, inner };
-        }
-
-        // Cuantificador Existencial
-        if (this.match("EXISTS")) {
-            const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∃'");
-            const variable: string = varToken.value;
-
-            this.pushBoundVar(variable);
-            const inner = this.parseExpression(Precedence.LOWEST);
-            this.popBoundVar(variable);
-
-            return { kind: "exists", variable, inner };
-        }
-
-        // Paréntesis
-        if (this.match("LPAREN")) {
-            const inner = this.parseExpression(Precedence.LOWEST);
-            this.expect("RPAREN", "Se esperaba ')' de cierre");
-            return inner;
-        }
-
-        // Predicado atómico: P(t1, t2) o predicado 0-ario P
-        if (token.type === "IDENT") {
-            this.advance();
-            const predicate = token.value;
-            const args: Term[] = [];
-
+            // Si viene seguido de '(', es una función: f(t1, t2)
             if (this.match("LPAREN")) {
+                const args: Term[] = [];
                 if (!this.match("RPAREN")) {
                     do {
                         args.push(this.parseTerm());
                     } while (this.match("COMMA"));
-                    this.expect("RPAREN", `Se esperaba ')' al cerrar argumentos del predicado '${predicate}'`);
+                    this.expect("RPAREN", `Se esperaba ')' al cerrar los argumentos de la función '${ident}'`);
                 }
+                return this.atToken({ kind: "func", name: ident, args }, start);
             }
 
-            return { kind: "atom", predicate, args };
-        }
-
-        throw new Error(`Token inesperado al inicio de la expresión: '${token.value}' (${token.type})`);
+            // Convención semántica:
+            // 1. Si está ligada por ∀ o ∃ en el alcance actual, es una variable.
+            // 2. Si empieza con u..z (minúscula o mayúscula), se toma como variable libre por convención estándar.
+            // 3. De lo contrario (a..t, dígitos, etc.), se asume constante.
+            if (this.isBound(ident) || /^[u-zU-Z]/.test(ident)) {
+                return this.atToken({ kind: "var", name: ident }, start);
+            }
+            // De lo contrario, se asume constante.
+            return this.atToken({ kind: "const", name: ident }, start);
+        });
     }
 
-    // Función que parsea la parte infija de la expresión,
-    // incluyendo conjunción, disyunción e implicación
-    private parseInfix(op: TokenType, left: Formula, precedence: number): Formula {
-        switch (op) {
-            case "AND": {
-                // Asociativo a la izquierda
-                const right = this.parseExpression(precedence + 1);
-                return { kind: "and", left, right };
-            }
-            case "OR": {
-                // Asociativo a la izquierda
-                const right = this.parseExpression(precedence + 1);
-                return { kind: "or", left, right };
-            }
-            case "IMPLIES": {
-                // Asociativo a la derecha
-                const right = this.parseExpression(precedence);
-                return { kind: "implies", left, right };
-            }
-            default:
-                throw new Error(`Operador binario desconocido: '${op}'`);
-        }
+    // Entrypoint para parsear una fórmula completa desde la lista de tokens
+    public parse(): Formula {
+        return this.inRule("formula", () => {
+            const formula = this.parseImplication();
+            this.expect("EOF", `Tokens no reconocidos tras el final de la fórmula: '${this.peek().value}'`);
+            return formula;
+        });
     }
 
-    private getInfixPrecedence(type: TokenType): number | null {
-        switch (type) {
-            case "IMPLIES":
-                return Precedence.IMPLIES;
-            case "OR":
-                return Precedence.OR;
-            case "AND":
-                return Precedence.AND;
-            default:
-                return null;
-        }
+    // Nivel 1 (Precedencia más baja): Implicación (→)
+    // Asociativo a la derecha: A → B → C se agrupa como A → (B → C)
+    private parseImplication(): Formula {
+        return this.inRule("implication", () => {
+            const left = this.parseDisjunction();
+
+            const operator = this.cursor;
+            if (this.match("IMPLIES")) {
+                const right = this.parseImplication();
+                return this.atToken({ kind: "implies", left, right }, operator);
+            }
+
+            return left;
+        });
+    }
+
+    // Nivel 2: Disyunción (∨)
+    // Asociativo a la izquierda: A ∨ B ∨ C se agrupa como (A ∨ B) ∨ C
+    private parseDisjunction(): Formula {
+        return this.inRule("disjunction", () => {
+            let left = this.parseConjunction();
+
+            while (this.peek().type === "OR") {
+                const operator = this.cursor;
+                this.advance();
+                const right = this.parseConjunction();
+                left = this.atToken({ kind: "or", left, right }, operator);
+            }
+
+            return left;
+        });
+    }
+
+    // Nivel 3: Conjunción (∧)
+    // Asociativo a la izquierda: A ∧ B ∧ C se agrupa como (A ∧ B) ∧ C
+    private parseConjunction(): Formula {
+        return this.inRule("conjunction", () => {
+            let left = this.parseUnary();
+
+            while (this.peek().type === "AND") {
+                const operator = this.cursor;
+                this.advance();
+                const right = this.parseUnary();
+                left = this.atToken({ kind: "and", left, right }, operator);
+            }
+
+            return left;
+        });
+    }
+
+    // Nivel 4: Operadores unarios prefijos (¬, ∀, ∃)
+    private parseUnary(): Formula {
+        return this.inRule("unary", () => {
+            const start = this.cursor;
+            // Negación
+            if (this.match("NOT")) {
+                const inner = this.parseUnary();
+                return this.atToken({ kind: "not", inner }, start);
+            }
+
+            // Cuantificador Universal
+            if (this.match("FORALL")) {
+                const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∀'");
+                const variable: string = varToken.value;
+
+                this.pushBoundVar(variable);
+                const inner = this.parseImplication();
+                this.popBoundVar(variable);
+
+                return this.atToken({ kind: "forall", variable, inner }, start);
+            }
+
+            // Cuantificador Existencial
+            if (this.match("EXISTS")) {
+                const varToken: Token = this.expect("IDENT", "Se esperaba el identificador de la variable tras '∃'");
+                const variable: string = varToken.value;
+
+                this.pushBoundVar(variable);
+                const inner = this.parseImplication();
+                this.popBoundVar(variable);
+
+                return this.atToken({ kind: "exists", variable, inner }, start);
+            }
+
+            return this.parsePrimary();
+        });
+    }
+
+    // Nivel 5 (Máxima precedencia): Expresiones primarias (paréntesis y predicados atómicos)
+    private parsePrimary(): Formula {
+        return this.inRule("primary", () => {
+            const start = this.cursor;
+            const token = this.peek();
+
+            // Paréntesis
+            if (this.match("LPAREN")) {
+                const inner = this.parseImplication();
+                this.expect("RPAREN", "Se esperaba ')' de cierre");
+                return inner;
+            }
+
+            // Predicado atómico: P(t1, t2) o predicado 0-ario P
+            if (token.type === "IDENT") {
+                this.advance();
+                const predicate = token.value;
+                const args: Term[] = [];
+
+                if (this.match("LPAREN")) {
+                    if (!this.match("RPAREN")) {
+                        do {
+                            args.push(this.parseTerm());
+                        } while (this.match("COMMA"));
+                        this.expect("RPAREN", `Se esperaba ')' al cerrar argumentos del predicado '${predicate}'`);
+                    }
+                }
+
+                return this.atToken({ kind: "atom", predicate, args }, start);
+            }
+
+            throw new Error(`Token inesperado al inicio de la expresión: '${token.value}' (${token.type})`);
+        });
     }
 }
 
