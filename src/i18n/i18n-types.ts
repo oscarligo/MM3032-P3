@@ -54,6 +54,10 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
+		 * E​j​e​m​p​l​o
+		 */
+		example: string
+		/**
 		 * E​s​t​a​ ​s​e​c​c​i​ó​n​ ​p​e​r​m​i​t​e​ ​e​v​a​l​u​a​r​ ​f​ó​r​m​u​l​a​s​ ​l​ó​g​i​c​a​s​ ​y​ ​v​i​s​u​a​l​i​z​a​r​ ​s​u​ ​e​s​t​r​u​c​t​u​r​a​.
 		 */
 		description: string
@@ -168,11 +172,11 @@ type RootTranslation = {
 		 */
 		tokenStream: string
 		/**
-		 * T​o​k​e​n​ ​a​c​t​u​a​l
+		 * T​o​k​e​n​ ​p​o​r​ ​l​e​e​r
 		 */
 		currentToken: string
 		/**
-		 * D​e​c​i​s​i​ó​n
+		 * S​i​g​u​i​e​n​t​e​ ​a​c​c​i​ó​n
 		 */
 		decision: string
 		/**
@@ -250,7 +254,7 @@ type RootTranslation = {
 		 */
 		english: string
 		/**
-		 * F​ó​r​m​u​l​a​ ​l​ó​g​i​c​a
+		 * F​ó​r​m​u​l​a​ ​d​e​ ​e​n​t​r​a​d​a
 		 */
 		inputLabel: string
 		/**
@@ -377,6 +381,10 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
+		 * Ejemplo
+		 */
+		example: () => LocalizedString
+		/**
 		 * Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.
 		 */
 		description: () => LocalizedString
@@ -489,11 +497,11 @@ export type TranslationFunctions = {
 		 */
 		tokenStream: () => LocalizedString
 		/**
-		 * Token actual
+		 * Token por leer
 		 */
 		currentToken: () => LocalizedString
 		/**
-		 * Decisión
+		 * Siguiente acción
 		 */
 		decision: () => LocalizedString
 		/**
@@ -571,7 +579,7 @@ export type TranslationFunctions = {
 		 */
 		english: () => LocalizedString
 		/**
-		 * Fórmula lógica
+		 * Fórmula de entrada
 		 */
 		inputLabel: () => LocalizedString
 		/**

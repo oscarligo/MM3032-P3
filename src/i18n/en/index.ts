@@ -7,7 +7,7 @@ const en = {
 		spanish: 'Spanish', english: 'English', lightTheme: 'Light theme', darkTheme: 'Dark theme',
 	},
 	semanticEvaluator: {
-		title: 'Semantic evaluator',
+		title: 'Semantic evaluator', example: 'Example',
 		description: 'This section evaluates logical formulas and visualizes their structure.',
 		leftBoard: 'Left whiteboard', centerBoard: 'Center whiteboard', rightBoard: 'Right whiteboard',
 	},

@@ -25,7 +25,7 @@ export default function FormulaInput() {
     return (
         <div className={styles.slideWrapper}>
             <div className={styles.topBar}>
-                <span>Ejemplo</span>
+                <span>{LL.semanticEvaluator.example()}</span>
             </div>
             
             <div className={styles.mainContent}>
@@ -58,7 +58,7 @@ export default function FormulaInput() {
             <div className={styles.bottomBar}>
                 <img className={styles.footerIcon} src={icon} alt="" />
                 <span className={styles.footerSeparator} aria-hidden="true" />
-                <span>Evaluador semántico</span>
+                <span>{LL.semanticEvaluator.title()}</span>
             </div>
         </div>
     );
