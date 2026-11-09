@@ -32,7 +32,7 @@ function TreeNodeView({ node }: { node: RenderTreeNode }) {
         <li className={styles.treeItem}>
             {node.roleTag && (
                 <span className={styles.roleTag}>
-                    <StaticChalk>{node.roleTag}</StaticChalk>
+                    <StaticChalk>{"          "}</StaticChalk>
                 </span>
             )}
             <span
@@ -234,7 +234,7 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
     return (
         <section className={styles.container}>
             <div className={styles.fitContent} data-fit-content>
-                <div className={styles.notesViewport} tabIndex={0}>
+                <div className={styles.notesViewport}>
                     {step && (
                         <aside className={styles.chalkNotes}>
                             <div className={styles.noteSection}>
@@ -246,18 +246,18 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                 </div>
                             </div>
 
-                            <div className={styles.noteSection}>
-                                <StaticChalk>{`${LL.parser.decision()}:`}</StaticChalk>
-                                <div className={styles.chalkIndent}>
-                                    <p className={styles.explanationText} key={`decision-${step.cursor}`}>
-                                        <Chalk>{decisionText}</Chalk>
-                                    </p>
-                                </div>
-                            </div>
+                            <p className={styles.actionParagraph} key={`decision-${step.cursor}`}>
+                                <span>{`${LL.parser.decision()}: `}</span>
+                                <span className={styles.explanationText}>{decisionText}</span>
+                            </p>
 
-                            <div className={styles.noteSection}>
+                            <div className={`${styles.noteSection} ${styles.callSection}`}>
                                 <StaticChalk>{`${LL.parser.functionHistory()}:`}</StaticChalk>
-                                <div className={styles.chalkIndent}>
+                                <div
+                                    className={`${styles.chalkIndent} ${styles.callScroll}`}
+                                    tabIndex={0}
+                                    aria-label={LL.parser.functionHistory()}
+                                >
                                     <span className={styles.callPath}><Chalk>{step.callStack.join(" → ")}</Chalk></span>
                                 </div>
                             </div>

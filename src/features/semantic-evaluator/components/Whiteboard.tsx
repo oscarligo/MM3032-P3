@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import styles from "./Whiteboard.module.css";
 
 export interface WhiteboardProps {
+    id?: string;
     children?: ReactNode;
     width?: CSSProperties["width"];
     maxWidth?: CSSProperties["maxWidth"];
@@ -13,6 +14,7 @@ export interface WhiteboardProps {
 }
 
 export default function Whiteboard({
+    id,
     children,
     width,
     maxWidth,
@@ -24,6 +26,7 @@ export default function Whiteboard({
 }: WhiteboardProps) {
     return (
         <section
+            id={id}
             className={`${styles.whiteboard}${className ? ` ${className}` : ""}`}
             style={{ width, maxWidth, height, minHeight, padding }}
             aria-label={ariaLabel}

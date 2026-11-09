@@ -39,7 +39,7 @@ const es = {
 	},
 	lexer: {
 		title: 'Analizador léxico', subtitle: 'Observa cómo la fórmula se convierte en tokens, paso a paso.',
-		language: 'Idioma', spanish: 'Español', english: 'Inglés', inputLabel: 'Fórmula lógica',
+		language: 'Idioma', spanish: 'Español', english: 'Inglés', inputLabel: 'Fórmula de entrada',
 		inputHint: 'También puedes usar \\forall, \\exists, &, |, ->, ~ o !.', stepsTitle: 'Procedimiento',
 		stepCounter: 'Paso {current:number} de {total:number}', previous: 'Anterior', next: 'Siguiente',
 		restart: 'Reiniciar', play: 'Reproducir', pause: 'Pausar', cursor: 'Cursor', matched: 'Coincidencia',

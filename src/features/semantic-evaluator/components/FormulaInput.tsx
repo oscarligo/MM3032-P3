@@ -11,7 +11,6 @@ export default function FormulaInput() {
         <div className={styles.container}>
             <label className={styles.label} htmlFor="formula-input">{LL.lexer.inputLabel()}</label>
             <input id="formula-input" className={styles.input} value={formula} onChange={(event) => setFormula(event.target.value)} spellCheck={false} />
-            <small className={styles.hint}>{LL.lexer.inputHint()}</small>
         </div>
     );
 }

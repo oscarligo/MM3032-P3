@@ -1,11 +1,44 @@
-.boards {
+.canvasShell {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
-    align-items: center;
+    grid-template-rows: minmax(0, 1fr);
     width: 100%;
-    padding: var(--space-lg);
-    padding-inline: clamp(1rem, 5vw, 5rem);
-    gap: var(--space-md);
+    height: calc(100dvh - 8rem);
+    min-height: 32rem;
+    border-block: 1px solid var(--color-border);
+    background: var(--color-background);
+}
+
+.canvasViewport {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    background:
+        linear-gradient(var(--color-border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+}
+
+.dragging {
+    cursor: grabbing;
+}
+
+.canvasScene {
+    width: max-content;
+    transform-origin: center;
+    will-change: transform;
+}
+
+.boards {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .boards > section {
@@ -27,10 +60,4 @@
     width: 100%;
     min-width: 0;
     overflow: visible;
-}
-
-@media (max-width: 960px) {
-    .boards {
-        grid-template-columns: 1fr;
-    }
 }

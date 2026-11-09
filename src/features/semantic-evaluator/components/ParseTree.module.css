@@ -12,7 +12,7 @@
 
 .fitContent {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     gap: var(--space-sm);
     width: 100%;
     height: 100%;
@@ -24,20 +24,33 @@
 
 .notesViewport {
     width: 100%;
+    height: 100%;
     min-width: 0;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
     padding-right: var(--space-sm);
+    box-sizing: border-box;
 }
 
 .chalkNotes {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     gap: 0.5rem;
     width: 100%;
+    height: 100%;
+    min-height: 0;
     font-size: 1.15rem;
     overflow-wrap: anywhere;
+}
+
+.chalkNotes > * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chalkIndent {
+    flex: 1;
+    min-width: 0;
 }
 
 .noteBlock {
@@ -62,18 +75,60 @@
 }
 
 .focusFormula {
-    font-size: 1.45rem;
+    font-size: 1.0rem;
     color: var(--color-annotation);
     font-weight: 700;
     word-break: break-word;
+    padding-top: 200px;
 }
 
 .explanationText {
-    margin: 0.1rem 0 0;
-    font-size: 1.15rem;
+    display: inline;
+    max-width: 100%;
+    font-size: 1.0rem;
     line-height: 1.25;
     opacity: 0.9;
+    color: var(--color-success);
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
+
+.actionParagraph {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--font-family-handwritten);
+    font-size: 1.15rem;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.noteSection{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+}
+
+.callSection,
+.callScroll {
+    min-width: 0;
+    min-height: 0;
+}
+
+.callSection {
+    flex-direction: column;
+    gap: var(--space-xs);
+    overflow: hidden;
+}
+
+.callScroll {
+    flex: 1;
+    overflow: auto;
+}
+
 
 .accentValue {
     color: var(--color-annotation);
@@ -85,7 +140,6 @@
     font-weight: 700;
 }
 
-/* Área del árbol dibujado con RoughJS */
 .treeArea {
     display: flex;
     flex-direction: column;
