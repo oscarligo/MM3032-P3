@@ -12,6 +12,7 @@ export default function FitContent({ children }: { children: ReactNode }) {
         if (!viewport || !content) return;
 
         const fit = () => {
+            if (!viewport.clientWidth || !viewport.clientHeight) return;
             const width = Math.max(1, content.scrollWidth);
             const height = Math.max(1, content.scrollHeight);
             const scale = Math.min(1, viewport.clientWidth / width, viewport.clientHeight / height);

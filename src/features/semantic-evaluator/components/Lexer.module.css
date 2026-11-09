@@ -12,20 +12,19 @@
     justify-content: space-between;
     align-items: center;
     gap: clamp(var(--space-xs), 2.5cqi, var(--space-md));
-    margin-bottom: clamp(var(--space-sm), 3cqi, var(--space-lg));
+    margin-bottom: var(--space-sm);
     font-family: var(--font-family);
     font-size: clamp(0.7rem, 2.2cqi, 0.9rem);
 }
 
 .title {
-    font-size: clamp(0.85rem, 3cqi, 1.15rem);
+    font-size: 1.15rem;
     margin: 0;
 }
 
 .stage {
     position: relative;
     width: 100%;
-    min-height: clamp(10rem, 45cqi, 15rem);
 }
 
 .canvas {
@@ -45,7 +44,6 @@
     gap: clamp(0.03rem, 0.3cqi, 0.1rem);
     font-size: clamp(1rem, 4.5cqi, 1.8rem);
     line-height: 1.2;
-    margin-bottom: clamp(var(--space-xs), 2.5cqi, var(--space-md));
     padding: clamp(var(--space-xs), 1.5cqi, var(--space-sm));
 }
 
@@ -62,41 +60,6 @@
     display: inline-block;
     width: 0.4em;
     min-height: 1.35em;
-}
-
-.tokensRow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: clamp(0.1rem, 1cqi, 0.4rem);
-    color: var(--color-whiteboard-ink);
-    font-size: clamp(0.8rem, 3cqi, 1.2rem);
-    min-height: clamp(2rem, 8cqi, 3.2rem);
-}
-
-.bracket {
-    font-size: inherit;
-    font-weight: 700;
-    color: var(--color-whiteboard-ink);
-    line-height: 1;
-}
-
-.token {
-    display: inline-flex;
-    align-items: center;
-}
-
-.slotContainer {
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
-    z-index: 4;
-}
-
-.previewSymbol {
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-annotation);
 }
 
 .error,

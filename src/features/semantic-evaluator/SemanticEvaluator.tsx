@@ -2,7 +2,6 @@ import Whiteboard from "./components/Whiteboard";
 import Lexer from "./components/Lexer";
 import FormulaInput from "./components/FormulaInput";
 import ParseTree from "./components/ParseTree";
-import FitContent from "./components/FitContent";
 import { useParserVisualization } from "./hooks/useParserVisualization";
 import { useI18nContext } from "../../i18n/i18n-react";
 import styles from "./SemanticEvaluator.module.css";
@@ -22,10 +21,10 @@ export default function SemanticEvaluator() {
                 className={styles.procedureBoard}
                 ariaLabel={LL.semanticEvaluator.leftBoard()}
             >
-                <FitContent>
+                <div className={styles.lexerArea}>
                     <Lexer />
-                    <ParseTree mode="procedure" visualization={parser} />
-                </FitContent>
+                </div>
+                <ParseTree mode="procedure" visualization={parser} />
             </Whiteboard>
             <Whiteboard
                 width="100%"

@@ -35,7 +35,7 @@ export function useParserVisualization(): ParserVisualization {
     }, [input]);
 
     useEffect(() => {
-        registerProcedure("parser", result.steps.length, 1);
+        registerProcedure("parser", result.steps.length, 0);
     }, [input, registerProcedure, result.steps.length]);
 
     useEffect(() => () => unregisterProcedure("parser"), [unregisterProcedure]);

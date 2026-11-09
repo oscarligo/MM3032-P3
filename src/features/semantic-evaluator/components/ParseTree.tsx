@@ -5,6 +5,7 @@ import rough from "roughjs";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import type { ParserVisualization } from "../hooks/useParserVisualization";
 import type { RenderTreeNode } from "../algorithms/parser-tree";
+import FitContent from "./FitContent";
 import styles from "./ParseTree.module.css";
 
 type ParseTreeProps = {
@@ -196,16 +197,20 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
 
     if (visualization.error) {
         return (
-            <p className={styles.error} role="alert">
-                <Chalk>{`${LL.parser.invalid()}: ${visualization.error}`}</Chalk>
-            </p>
+            <div className={styles.notesViewport}>
+                <p className={styles.error} role="alert">
+                    <Chalk>{`${LL.parser.invalid()}: ${visualization.error}`}</Chalk>
+                </p>
+            </div>
         );
     }
     if (!visualization.hasStarted) {
         return (
-            <p className={styles.waiting}>
-                <Chalk>{LL.parser.waiting()}</Chalk>
-            </p>
+            <div className={styles.notesViewport}>
+                <p className={styles.waiting}>
+                    <Chalk>{LL.parser.waiting()}</Chalk>
+                </p>
+            </div>
         );
     }
 
@@ -229,75 +234,79 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
     return (
         <section className={styles.container}>
             <div className={styles.fitContent} data-fit-content>
-                {step && (
-                    <aside className={styles.chalkNotes}>
-                        <div className={styles.noteSection}>
-                            <StaticChalk>{`${LL.parser.currentToken()}:`}</StaticChalk>
-                            <div className={styles.chalkIndent}>
-                                <span className={styles.focusFormula} key={`focus-${step.cursor}`}>
-                                    <Chalk>{step.currentToken}</Chalk>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className={styles.noteSection}>
-                            <StaticChalk>{`${LL.parser.decision()}:`}</StaticChalk>
-                            <div className={styles.chalkIndent}>
-                                <p className={styles.explanationText} key={`decision-${step.cursor}`}>
-                                    <Chalk>{decisionText}</Chalk>
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className={styles.noteSection}>
-                            <StaticChalk>{`${LL.parser.functionHistory()}:`}</StaticChalk>
-                            <div className={styles.chalkIndent}>
-                                <span className={styles.callPath}><Chalk>{step.callStack.join(" → ")}</Chalk></span>
-                            </div>
-                        </div>
-
-                        <div className={styles.noteSection}>
-                            <StaticChalk>{`${LL.parser.bound()}:`}</StaticChalk>
-                            <div className={styles.chalkIndent}>
-                                <span className={styles.accentValue}>
-                                    <Chalk>
-                                        {step.activeScopeVars.length > 0
-                                            ? `{ ${step.activeScopeVars.join(", ")} }`
-                                            : "∅"}
-                                    </Chalk>
-                                </span>
-                            </div>
-                        </div>
-                    </aside>
-                )}
-
-                {mode === "text" ? (
-                    <div className={styles.textView}>
-                        <Chalk>{visualization.structureText}</Chalk>
-                    </div>
-                ) : (
-                    <div className={styles.treeArea}>
-                        {visualization.visibleTree ? (
-                            <>
-                                <SketchTreeCanvas
-                                    visualTree={visualization.visibleTree}
-                                />
-                                <footer className={styles.legend}>
-                                    <span className={styles.legendBound}>
-                                        <StaticChalk>{`◯ ${LL.parser.bound()}`}</StaticChalk>
+                <div className={styles.notesViewport} tabIndex={0}>
+                    {step && (
+                        <aside className={styles.chalkNotes}>
+                            <div className={styles.noteSection}>
+                                <StaticChalk>{`${LL.parser.currentToken()}:`}</StaticChalk>
+                                <div className={styles.chalkIndent}>
+                                    <span className={styles.focusFormula} key={`focus-${step.cursor}`}>
+                                        <Chalk>{step.currentToken}</Chalk>
                                     </span>
-                                    <span className={styles.legendFree}>
-                                        <StaticChalk>{`[ ] ${LL.parser.free()}`}</StaticChalk>
-                                    </span>
-                                </footer>
-                            </>
-                        ) : (
-                            <div className={styles.buildingPlaceholder}>
-                                <Chalk>{LL.parser.building()}</Chalk>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                )}
+
+                            <div className={styles.noteSection}>
+                                <StaticChalk>{`${LL.parser.decision()}:`}</StaticChalk>
+                                <div className={styles.chalkIndent}>
+                                    <p className={styles.explanationText} key={`decision-${step.cursor}`}>
+                                        <Chalk>{decisionText}</Chalk>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className={styles.noteSection}>
+                                <StaticChalk>{`${LL.parser.functionHistory()}:`}</StaticChalk>
+                                <div className={styles.chalkIndent}>
+                                    <span className={styles.callPath}><Chalk>{step.callStack.join(" → ")}</Chalk></span>
+                                </div>
+                            </div>
+
+                            <div className={styles.noteSection}>
+                                <StaticChalk>{`${LL.parser.bound()}:`}</StaticChalk>
+                                <div className={styles.chalkIndent}>
+                                    <span className={styles.accentValue}>
+                                        <Chalk>
+                                            {step.activeScopeVars.length > 0
+                                                ? `{ ${step.activeScopeVars.join(", ")} }`
+                                                : "∅"}
+                                        </Chalk>
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+                    )}
+                </div>
+
+                <FitContent>
+                    {mode === "text" ? (
+                        <div className={styles.textView}>
+                            <Chalk>{visualization.structureText}</Chalk>
+                        </div>
+                    ) : (
+                        <div className={styles.treeArea}>
+                            {visualization.visibleTree ? (
+                                <>
+                                    <SketchTreeCanvas
+                                        visualTree={visualization.visibleTree}
+                                    />
+                                    <footer className={styles.legend}>
+                                        <span className={styles.legendBound}>
+                                            <StaticChalk>{`◯ ${LL.parser.bound()}`}</StaticChalk>
+                                        </span>
+                                        <span className={styles.legendFree}>
+                                            <StaticChalk>{`[ ] ${LL.parser.free()}`}</StaticChalk>
+                                        </span>
+                                    </footer>
+                                </>
+                            ) : (
+                                <div className={styles.buildingPlaceholder}>
+                                    <Chalk>{LL.parser.building()}</Chalk>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </FitContent>
             </div>
         </section>
     );

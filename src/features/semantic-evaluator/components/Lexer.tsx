@@ -21,8 +21,7 @@ const StaticChalk = ({ children }: { children: string | number }) => (
 export default function Lexer() {
     const { LL } = useI18nContext();
     const {
-        input, result, currentStep, settledTokens,
-        hasStarted, boardRef, canvasRef, charRefs,
+        input, result, boardRef, canvasRef, charRefs,
     } = useLexerVisualization();
 
     return (
@@ -53,32 +52,6 @@ export default function Lexer() {
                             </span>
                         ))}
                     </div>
-
-                    {/* Fila inferior de tokens con altura uniforme constante */}
-                    {hasStarted && (
-                        <div className={styles.tokensRow}>
-                            <span className={styles.bracket}><Chalk>{"["}</Chalk></span>
-
-                            {settledTokens.map((step, idx) => (
-                                <span key={`${step.cursor}-${idx}`} className={styles.token}>
-                                    <Chalk>{`${step.tokenType}${
-                                        idx < result.steps.length - 1 ? ", " : ""
-                                    }`}</Chalk>
-                                </span>
-                            ))}
-
-                            {/* Ranura activa del paso en curso */}
-                            {currentStep && (
-                                <span className={styles.slotContainer}>
-                                    <span className={styles.previewSymbol}>
-                                        <Chalk>{currentStep.matchedText}</Chalk>
-                                    </span>
-                                </span>
-                            )}
-
-                            <span className={styles.bracket}><Chalk>{"]"}</Chalk></span>
-                        </div>
-                    )}
 
                 </div>
             ) : (

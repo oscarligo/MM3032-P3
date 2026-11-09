@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import rough from "roughjs";
-import { tokenizeWithSteps, type LexerStep } from "../algorithms/lexer-steps";
+import { tokenizeWithSteps } from "../algorithms/lexer-steps";
 import { procedureOffset, useProcedureStore } from "../../../store/store_control";
 import { useFormulaStore } from "../../../store/store_formula";
 
@@ -8,9 +8,6 @@ export function useLexerVisualization() {
     const input = useFormulaStore((state) => state.formula);
     const globalStep = useProcedureStore((state) => state.stepIndex);
     const procedures = useProcedureStore((state) => state.procedures);
-    const registerProcedure = useProcedureStore((state) => state.registerProcedure);
-    const unregisterProcedure = useProcedureStore((state) => state.unregisterProcedure);
-    const stepIndex = globalStep - procedureOffset(procedures, "lexer");
     const parserOffset = procedureOffset(procedures, "parser");
     const parserStepIndex = globalStep - parserOffset;
 
@@ -36,22 +33,9 @@ export function useLexerVisualization() {
         }
     }, [input]);
 
-    const currentStep: LexerStep | undefined =
-        stepIndex >= 0 && stepIndex < result.steps.length
-            ? result.steps[stepIndex]
-            : undefined;
-    const parserFocusStep = procedures.parser && parserStepIndex >= 0
+    const focusStep = procedures.parser && parserStepIndex >= 0
         ? result.steps[parserStepIndex]
         : undefined;
-    const focusStep = procedures.parser && parserStepIndex >= 0 ? parserFocusStep : currentStep;
-
-    const settledTokens = result.steps.slice(0, Math.max(0, stepIndex));
-
-    useEffect(() => {
-        registerProcedure("lexer", result.steps.length, 0);
-    }, [input, result.steps.length, registerProcedure]);
-
-    useEffect(() => () => unregisterProcedure("lexer"), [unregisterProcedure]);
 
     // Renderizado del círculo de RoughJS y cálculo de coordenadas hacia el slot destino
     useEffect(() => {
@@ -113,10 +97,6 @@ export function useLexerVisualization() {
     return {
         input,
         result,
-        currentStep,
-        settledTokens,
-        stepIndex,
-        hasStarted: stepIndex >= 0,
         boardRef,
         canvasRef,
         charRefs,
