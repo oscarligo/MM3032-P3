@@ -34,7 +34,16 @@ function TreeAutoCenter({ tree }: { tree: RenderTreeNode }) {
 
     useEffect(() => {
         const frame = window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(() => centerView(instance.state.scale, 0));
+            window.requestAnimationFrame(() => {
+                const wrapper = instance.wrapperComponent;
+                const content = instance.contentComponent;
+                if (!wrapper || !content) return;
+                const scale = Math.min(2,
+                    wrapper.clientWidth / content.offsetWidth,
+                    wrapper.clientHeight / content.offsetHeight,
+                ) * 0.9;
+                centerView(scale, 250, "easeOut");
+            });
         });
         return () => window.cancelAnimationFrame(frame);
     }, [tree]);
@@ -205,11 +214,11 @@ function SketchTreeCanvas({ visualTree, boundLabel, freeLabel }: {
         <div className={styles.treeCanvasPanel}>
             <TransformWrapper
                 initialScale={0.5}
-                minScale={0.5}
-                maxScale={1.8}
+                minScale={0.0000001}
+                maxScale={2}
                 centerOnInit
                 limitToBounds={false}
-                wheel={{ step: 0.1 }}
+                wheel={{ step: 0.005 }}
                 panning={{ velocityDisabled: true }}
                 doubleClick={{ disabled: true }}
             >

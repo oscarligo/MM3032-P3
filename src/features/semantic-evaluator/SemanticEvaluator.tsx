@@ -21,7 +21,7 @@ export default function SemanticEvaluator() {
                 maxScale={1.5}
                 centerOnInit
                 limitToBounds={false}
-                wheel={{ step: 0.1, excluded: ["nested-tree-canvas"] }}
+                wheel={{ step: 0.005, excluded: ["nested-tree-canvas"] }}
                 panning={{ velocityDisabled: true, excluded: ["nested-tree-canvas", "button", "input", "textarea", "select", "a"] }}
                 doubleClick={{ disabled: true }}
                 onInit={({ centerView }) => {

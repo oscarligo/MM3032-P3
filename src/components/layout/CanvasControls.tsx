@@ -2,18 +2,18 @@ import { useControls, useTransformComponent } from "react-zoom-pan-pinch";
 import styles from "./CanvasControls.module.css";
 
 export default function CanvasControls() {
-    const { setTransform, centerView, zoomIn, zoomOut } = useControls();
-    const state = useTransformComponent(({ state }) => state);
+    const { instance, setTransform, centerView, zoomIn, zoomOut } = useControls();
+    const scale = useTransformComponent(({ state }) => state.scale);
     const move = (x: number, y: number) =>
-        setTransform(state.positionX + x, state.positionY + y, state.scale, 0);
-    const center = () => centerView(0.5, 0);
+        setTransform(instance.state.positionX + x, instance.state.positionY + y, instance.state.scale, 0);
+    const center = () => centerView(0.5, 250, "easeOut");
 
     return (
         <div className={styles.controls} aria-label="Controles del lienzo">
             <div className={styles.panel}>
-                <button type="button" onClick={() => zoomOut(0.1, 0)} disabled={state.scale <= 0.5} aria-label="Alejar">−</button>
-                <output aria-label="Nivel de zoom">{Math.round(state.scale * 100)}%</output>
-                <button type="button" onClick={() => zoomIn(0.1, 0)} disabled={state.scale >= 1.5} aria-label="Acercar">+</button>
+                <button type="button" onClick={() => zoomOut(0.1, 150, "easeOut")} disabled={scale <= 0.5} aria-label="Alejar">−</button>
+                <output aria-label="Nivel de zoom">{Math.round(scale * 100)}%</output>
+                <button type="button" onClick={() => zoomIn(0.1, 150, "easeOut")} disabled={scale >= 1.5} aria-label="Acercar">+</button>
             </div>
             <div className={`${styles.panel} ${styles.navigation}`} aria-label="Navegar por el lienzo">
                 <button type="button" className={styles.up} onClick={() => move(0, 100)} aria-label="Mover arriba">↑</button>
