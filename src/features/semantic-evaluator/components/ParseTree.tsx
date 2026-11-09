@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
 import { TegakiRenderer } from "tegaki/react";
 import caveat from "tegaki/fonts/caveat";
 import rough from "roughjs";
@@ -6,6 +7,7 @@ import { useI18nContext } from "../../../i18n/i18n-react";
 import type { ParserVisualization } from "../hooks/useParserVisualization";
 import type { RenderTreeNode } from "../algorithms/parser-tree";
 import FitContent from "./FitContent";
+import TreeCanvasControls from "./TreeCanvasControls";
 import styles from "./ParseTree.module.css";
 
 type ParseTreeProps = {
@@ -26,6 +28,19 @@ const StaticChalk = ({ children }: { children: string | number }) => (
         {String(children)}
     </TegakiRenderer>
 );
+
+function TreeAutoCenter({ tree }: { tree: RenderTreeNode }) {
+    const { instance, centerView } = useControls();
+
+    useEffect(() => {
+        const frame = window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => centerView(instance.state.scale, 0));
+        });
+        return () => window.cancelAnimationFrame(frame);
+    }, [tree]);
+
+    return null;
+}
 
 function TreeNodeView({ node }: { node: RenderTreeNode }) {
     return (
@@ -57,7 +72,11 @@ function TreeNodeView({ node }: { node: RenderTreeNode }) {
     );
 }
 
-function SketchTreeCanvas({ visualTree }: { visualTree: RenderTreeNode }) {
+function SketchTreeCanvas({ visualTree, boundLabel, freeLabel }: {
+    visualTree: RenderTreeNode;
+    boundLabel: string;
+    freeLabel: string;
+}) {
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -160,9 +179,9 @@ function SketchTreeCanvas({ visualTree }: { visualTree: RenderTreeNode }) {
                         const childCx = (cr.left - wrapRect.left) / scaleX + cr.width / (2 * scaleX);
                         const childTop = (cr.top - wrapRect.top) / scaleY;
 
-                        rc.line(cx, y + h + 5, childCx, childTop - 22, {
+                        rc.line(cx, y + h + 2, childCx, childTop - 4, {
                             stroke: inkColor,
-                            strokeWidth: 1.5,
+                            strokeWidth: 2,
                             roughness: 1.5,
                             bowing: 1.2,
                             seed: seed * 10 + cIdx,
@@ -183,11 +202,36 @@ function SketchTreeCanvas({ visualTree }: { visualTree: RenderTreeNode }) {
     }, [visualTree]);
 
     return (
-        <div ref={wrapRef} className={styles.treeCanvasWrap} data-fit-content>
-            <canvas ref={canvasRef} className={styles.roughCanvas} />
-            <ul className={styles.tree}>
-                <TreeNodeView node={visualTree} />
-            </ul>
+        <div className={styles.treeCanvasPanel}>
+            <TransformWrapper
+                initialScale={0.5}
+                minScale={0.5}
+                maxScale={1.8}
+                centerOnInit
+                limitToBounds={false}
+                wheel={{ step: 0.1 }}
+                panning={{ velocityDisabled: true }}
+                doubleClick={{ disabled: true }}
+            >
+                <TransformComponent
+                    wrapperClass={`${styles.treeViewport} nested-tree-canvas`}
+                    contentClass={styles.treeCanvasContent}
+                    wrapperStyle={{ width: "100%", height: "100%" }}
+                >
+                    <div ref={wrapRef} className={styles.treeCanvasWrap}>
+                        <canvas ref={canvasRef} className={styles.roughCanvas} />
+                        <ul className={styles.tree}>
+                            <TreeNodeView node={visualTree} />
+                        </ul>
+                    </div>
+                </TransformComponent>
+                <TreeAutoCenter tree={visualTree} />
+                <footer className={styles.legend}>
+                    <span className={styles.legendBound}><StaticChalk>{`◯ ${boundLabel}`}</StaticChalk></span>
+                    <span className={styles.legendFree}><StaticChalk>{`[ ] ${freeLabel}`}</StaticChalk></span>
+                </footer>
+                <TreeCanvasControls />
+            </TransformWrapper>
         </div>
     );
 }
@@ -289,15 +333,9 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                 <>
                                     <SketchTreeCanvas
                                         visualTree={visualization.visibleTree}
+                                        boundLabel={LL.parser.bound()}
+                                        freeLabel={LL.parser.free()}
                                     />
-                                    <footer className={styles.legend}>
-                                        <span className={styles.legendBound}>
-                                            <StaticChalk>{`◯ ${LL.parser.bound()}`}</StaticChalk>
-                                        </span>
-                                        <span className={styles.legendFree}>
-                                            <StaticChalk>{`[ ] ${LL.parser.free()}`}</StaticChalk>
-                                        </span>
-                                    </footer>
                                 </>
                             ) : (
                                 <div className={styles.buildingPlaceholder}>
