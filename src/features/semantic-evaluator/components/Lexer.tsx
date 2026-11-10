@@ -48,7 +48,16 @@ export default function Lexer() {
                                 ref={(el) => { charRefs.current[i] = el; }}
                                 className={char === " " ? styles.space : styles.char}
                             >
-                                {char !== " " && <Chalk>{char}</Chalk>}
+                                {char !== " " && (
+                                    <>
+                                        <Chalk>{char}</Chalk>
+                                        {result.predicateSubscripts.get(i) && (
+                                            <span className={styles.aritySubscript}>
+                                                <Chalk>{result.predicateSubscripts.get(i)!}</Chalk>
+                                            </span>
+                                        )}
+                                    </>
+                                )}
                             </span>
                         ))}
                     </div>

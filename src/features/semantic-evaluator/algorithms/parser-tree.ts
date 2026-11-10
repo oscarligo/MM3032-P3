@@ -13,12 +13,45 @@ export type RenderTreeNode = {
     children: RenderTreeNode[];
 };
 
+const SUBSCRIPT_DIGITS: Record<string, string> = {
+    "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
+    "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
+};
+
+const toSubscript = (value: number) =>
+    String(value).replace(/\d/g, (digit) => SUBSCRIPT_DIGITS[digit]);
+
+export const collectPredicateArities = (formula: Formula) => {
+    const predicateArities = new Map<string, Set<number>>();
+    const visit = (current: Formula) => {
+        if (current.kind === "atom") {
+            const arities = predicateArities.get(current.predicate) ?? new Set<number>();
+            arities.add(current.args.length);
+            predicateArities.set(current.predicate, arities);
+            return;
+        }
+        if (current.kind === "not") return visit(current.inner);
+        if (current.kind === "forall" || current.kind === "exists") return visit(current.inner);
+        visit(current.left);
+        visit(current.right);
+    };
+    visit(formula);
+    return predicateArities;
+};
+
+export const predicateAritySubscript = (
+    predicateArities: ReadonlyMap<string, ReadonlySet<number>>,
+    predicate: string,
+    arity: number,
+) => (predicateArities.get(predicate)?.size ?? 0) > 1 ? toSubscript(arity) : "";
+
 export function buildVisualTree(
     formula: Formula,
     nodeTokens: WeakMap<Formula | Term, number>,
     cursor: number
 ): RenderTreeNode | undefined {
     let placeholderCounter = 0;
+    const predicateArities = collectPredicateArities(formula);
 
     const makePlaceholder = (roleTag?: string): RenderTreeNode => ({
         id: `placeholder-${placeholderCounter++}`,
@@ -93,10 +126,11 @@ export function buildVisualTree(
         const isActive = currentIndex === cursor - 1;
 
         if (f.kind === "atom") {
+            const aritySubscript = predicateAritySubscript(predicateArities, f.predicate, f.args.length);
             return {
                 id: `node-${currentIndex}`,
                 nodeIndex: currentIndex,
-                label: f.predicate,
+                label: `${f.predicate}${aritySubscript}`,
                 roleTag: roleTag ?? "Predicado",
                 nodeType: "atom",
                 isActive,

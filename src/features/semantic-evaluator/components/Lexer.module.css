@@ -48,12 +48,21 @@
 }
 
 .char {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--color-whiteboard-ink);
     min-width: 1.15em;
     min-height: 1.35em;
+}
+
+.aritySubscript {
+    align-self: flex-end;
+    margin-left: -0.15em;
+    margin-bottom: -0.15em;
+    font-size: 0.72em;
+    line-height: 1;
 }
 
 .space {

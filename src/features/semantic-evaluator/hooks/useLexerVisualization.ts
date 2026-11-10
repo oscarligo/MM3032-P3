@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import rough from "roughjs";
 import { tokenizeWithSteps } from "../algorithms/lexer-steps";
+import { FormulaParser } from "../algorithms/parser";
+import { collectPredicateArities, predicateAritySubscript } from "../algorithms/parser-tree";
+import type { Formula } from "../types";
 import { procedureOffset, useProcedureStore } from "../../../store/store_control";
 import { useFormulaStore } from "../../../store/store_formula";
 
@@ -16,19 +19,43 @@ export function useLexerVisualization() {
     const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
     const result = useMemo(() => {
-        if (!input.trim()) return { tokens: [], steps: [], error: "" };
+        if (!input.trim()) return { tokens: [], steps: [], predicateSubscripts: new Map<number, string>(), error: "" };
         try {
             const raw = tokenizeWithSteps(input);
+            const predicateSubscripts = new Map<number, string>();
+            try {
+                const parser = new FormulaParser(raw.tokens);
+                const formula = parser.parse();
+                const arities = collectPredicateArities(formula);
+                const tokenSteps = raw.steps.filter((step) => step.tokenType !== "WHITESPACE" && step.tokenType !== "EOF");
+                const visit = (current: Formula) => {
+                    if (current.kind === "atom") {
+                        const tokenIndex = parser.nodeTokens.get(current);
+                        const step = tokenIndex === undefined ? undefined : tokenSteps[tokenIndex];
+                        const subscript = predicateAritySubscript(arities, current.predicate, current.args.length);
+                        if (step && subscript) predicateSubscripts.set(step.cursor, subscript);
+                        return;
+                    }
+                    if (current.kind === "not") return visit(current.inner);
+                    if (current.kind === "forall" || current.kind === "exists") return visit(current.inner);
+                    visit(current.left);
+                    visit(current.right);
+                };
+                visit(formula);
+            } catch {
+                // A lexically valid partial formula has no arity annotation yet.
+            }
             return {
                 tokens: raw.tokens,
                 steps: raw.steps.filter((s) => s.tokenType !== "WHITESPACE" && s.matchedText !== ""),
+                predicateSubscripts,
                 error: "",
             };
         } catch (error) {
             return {
                 tokens: [],
                 steps: [],
-                error: error instanceof Error ? error.message : String(error),
+                predicateSubscripts: new Map<number, string>(), error: error instanceof Error ? error.message : String(error),
             };
         }
     }, [input]);
