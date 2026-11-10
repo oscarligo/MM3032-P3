@@ -1,6 +1,6 @@
 .controls {
     position: sticky;
-    bottom: var(--space-lg, 1.5rem);
+    bottom: var(--space-lg);
     z-index: 50;
     margin-inline: auto;
     width: max-content;
@@ -11,14 +11,12 @@
     justify-content: center;
     gap: var(--space-md);
     
-    padding: var(--space-xs, 0.5rem) var(--space-md, 1rem);
+    padding: var(--space-xs) var(--space-md);
 
     background: color-mix(in srgb, var(--color-surface) 88%, transparent);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-full, 9999px);
-    box-shadow: 
-        0 10px 25px -5px rgb(16 24 40 / 15%),
-        0 8px 10px -6px rgb(16 24 40 / 10%);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-floating);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
@@ -40,7 +38,7 @@
 .actions button {
     padding: 0.4rem 0.85rem;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     color: var(--color-text);
     background: var(--color-surface);
     font-size: 0.875rem;
@@ -71,10 +69,10 @@
 
 @media (max-width: 560px) {
     .controls {
-        bottom: var(--space-sm, 1rem);
+        bottom: var(--space-sm);
         padding: 0.4rem 0.75rem;
         gap: var(--space-sm);
-        border-radius: var(--radius-lg, 0.75rem);
+        border-radius: var(--radius-lg);
     }
 
     .progress {

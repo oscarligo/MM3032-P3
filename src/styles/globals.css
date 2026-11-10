@@ -51,7 +51,7 @@ select {
   min-width: 32px;
   min-height: 32px;
   border: 2px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--scrollbar-thumb);
   background-clip: padding-box;
 }

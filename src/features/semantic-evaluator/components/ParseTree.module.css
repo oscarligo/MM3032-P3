@@ -208,7 +208,7 @@
     color: inherit;
     background: transparent;
     border: 1.5px solid currentColor;
-    border-radius: 0.35rem 0.5rem 0.3rem 0.55rem;
+    border-radius: var(--radius-handdrawn);
     font-family: inherit;
     font-size: 0.5rem;
     cursor: pointer;

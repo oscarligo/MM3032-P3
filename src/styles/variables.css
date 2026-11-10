@@ -5,6 +5,8 @@
   --font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   --font-family-handwritten: Caveat, cursive;
   --font-family-monospace: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-family-math: "Cambria Math", "STIX Two Math", Georgia, "Times New Roman", serif;
+  --font-family-serif: Georgia, "Times New Roman", serif;
   --font-size-base: 16px;
   --line-height-base: 1.5;
 
@@ -22,6 +24,22 @@
   --color-whiteboard: #fcfdfe;
   --color-whiteboard-ink: #0c47a5;
   --color-annotation: #e11d48;
+  --color-on-dark: #ffffff;
+  --color-presentation-background: #e6e6e6;
+  --color-presentation-bar: #333333;
+  --color-presentation-footer: #000000;
+  --color-presentation-surface: #ffffff;
+  --color-presentation-text: #202124;
+  --color-presentation-text-muted: #404040;
+  --color-presentation-border: #cccccc;
+  --color-presentation-border-subtle: #dedede;
+  --color-presentation-control-border: #777777;
+  --color-presentation-control-hover: #f1f1f1;
+  --color-presentation-input: #f9f9f9;
+  --color-presentation-focus: #888888;
+  --color-presentation-focus-ring: rgb(136 136 136 / 20%);
+  --color-presentation-header-control: rgb(255 255 255 / 72%);
+  --color-presentation-header-hover: rgb(255 255 255 / 12%);
   --whiteboard-surface: linear-gradient(135deg, rgb(255 255 255 / 90%) 0%, rgb(244 247 250 / 50%) 50%, rgb(235 240 245 / 80%) 100%);
   --whiteboard-frame: linear-gradient(45deg, #8a939b 0%, #e2e6ea 20%, #b8c0c8 45%, #f8f9fa 50%, #9aa2aa 75%, #d5dade 90%, #6c757d 100%);
   --whiteboard-shadow: inset 0 2px 5px rgb(0 0 0 / 28%), inset 0 0 0 1px rgb(0 0 0 / 15%), 0 12px 28px rgb(0 0 0 / 15%), 0 4px 8px rgb(0 0 0 / 8%);
@@ -33,9 +51,17 @@
 
   --shadow-sm: 0 1px 3px rgb(16 24 40 / 10%);
   --shadow-md: 0 4px 12px rgb(16 24 40 / 14%);
+  --shadow-presentation: 0 4px 12px rgb(0 0 0 / 8%);
+  --shadow-presentation-focus: 0 0 0 3px var(--color-presentation-focus-ring);
+  --shadow-floating: 0 10px 25px -5px rgb(16 24 40 / 15%), 0 8px 10px -6px rgb(16 24 40 / 10%);
+  --shadow-floating-sm: 0 8px 18px -5px rgb(16 24 40 / 15%), 0 4px 8px -5px rgb(16 24 40 / 10%);
+  --whiteboard-joint-inset-shadow: inset 0 0 0 1px var(--whiteboard-joint-shadow);
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --radius-handdrawn: 0.35rem 0.5rem 0.3rem 0.55rem;
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;

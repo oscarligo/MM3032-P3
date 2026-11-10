@@ -9,10 +9,10 @@
     min-height: 0;
     overflow: auto;
     padding: var(--space-lg);
-    border-radius: 24px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    color: #404040;
+    border-radius: var(--radius-xl);
+    background-color: var(--color-presentation-surface);
+    box-shadow: var(--shadow-presentation);
+    color: var(--color-presentation-text-muted);
     font-family: var(--font-family);
     line-height: 1.4;
 }
@@ -36,7 +36,7 @@
     align-items: center;
     gap: .3rem;
     margin: .35rem 0;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-family-serif);
 }
 
 .predicateItem {
@@ -90,17 +90,17 @@
     display: inline-block;
     min-width: 1ch;
     padding: 0 .08rem;
-    color: #202124;
+    color: var(--color-presentation-text);
 }
 
 .card input:not([type]),
 .card select {
     width: 1.4rem;
     height: 1.4rem;
-    border-radius: 2px;
-    background: #ffffff;
-    color: #202124;
-    border: 1px solid #dedede;
+    border-radius: var(--radius-sm);
+    background: var(--color-presentation-surface);
+    color: var(--color-presentation-text);
+    border: 1px solid var(--color-presentation-border-subtle);
     font: inherit;
     text-align: center;
 }
@@ -117,18 +117,18 @@
 
 .card input:hover,
 .card select:hover {
-    border-color: #555;
+    border-color: var(--color-presentation-focus);
 }
 
 .card input:focus,
 .card select:focus {
     outline: 1px;
-    border-color: #ababab;
-    background-color: #fff;
+    border-color: var(--color-presentation-focus);
+    background-color: var(--color-presentation-surface);
 }
 
 .card select:invalid {
-    background-color: #fff;
+    background-color: var(--color-presentation-surface);
 }
 
 .actions {
@@ -144,10 +144,10 @@
     width: 1.1rem;
     height: 1.1rem;
     padding: 0;
-    border: 1px solid #777;
-    border-radius: 5px;
-    background: #fff;
-    color: #202124;
+    border: 1px solid var(--color-presentation-control-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-presentation-surface);
+    color: var(--color-presentation-text);
     font-size: 0.5rem;
     font-weight: 600;
     cursor: pointer;
@@ -155,12 +155,12 @@
 
 .actions .add,
 .actions .remove {
-    background: #fff;
+    background: var(--color-presentation-surface);
 }
 
 .actions button:hover:not(:disabled) {
-    border-color: #222;
-    background: #f1f1f1;
+    border-color: var(--color-presentation-text);
+    background: var(--color-presentation-control-hover);
 }
 
 .actions button:disabled {
@@ -198,8 +198,8 @@
     gap: .55rem;
     min-width: 0;
     padding-left: var(--space-md);
-    border-left: 1px solid #dedede;
-    font-family: "Cambria Math", "STIX Two Math", Georgia, "Times New Roman", serif;
+    border-left: 1px solid var(--color-presentation-border-subtle);
+    font-family: var(--font-family-math);
 }
 
 .environmentSymbol {
@@ -229,8 +229,8 @@
 
 .formula {
     display: inline;
-    color: #111;
-    font-family: "Cambria Math", "STIX Two Math", Georgia, "Times New Roman", serif;
+    color: var(--color-presentation-text);
+    font-family: var(--font-family-math);
     font-size: 1.08em;
     font-style: italic;
     font-weight: 400;
@@ -240,7 +240,7 @@
 
 .error {
     margin: .2rem 0;
-    color: #b42318;
+    color: var(--color-danger);
     font-family: var(--font-family);
     font-size: .7em;
 }
@@ -253,7 +253,7 @@
     .environmentPanel {
         padding-top: var(--space-sm);
         padding-left: 0;
-        border-top: 1px solid #dedede;
+        border-top: 1px solid var(--color-presentation-border-subtle);
         border-left: 0;
     }
 }
