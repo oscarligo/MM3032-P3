@@ -1,77 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useFormulaStore } from "../../../store/store_formula";
-import type { Formula, Term } from "../types";
+import {
+    analyzeFormula,
+    canAddPredicateTuple,
+    cleanDomain,
+    cleanFunctionRows,
+    cleanPredicateRows,
+    domainState,
+    symbolLabel,
+    updatePredicateTuple,
+    type FunctionRow,
+    type SymbolInfo,
+} from "../algorithms/interpretation";
+import type { Formula } from "../types";
 import InterpretationCarousel from "./InterpretationCarousel";
 import styles from "./InterpretationInput.module.css";
-
-type SymbolInfo = {
-    key: string;
-    name: string;
-    arity: number;
-};
-
-type FunctionRow = {
-    args: string[];
-    result: string;
-};
-
-const subscript = (value: number) =>
-    String(value).replace(/\d/g, (digit) => "₀₁₂₃₄₅₆₇₈₉"[Number(digit)]);
-
-const symbolLabel = ({ name, arity }: SymbolInfo, symbols: SymbolInfo[]) =>
-    symbols.filter((symbol) => symbol.name === name).length > 1
-        ? `${name}${subscript(arity)}`
-        : name;
-
-function analyzeFormula(formula: Formula) {
-    const constants = new Set<string>();
-    const freeVariables = new Set<string>();
-    const functions = new Map<string, SymbolInfo>();
-    const predicates = new Map<string, SymbolInfo>();
-
-    const visitTerm = (term: Term, bound: ReadonlySet<string>) => {
-        if (term.kind === "const") {
-            constants.add(term.name);
-        }
-        if (term.kind === "var" && !bound.has(term.name)) {
-            freeVariables.add(term.name);
-        }
-        if (term.kind === "func") {
-            const key = `${term.name}/${term.args.length}`;
-            functions.set(key, { key, name: term.name, arity: term.args.length });
-            term.args.forEach((argument) => visitTerm(argument, bound));
-        }
-    };
-
-    const visit = (current: Formula, bound: ReadonlySet<string>) => {
-        if (current.kind === "atom") {
-            const key = `${current.predicate}/${current.args.length}`;
-            predicates.set(key, { key, name: current.predicate, arity: current.args.length });
-            current.args.forEach((argument) => visitTerm(argument, bound));
-            return;
-        }
-        if (current.kind === "not") {
-            return visit(current.inner, bound);
-        }
-        if (current.kind === "forall" || current.kind === "exists") {
-            const nested = new Set(bound);
-            nested.add(current.variable);
-            return visit(current.inner, nested);
-        }
-        visit(current.left, bound);
-        visit(current.right, bound);
-    };
-
-    visit(formula, new Set());
-
-    return {
-        constants: [...constants],
-        freeVariables: [...freeVariables],
-        functions: [...functions.values()],
-        predicates: [...predicates.values()],
-    };
-}
 
 export default function InterpretationInput({ formula, isEditing }: { formula: Formula; isEditing: boolean }) {
     const { LL } = useI18nContext();
@@ -90,28 +34,13 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
     useEffect(() => {
         if (isEditing) return;
 
-        setDomain((values) => {
-            const completed = values.filter((value) => value.trim());
-            return completed.length > 0 ? completed : [""];
-        });
-        setFunctionRows((rows) => Object.fromEntries(
-            Object.entries(rows).map(([key, values]) => [
-                key,
-                values.filter((row) => row.args.every(Boolean) && Boolean(row.result)),
-            ])
-        ));
-        setPredicateRows((rows) => Object.fromEntries(
-            Object.entries(rows).map(([key, values]) => [
-                key,
-                values.filter((tuple) => tuple.every(Boolean)),
-            ])
-        ));
+        setDomain(cleanDomain);
+        setFunctionRows(cleanFunctionRows);
+        setPredicateRows(cleanPredicateRows);
         setDuplicatePredicates({});
     }, [isEditing]);
 
-    const domainValues = domain.map((value) => value.trim()).filter(Boolean);
-    const duplicateDomain = new Set(domainValues).size !== domainValues.length;
-    const options = [...new Set(domainValues)];
+    const { options, hasDuplicates: duplicateDomain } = domainState(domain);
 
     const handleDomainChange = (index: number, nextValue: string) => {
         setDomain((values) =>
@@ -197,25 +126,20 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
         nextValue: string
     ) => {
         const rows = predicateRows[key] ?? [];
-        const candidate = rows[rowIndex].map((entry, entryIndex) =>
-            entryIndex === valueIndex ? nextValue : entry
-        );
-        const duplicate = candidate.every(Boolean) && rows.some(
-            (tuple, index) => index !== rowIndex && tuple.join("\u0000") === candidate.join("\u0000")
-        );
+        const update = updatePredicateTuple(rows, rowIndex, valueIndex, nextValue);
 
-        setDuplicatePredicates((values) => ({ ...values, [key]: duplicate }));
-        if (duplicate) return;
+        setDuplicatePredicates((values) => ({ ...values, [key]: update.duplicate }));
+        if (update.duplicate) return;
 
         setPredicateRows((current) => ({
             ...current,
-            [key]: current[key].map((item, index) => index === rowIndex ? candidate : item),
+            [key]: update.rows,
         }));
     };
 
     const canAddPredicateRow = (key: string) => {
         const rows = predicateRows[key] ?? [];
-        return options.length > 0 && (rows.length === 0 || rows[rows.length - 1].every(Boolean));
+        return canAddPredicateTuple(rows, options.length > 0);
     };
 
     const valueSelect = (value: string, onChange: (value: string) => void, label: string) => (
