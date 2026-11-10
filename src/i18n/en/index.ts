@@ -48,6 +48,17 @@ const en = {
 		tokenType: 'Type', tokenValue: 'Value', empty: 'Enter a formula to begin.',
 		invalid: 'The formula contains an unrecognized character.',
 	},
+	interpretation: {
+		title: 'Domain and interpretation', domain: 'Domain', addDomain: 'Add domain element',
+		exampleIntro: 'Let ℒ be a first-order language and ℐ an interpretation of ℒ given by:',
+		determine: 'Determine the truth value of', inInterpretation: 'in ℐ', underEnvironment: 'under environment ℓ.',
+		edit: 'Edit', done: 'Done', falseValue: 'False',
+		constants: 'Constants', function: 'Function {symbol}', predicate: 'Predicate {symbol}',
+		environment: 'Free-variable environment', argument: 'argument', result: 'result',
+		selectValue: '-', emptyDomain: 'Add at least one element to the domain.',
+		duplicateDomain: 'Domain elements cannot be repeated.',
+		duplicatePredicate: 'Predicate interpretation elements cannot be repeated.', trueValue: 'True',
+	},
 } satisfies Translation
 
 export default en

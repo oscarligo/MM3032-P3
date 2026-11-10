@@ -48,6 +48,17 @@ const es = {
 		tokenType: 'Tipo', tokenValue: 'Valor', empty: 'Escribe una fórmula para comenzar.',
 		invalid: 'La fórmula contiene un carácter no reconocido.',
 	},
+	interpretation: {
+		title: 'Dominio e interpretación', domain: 'Dominio', addDomain: 'Agregar elemento al dominio',
+		exampleIntro: 'Sea ℒ un lenguaje de primer orden e ℐ una interpretación de ℒ dada por:',
+		determine: 'Determinar el valor de verdad de', inInterpretation: 'en ℐ', underEnvironment: 'bajo el entorno ℓ.',
+		edit: 'Editar', done: 'Listo', falseValue: 'Falso',
+		constants: 'Constantes', function: 'Función {symbol:string}', predicate: 'Predicado {symbol:string}',
+		environment: 'Entorno de variables libres', argument: 'argumento', result: 'resultado',
+		selectValue: '-', emptyDomain: 'Agrega al menos un elemento al dominio.',
+		duplicateDomain: 'Los elementos del dominio no pueden repetirse.',
+		duplicatePredicate: 'Los elementos de la interpretación del predicado no pueden repetirse.', trueValue: 'Verdadero',
+	},
 } satisfies BaseTranslation
 
 export default es

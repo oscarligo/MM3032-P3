@@ -338,6 +338,94 @@ type RootTranslation = {
 		 */
 		invalid: string
 	}
+	interpretation: {
+		/**
+		 * D​o​m​i​n​i​o​ ​e​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n
+		 */
+		title: string
+		/**
+		 * D​o​m​i​n​i​o
+		 */
+		domain: string
+		/**
+		 * A​g​r​e​g​a​r​ ​e​l​e​m​e​n​t​o​ ​a​l​ ​d​o​m​i​n​i​o
+		 */
+		addDomain: string
+		/**
+		 * S​e​a​ ​ℒ​ ​u​n​ ​l​e​n​g​u​a​j​e​ ​d​e​ ​p​r​i​m​e​r​ ​o​r​d​e​n​ ​e​ ​ℐ​ ​u​n​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​ ​ℒ​ ​d​a​d​a​ ​p​o​r​:
+		 */
+		exampleIntro: string
+		/**
+		 * D​e​t​e​r​m​i​n​a​r​ ​e​l​ ​v​a​l​o​r​ ​d​e​ ​v​e​r​d​a​d​ ​d​e
+		 */
+		determine: string
+		/**
+		 * e​n​ ​ℐ
+		 */
+		inInterpretation: string
+		/**
+		 * b​a​j​o​ ​e​l​ ​e​n​t​o​r​n​o​ ​ℓ​.
+		 */
+		underEnvironment: string
+		/**
+		 * E​d​i​t​a​r
+		 */
+		edit: string
+		/**
+		 * L​i​s​t​o
+		 */
+		done: string
+		/**
+		 * F​a​l​s​o
+		 */
+		falseValue: string
+		/**
+		 * C​o​n​s​t​a​n​t​e​s
+		 */
+		constants: string
+		/**
+		 * F​u​n​c​i​ó​n​ ​{​s​y​m​b​o​l​}
+		 * @param {string} symbol
+		 */
+		'function': RequiredParams<'symbol'>
+		/**
+		 * P​r​e​d​i​c​a​d​o​ ​{​s​y​m​b​o​l​}
+		 * @param {string} symbol
+		 */
+		predicate: RequiredParams<'symbol'>
+		/**
+		 * E​n​t​o​r​n​o​ ​d​e​ ​v​a​r​i​a​b​l​e​s​ ​l​i​b​r​e​s
+		 */
+		environment: string
+		/**
+		 * a​r​g​u​m​e​n​t​o
+		 */
+		argument: string
+		/**
+		 * r​e​s​u​l​t​a​d​o
+		 */
+		result: string
+		/**
+		 * S​e​l​e​c​c​i​o​n​a​r
+		 */
+		selectValue: string
+		/**
+		 * A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​ ​e​l​e​m​e​n​t​o​ ​a​l​ ​d​o​m​i​n​i​o​.
+		 */
+		emptyDomain: string
+		/**
+		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​l​ ​d​o​m​i​n​i​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
+		 */
+		duplicateDomain: string
+		/**
+		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​ ​l​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
+		 */
+		duplicatePredicate: string
+		/**
+		 * V​e​r​d​a​d​e​r​o
+		 */
+		trueValue: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -658,6 +746,92 @@ export type TranslationFunctions = {
 		 * La fórmula contiene un carácter no reconocido.
 		 */
 		invalid: () => LocalizedString
+	}
+	interpretation: {
+		/**
+		 * Dominio e interpretación
+		 */
+		title: () => LocalizedString
+		/**
+		 * Dominio
+		 */
+		domain: () => LocalizedString
+		/**
+		 * Agregar elemento al dominio
+		 */
+		addDomain: () => LocalizedString
+		/**
+		 * Sea ℒ un lenguaje de primer orden e ℐ una interpretación de ℒ dada por:
+		 */
+		exampleIntro: () => LocalizedString
+		/**
+		 * Determinar el valor de verdad de
+		 */
+		determine: () => LocalizedString
+		/**
+		 * en ℐ
+		 */
+		inInterpretation: () => LocalizedString
+		/**
+		 * bajo el entorno ℓ.
+		 */
+		underEnvironment: () => LocalizedString
+		/**
+		 * Editar
+		 */
+		edit: () => LocalizedString
+		/**
+		 * Listo
+		 */
+		done: () => LocalizedString
+		/**
+		 * Falso
+		 */
+		falseValue: () => LocalizedString
+		/**
+		 * Constantes
+		 */
+		constants: () => LocalizedString
+		/**
+		 * Función {symbol}
+		 */
+		'function': (arg: { symbol: string }) => LocalizedString
+		/**
+		 * Predicado {symbol}
+		 */
+		predicate: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * Entorno de variables libres
+		 */
+		environment: () => LocalizedString
+		/**
+		 * argumento
+		 */
+		argument: () => LocalizedString
+		/**
+		 * resultado
+		 */
+		result: () => LocalizedString
+		/**
+		 * Seleccionar
+		 */
+		selectValue: () => LocalizedString
+		/**
+		 * Agrega al menos un elemento al dominio.
+		 */
+		emptyDomain: () => LocalizedString
+		/**
+		 * Los elementos del dominio no pueden repetirse.
+		 */
+		duplicateDomain: () => LocalizedString
+		/**
+		 * Los elementos de la interpretación del predicado no pueden repetirse.
+		 */
+		duplicatePredicate: () => LocalizedString
+		/**
+		 * Verdadero
+		 */
+		trueValue: () => LocalizedString
 	}
 }
 
