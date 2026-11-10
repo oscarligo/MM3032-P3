@@ -16,16 +16,45 @@
   border-radius: 0;
   border-image: var(--whiteboard-frame) 1;
 
-  box-shadow: var(--whiteboard-shadow);
+  outline: 1px solid var(--whiteboard-outer-edge);
+  outline-offset: 0;
+  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-shadow);
 
   color: var(--color-whiteboard-ink);
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
+}
+
+.whiteboard--center {
+  z-index: 2;
+  transform: translateZ(var(--whiteboard-depth-center));
+}
+
+.whiteboard--left {
+  z-index: 1;
+  transform-origin: right center;
+  transform: translateZ(var(--whiteboard-depth-side)) rotateY(var(--whiteboard-side-angle));
+  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
+  user-select: none;
+}
+
+.whiteboard--right {
+  z-index: 1;
+  transform-origin: left center;
+  transform: translateZ(var(--whiteboard-depth-side)) rotateY(calc(var(--whiteboard-side-angle) * -1));
+  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
+  user-select: none;
 }
 
 .whiteboard::after {
   content: "";
   position: absolute;
-  inset: calc(var(--whiteboard-frame-width) * -2);
+  inset: calc(var(--whiteboard-frame-width) * -1);
   pointer-events: none;
   border: 1px solid var(--whiteboard-joint);
-  box-shadow: var(--whiteboard-joint-inset-shadow);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }

@@ -6,7 +6,7 @@
     height: calc(100dvh - 8rem);
     min-height: 32rem;
     border-block: 1px solid var(--color-border);
-    background: var(--color-background);
+    background: var(--wall-color);
 }
 
 .canvasViewport {
@@ -19,10 +19,18 @@
     cursor: grab;
     touch-action: none;
     user-select: none;
-    background:
-        linear-gradient(var(--color-border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-    background-size: 2rem 2rem;
+    background-color: var(--wall-color);
+    transition: background-color 0.4s ease;
+}
+
+.canvasViewport::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none; 
+    background-image: var(--wall-lighting);
+    z-index: 1;
+    transition: background-image 0.4s ease;
 }
 
 .dragging {
@@ -33,27 +41,48 @@
     width: max-content;
     transform-origin: 0 0;
     will-change: transform;
+    z-index: 2;
 }
 
 .boards {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
+    perspective-origin: center center;
+    padding: var(--space-xl);
 }
 
 .boards > section {
     min-width: 0;
 }
 
-.procedureBoard,
-.secondaryBoard {
-    overflow: hidden;
-}
-
 .procedureBoard {
     display: grid;
     grid-template-rows: max-content minmax(0, 1fr);
     gap: var(--space-md);
+    overflow: hidden;
+    z-index: 1;
+
+    transform-origin: right center;
+    transform: translateZ(var(--whiteboard-depth-side)) rotateY(var(--whiteboard-side-angle));
+    box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
+}
+
+.centerBoard {
+    z-index: 2;
+    transform: translateZ(var(--whiteboard-depth-center));
+    box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-shadow);
+}
+
+
+.secondaryBoard {
+    overflow: hidden;
+    z-index: 3;
+
+    transform-origin: left center;
+    transform: translateZ(var(--whiteboard-depth-front)) rotateY(calc(var(--whiteboard-side-angle) * -1));
+    box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
 }
 
 .lexerArea {

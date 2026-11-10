@@ -21,7 +21,7 @@
   --color-success: #16835d;
   --color-warning: #b76e00;
   --color-danger: #d13b3b;
-  --color-whiteboard: #fcfdfe;
+  --color-whiteboard: #f4f6f8;
   --color-whiteboard-ink: #0c47a5;
   --color-annotation: #e11d48;
   --color-on-dark: #ffffff;
@@ -40,14 +40,49 @@
   --color-presentation-focus-ring: rgb(136 136 136 / 20%);
   --color-presentation-header-control: rgb(255 255 255 / 72%);
   --color-presentation-header-hover: rgb(255 255 255 / 12%);
-  --whiteboard-surface: linear-gradient(135deg, rgb(255 255 255 / 90%) 0%, rgb(244 247 250 / 50%) 50%, rgb(235 240 245 / 80%) 100%);
-  --whiteboard-frame: linear-gradient(45deg, #8a939b 0%, #e2e6ea 20%, #b8c0c8 45%, #f8f9fa 50%, #9aa2aa 75%, #d5dade 90%, #6c757d 100%);
-  --whiteboard-shadow: inset 0 2px 5px rgb(0 0 0 / 28%), inset 0 0 0 1px rgb(0 0 0 / 15%), 0 12px 28px rgb(0 0 0 / 15%), 0 4px 8px rgb(0 0 0 / 8%);
-  --whiteboard-joint: rgb(255 255 255 / 40%);
-  --whiteboard-joint-shadow: rgb(0 0 0 / 20%);
+
+  --whiteboard-surface: radial-gradient(
+    ellipse 95% 70% at 50% 0%,
+    rgb(255 255 255 / 99%) 0%,
+    rgb(246 248 251 / 86%) 50%,
+    rgb(231 236 242 / 95%) 100%
+  );
+  --whiteboard-frame: linear-gradient(180deg, #ffffff 0%, #d8dee4 18%, #9ba5af 55%, #535d67 100%);
+  --whiteboard-frame-bevel:
+    inset 0 2px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 3px 0 rgba(24, 32, 42, 0.5),
+    inset 2px 0 2px 0 rgba(130, 142, 154, 0.35),
+    inset -2px 0 2px 0 rgba(130, 142, 154, 0.35),
+    inset 0 5px 12px 0 rgba(0, 0, 0, 0.28),
+    inset 0 0 2px 1px rgba(0, 0, 0, 0.22);
+  --whiteboard-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 10px 20px -4px rgba(27, 36, 48, 0.28),
+    0 22px 36px -8px rgba(18, 26, 38, 0.32);
+  --whiteboard-side-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px -4px rgba(27, 36, 48, 0.2),
+    0 16px 28px -6px rgba(18, 26, 38, 0.22);
+  --whiteboard-outer-edge: rgba(38, 47, 58, 0.35);
+  --whiteboard-joint: rgb(255 255 255 / 65%);
+  --whiteboard-joint-shadow: rgb(0 0 0 / 30%);
+  --whiteboard-joint-inset-shadow: inset 0 0 0 1px var(--whiteboard-joint-shadow);
   --whiteboard-max-width: 75%;
   --whiteboard-min-height: 28.125rem;
-  --whiteboard-frame-width: 0.5rem;
+  --whiteboard-frame-width: 0.625rem;
+
+  --whiteboard-depth-center: 24px;
+  --whiteboard-depth-front: 25px;
+  --whiteboard-depth-side: 10px;
+  --whiteboard-side-angle: 3.5deg;
+
+  --wall-color: #d9dee6;
+  --wall-lighting: radial-gradient(
+    ellipse 75% 55% at 50% 0%,
+    rgba(242, 247, 255, 0.55) 0%,
+    rgba(215, 229, 248, 0.2) 45%,
+    transparent 80%
+  );
 
   --shadow-sm: 0 1px 3px rgb(16 24 40 / 10%);
   --shadow-md: 0 4px 12px rgb(16 24 40 / 14%);
@@ -55,7 +90,6 @@
   --shadow-presentation-focus: 0 0 0 3px var(--color-presentation-focus-ring);
   --shadow-floating: 0 10px 25px -5px rgb(16 24 40 / 15%), 0 8px 10px -6px rgb(16 24 40 / 10%);
   --shadow-floating-sm: 0 8px 18px -5px rgb(16 24 40 / 15%), 0 4px 8px -5px rgb(16 24 40 / 10%);
-  --whiteboard-joint-inset-shadow: inset 0 0 0 1px var(--whiteboard-joint-shadow);
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -73,6 +107,25 @@
   --scrollbar-track: transparent;
   --scrollbar-thumb: #b4bdca;
   --scrollbar-thumb-hover: #8b96a6;
+
+  --lamp-body: linear-gradient(180deg, #dce1e7 0%, #b9c1cb 100%);
+  --lamp-border: #929ca8;
+  --lamp-diffuser: #f5f9ff;
+  --lamp-diffuser-glow: 
+    0 0 10px rgba(225, 238, 255, 0.9),
+    0 4px 18px rgba(185, 211, 245, 0.65);
+  --lamp-beam: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    rgba(235, 244, 255, 0.48) 0%,
+    rgba(208, 225, 248, 0.24) 35%,
+    rgba(188, 211, 241, 0.09) 65%,
+    transparent 80%
+  );
+  --lamp-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    0 8px 18px rgba(31, 41, 55, 0.25);
+  --lamp-btn-bg: #e9edf2;
+  --lamp-btn-border: #b7c0ca;
 }
 
 :root[data-theme="dark"] {
@@ -86,22 +139,57 @@
   --color-border: #353b47;
   --color-primary: #78a2ff;
   --color-primary-hover: #9ab9ff;
-  --color-success: #54c99a;
+  --color-success: #13704f;
   --color-warning: #f0b44d;
   --color-danger: #ff7777;
-  --color-whiteboard: #202936;
-  --color-whiteboard-ink: #8eb7ff;
-  --color-annotation: #ff7895;
-  --whiteboard-surface: linear-gradient(135deg, rgb(45 56 72 / 95%) 0%, rgb(32 41 54 / 92%) 50%, rgb(25 33 44 / 96%) 100%);
-  --whiteboard-frame: linear-gradient(45deg, #555e68 0%, #9ba3ac 20%, #69737e 45%, #c4cad0 50%, #59636e 75%, #89929b 90%, #414952 100%);
-  --whiteboard-shadow: inset 0 2px 5px rgb(0 0 0 / 55%), inset 0 0 0 1px rgb(255 255 255 / 8%), 0 12px 28px rgb(0 0 0 / 40%), 0 4px 8px rgb(0 0 0 / 28%);
-  --whiteboard-joint: rgb(255 255 255 / 16%);
-  --whiteboard-joint-shadow: rgb(0 0 0 / 45%);
+  --color-whiteboard: #dde0e3;
+  --color-whiteboard-ink: #0a3985;
+  --color-annotation: #b91c1c;
+
+  --whiteboard-surface: linear-gradient(135deg, rgb(244 245 246 / 97%) 0%, rgb(222 225 228 / 88%) 50%, rgb(202 206 210 / 94%) 100%);
+  --whiteboard-frame: linear-gradient(180deg, #c4c9ce 0%, #7b838a 18%, #42494f 55%, #181d22 100%);
+  --whiteboard-frame-bevel:
+    inset 0 3px 2px 0 rgba(215, 235, 255, 0.9),
+    inset 0 -3px 4px 0 rgba(4, 8, 14, 0.95),
+    inset 2px 0 2px 0 rgba(72, 90, 108, 0.45),
+    inset -2px 0 2px 0 rgba(72, 90, 108, 0.45),
+    inset 0 6px 14px 0 rgba(8, 14, 24, 0.55),
+    inset 0 0 3px 1px rgba(0, 0, 0, 0.5);
+  --whiteboard-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.6),
+    0 14px 26px -6px rgba(2, 5, 10, 0.8),
+    0 28px 44px -10px rgba(0, 0, 0, 0.9);
+  --whiteboard-side-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.5),
+    0 10px 20px -6px rgba(2, 5, 10, 0.7),
+    0 20px 34px -8px rgba(0, 0, 0, 0.8);
+  --whiteboard-outer-edge: rgba(0, 0, 0, 0.8);
+  --whiteboard-joint: rgb(215 235 255 / 35%);
+  --whiteboard-joint-shadow: rgb(0 0 0 / 60%);
+
+  --wall-color: #12161f;
+  --wall-lighting: linear-gradient(
+    115deg,
+    rgba(145, 185, 230, 0.18) 0%,
+    rgba(100, 140, 190, 0.08) 30%,
+    rgba(18, 22, 31, 0) 65%
+  );
 
   --shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 40%);
   --scrollbar-thumb: #4b5361;
   --scrollbar-thumb-hover: #687384;
+
+  --lamp-body: linear-gradient(180deg, #2b323c 0%, #1a1f26 100%);
+  --lamp-border: #13171d;
+  --lamp-diffuser: #353e4b;
+  --lamp-diffuser-glow: none;
+  --lamp-beam: none;
+  --lamp-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.6),
+    0 12px 24px rgba(0, 0, 0, 0.7);
+  --lamp-btn-bg: #1f252e;
+  --lamp-btn-border: #2e3642;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -119,18 +207,53 @@
     --color-success: #54c99a;
     --color-warning: #f0b44d;
     --color-danger: #ff7777;
-    --color-whiteboard: #202936;
-    --color-whiteboard-ink: #8eb7ff;
-    --color-annotation: #ff7895;
-    --whiteboard-surface: linear-gradient(135deg, rgb(45 56 72 / 95%) 0%, rgb(32 41 54 / 92%) 50%, rgb(25 33 44 / 96%) 100%);
-    --whiteboard-frame: linear-gradient(45deg, #555e68 0%, #9ba3ac 20%, #69737e 45%, #c4cad0 50%, #59636e 75%, #89929b 90%, #414952 100%);
-    --whiteboard-shadow: inset 0 2px 5px rgb(0 0 0 / 55%), inset 0 0 0 1px rgb(255 255 255 / 8%), 0 12px 28px rgb(0 0 0 / 40%), 0 4px 8px rgb(0 0 0 / 28%);
-    --whiteboard-joint: rgb(255 255 255 / 16%);
-    --whiteboard-joint-shadow: rgb(0 0 0 / 45%);
+    --color-whiteboard: #dde0e3;
+    --color-whiteboard-ink: #171b20;
+    --color-annotation: #b91c1c;
+
+    --whiteboard-surface: linear-gradient(135deg, rgb(244 245 246 / 97%) 0%, rgb(222 225 228 / 88%) 50%, rgb(202 206 210 / 94%) 100%);
+    --whiteboard-frame: linear-gradient(180deg, #c4c9ce 0%, #7b838a 18%, #42494f 55%, #181d22 100%);
+    --whiteboard-frame-bevel:
+      inset 0 3px 2px 0 rgba(215, 235, 255, 0.9),
+      inset 0 -3px 4px 0 rgba(4, 8, 14, 0.95),
+      inset 2px 0 2px 0 rgba(72, 90, 108, 0.45),
+      inset -2px 0 2px 0 rgba(72, 90, 108, 0.45),
+      inset 0 6px 14px 0 rgba(8, 14, 24, 0.55),
+      inset 0 0 3px 1px rgba(0, 0, 0, 0.5);
+    --whiteboard-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.6),
+      0 14px 26px -6px rgba(2, 5, 10, 0.8),
+      0 28px 44px -10px rgba(0, 0, 0, 0.9);
+    --whiteboard-side-shadow:
+      0 3px 6px rgba(0, 0, 0, 0.5),
+      0 10px 20px -6px rgba(2, 5, 10, 0.7),
+      0 20px 34px -8px rgba(0, 0, 0, 0.8);
+    --whiteboard-outer-edge: rgba(0, 0, 0, 0.8);
+    --whiteboard-joint: rgb(215 235 255 / 35%);
+    --whiteboard-joint-shadow: rgb(0 0 0 / 60%);
+
+    --wall-color: #12161f;
+    --wall-lighting: linear-gradient(
+      115deg,
+      rgba(145, 185, 230, 0.18) 0%,
+      rgba(100, 140, 190, 0.08) 30%,
+      rgba(18, 22, 31, 0) 65%
+    );
 
     --shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 40%);
     --scrollbar-thumb: #4b5361;
     --scrollbar-thumb-hover: #687384;
+
+    --lamp-body: linear-gradient(180deg, #2b323c 0%, #1a1f26 100%);
+    --lamp-border: #13171d;
+    --lamp-diffuser: #353e4b;
+    --lamp-diffuser-glow: none;
+    --lamp-beam: none;
+    --lamp-shadow: 
+      0 3px 6px rgba(0, 0, 0, 0.6),
+      0 12px 24px rgba(0, 0, 0, 0.7);
+    --lamp-btn-bg: #1f252e;
+    --lamp-btn-border: #2e3642;
   }
 }

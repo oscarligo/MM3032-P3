@@ -9,7 +9,6 @@
     background-color: var(--color-presentation-background);
     font-family: var(--font-family);
     overflow: hidden;
-    border: 1px solid var(--color-presentation-border);
 }
 
 .topBar {

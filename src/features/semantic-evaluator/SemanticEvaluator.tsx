@@ -35,36 +35,37 @@ export default function SemanticEvaluator() {
                     wrapperProps={{ id: "canvas-viewport", "aria-label": "Lienzo de pizarras: arrastra para navegar" }}
                 >
                     <div className={styles.boards}>
-                    <Whiteboard
-                        width="40rem"
-                        height="33.0rem"
-                        minHeight="33.0rem"
-                        padding="var(--space-lg)"
-                        className={styles.procedureBoard}
-                        ariaLabel={LL.semanticEvaluator.leftBoard()}
-                    >
-                        <div className={styles.lexerArea}>
-                            <Lexer />
-                        </div>
-                        <ParseTree mode="procedure" visualization={parser} />
-                    </Whiteboard>
-                    <Whiteboard
-                        id="canvas-center-board"
-                        width="55rem"
-                        height="38rem"
-                        minHeight="38rem"
-                        ariaLabel={LL.semanticEvaluator.centerBoard()}
-                    >
-                        <FormulaInput interpretationFormula={parser.isComplete ? parser.formula : undefined} />
-                    </Whiteboard>
-                    <Whiteboard
-                        width="40rem"
-                        height="33.0rem"
-                        minHeight="33.0rem"
-                        padding="var(--space-lg)"
-                        className={styles.secondaryBoard}
-                        ariaLabel={LL.semanticEvaluator.rightBoard()}
-                    />
+                        <Whiteboard
+                            width="40rem"
+                            height="33.0rem"
+                            minHeight="33.0rem"
+                            padding="var(--space-lg)"
+                            className={styles.procedureBoard}
+                            ariaLabel={LL.semanticEvaluator.leftBoard()}
+                        >
+                            <div className={styles.lexerArea}>
+                                <Lexer />
+                            </div>
+                            <ParseTree mode="procedure" visualization={parser} />
+                        </Whiteboard>
+                        <Whiteboard
+                            id="canvas-center-board"
+                            width="55rem"
+                            height="38rem"
+                            minHeight="38rem"
+                            ariaLabel={LL.semanticEvaluator.centerBoard()}
+                            className={styles.centerBoard}
+                        >
+                            <FormulaInput interpretationFormula={parser.isComplete ? parser.formula : undefined} />
+                        </Whiteboard>
+                        <Whiteboard
+                            width="40rem"
+                            height="33.0rem"
+                            minHeight="33.0rem"
+                            padding="var(--space-lg)"
+                            className={styles.secondaryBoard}
+                            ariaLabel={LL.semanticEvaluator.rightBoard()}
+                        />
                     </div>
                 </TransformComponent>
                 <CanvasControls />
