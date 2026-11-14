@@ -56,7 +56,10 @@ export default function SemanticEvaluator() {
                             ariaLabel={LL.semanticEvaluator.centerBoard()}
                             className={styles.centerBoard}
                         >
-                            <FormulaInput interpretationFormula={parser.isComplete ? parser.formula : undefined} />
+                            <FormulaInput
+                                formula={parser.formula}
+                                interpretationFormula={parser.isComplete ? parser.formula : undefined}
+                            />
                         </Whiteboard>
                         <Whiteboard
                             width="40rem"

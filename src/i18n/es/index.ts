@@ -44,6 +44,7 @@ const es = {
 		stepCounter: 'Paso {current:number} de {total:number}', previous: 'Anterior', next: 'Siguiente',
 		restart: 'Reiniciar', play: 'Reproducir', pause: 'Pausar', cursor: 'Cursor', matched: 'Coincidencia',
 		remaining: 'Por analizar', nothing: 'Nada', whitespace: 'Se ignoró un espacio en blanco.',
+		constantSelection: 'Selecciona los símbolos que se comportan como constantes',
 		recognized: 'Se reconoció {type:string}: «{value:string}».', tokensTitle: 'Tokens encontrados',
 		tokenType: 'Tipo', tokenValue: 'Valor', empty: 'Escribe una fórmula para comenzar.',
 		invalid: 'La fórmula contiene un carácter no reconocido.',

@@ -312,6 +312,10 @@ type RootTranslation = {
 		 */
 		whitespace: string
 		/**
+		 * S​e​l​e​c​c​i​o​n​a​ ​l​o​s​ ​s​í​m​b​o​l​o​s​ ​q​u​e​ ​s​e​ ​c​o​m​p​o​r​t​a​n​ ​c​o​m​o​ ​c​o​n​s​t​a​n​t​e​s
+		 */
+		constantSelection: string
+		/**
 		 * S​e​ ​r​e​c​o​n​o​c​i​ó​ ​{​t​y​p​e​}​:​ ​«​{​v​a​l​u​e​}​»​.
 		 * @param {string} type
 		 * @param {string} value
@@ -406,7 +410,7 @@ type RootTranslation = {
 		 */
 		result: string
 		/**
-		 * S​e​l​e​c​c​i​o​n​a​r
+		 * -
 		 */
 		selectValue: string
 		/**
@@ -723,6 +727,10 @@ export type TranslationFunctions = {
 		 */
 		whitespace: () => LocalizedString
 		/**
+		 * Selecciona los símbolos que se comportan como constantes
+		 */
+		constantSelection: () => LocalizedString
+		/**
 		 * Se reconoció {type}: «{value}».
 		 */
 		recognized: (arg: { type: string, value: string }) => LocalizedString
@@ -813,7 +821,7 @@ export type TranslationFunctions = {
 		 */
 		result: () => LocalizedString
 		/**
-		 * Seleccionar
+		 * -
 		 */
 		selectValue: () => LocalizedString
 		/**

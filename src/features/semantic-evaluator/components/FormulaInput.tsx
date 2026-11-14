@@ -2,18 +2,24 @@ import { useRef, useState } from "react";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useFormulaStore } from "../../../store/store_formula";
 import type { Formula } from "../types";
+import { analyzeFormula } from "../algorithms/interpretation";
 import InterpretationInput from "./InterpretationInput";
 import icon from "../../../assets/icon.svg";
 import styles from "./FormulaInput.module.css";
 
 const LOGIC_SYMBOLS = ["∀", "∃", "¬", "∧", "∨", "→", "(", ")", ","];
 
-export default function FormulaInput({ interpretationFormula }: { interpretationFormula?: Formula }) {
+export default function FormulaInput({ formula: parsedFormula, interpretationFormula }: { formula?: Formula; interpretationFormula?: Formula }) {
     const { LL } = useI18nContext();
     const formula = useFormulaStore((state) => state.formula);
     const setFormula = useFormulaStore((state) => state.setFormula);
+    const constantSymbols = useFormulaStore((state) => state.constantSymbols);
+    const toggleConstantSymbol = useFormulaStore((state) => state.toggleConstantSymbol);
     const [isEditingInterpretation, setIsEditingInterpretation] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const termSymbols = parsedFormula
+        ? [...analyzeFormula(parsedFormula).freeVariables, ...analyzeFormula(parsedFormula).constants].sort()
+        : [];
     const insertSymbol = (symbol: string) => {
         const input = inputRef.current;
         const start = input?.selectionStart ?? formula.length;
@@ -69,6 +75,21 @@ export default function FormulaInput({ interpretationFormula }: { interpretation
                             </button>
                         ))}
                     </div>
+                    {termSymbols.length > 0 && (
+                        <fieldset className={styles.constantSelector}>
+                            <legend>{LL.lexer.constantSelection()}</legend>
+                            {termSymbols.map((symbol) => (
+                                <label key={symbol}>
+                                    <input
+                                        type="checkbox"
+                                        checked={constantSymbols.includes(symbol)}
+                                        onChange={() => toggleConstantSymbol(symbol)}
+                                    />
+                                    <span>{symbol}</span>
+                                </label>
+                            ))}
+                        </fieldset>
+                    )}
                 </div>}
             </div>
 

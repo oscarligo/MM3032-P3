@@ -44,6 +44,7 @@ const en = {
 		stepCounter: 'Step {current} of {total}', previous: 'Previous', next: 'Next',
 		restart: 'Restart', play: 'Play', pause: 'Pause', cursor: 'Cursor', matched: 'Match',
 		remaining: 'Remaining', nothing: 'Nothing', whitespace: 'Whitespace was ignored.',
+		constantSelection: 'Select the symbols that behave as constants',
 		recognized: '{type} was recognized: “{value}”.', tokensTitle: 'Tokens found',
 		tokenType: 'Type', tokenValue: 'Value', empty: 'Enter a formula to begin.',
 		invalid: 'The formula contains an unrecognized character.',

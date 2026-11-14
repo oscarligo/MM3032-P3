@@ -42,9 +42,9 @@ const decisionFor = (token: Token, callStack: string[], previous?: Token): strin
     }
 };
 
-export function parseTokensWithSteps(tokens: Token[]): ParserStepsResult {
+export function parseTokensWithSteps(tokens: Token[], constantSymbols: ReadonlySet<string> = new Set()): ParserStepsResult {
     const trace: ParserTrace[] = [];
-    const parser = new FormulaParser(tokens, (step) => trace.push(step));
+    const parser = new FormulaParser(tokens, (step) => trace.push(step), constantSymbols);
     const formula = parser.parse();
     const steps = trace.map<ParserStep>(({ cursor, token, callStack, activeScopeVars }) => ({
         stage: "parser",
@@ -61,7 +61,7 @@ export function parseTokensWithSteps(tokens: Token[]): ParserStepsResult {
     return { formula, tokens, steps };
 }
 
-export function parseFormulaWithSteps(input: string): ParserStepsResult {
+export function parseFormulaWithSteps(input: string, constantSymbols: ReadonlySet<string> = new Set()): ParserStepsResult {
     const { tokens } = tokenizeWithSteps(input);
-    return parseTokensWithSteps(tokens);
+    return parseTokensWithSteps(tokens, constantSymbols);
 }

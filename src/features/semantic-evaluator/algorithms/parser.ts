@@ -48,7 +48,11 @@ export class FormulaParser {
     // Mapa de frecuencias de variables ligadas para soportar anidamiento y sombreado (shadowing)
     private boundVarCounts: Map<string, number> = new Map();
 
-    constructor(tokens: Token[], private onRead?: (trace: ParserTrace) => void) {
+    constructor(
+        tokens: Token[],
+        private onRead?: (trace: ParserTrace) => void,
+        private constantSymbols: ReadonlySet<string> = new Set()
+    ) {
         this.tokens = tokens;
     }
 
@@ -132,14 +136,9 @@ export class FormulaParser {
                 return this.atToken({ kind: "func", name: ident, args }, start);
             }
 
-            // Convención semántica:
-            // 1. Si está ligada por ∀ o ∃ en el alcance actual, es una variable.
-            // 2. Si empieza con u..z (minúscula o mayúscula), se toma como variable libre por convención estándar.
-            // 3. De lo contrario (a..t, dígitos, etc.), se asume constante.
-            if (this.isBound(ident) || /^[u-zU-Z]/.test(ident)) {
+            if (this.isBound(ident) || !this.constantSymbols.has(ident)) {
                 return this.atToken({ kind: "var", name: ident }, start);
             }
-            // De lo contrario, se asume constante.
             return this.atToken({ kind: "const", name: ident }, start);
         });
     }
@@ -278,8 +277,8 @@ export class FormulaParser {
 }
 
 // Función helper de conveniencia para parsear directo desde un string
-export function parseFormula(input: string): Formula {
+export function parseFormula(input: string, constantSymbols: ReadonlySet<string> = new Set()): Formula {
     const tokens = tokenize(input);
-    const parser = new FormulaParser(tokens);
+    const parser = new FormulaParser(tokens, undefined, constantSymbols);
     return parser.parse();
 }

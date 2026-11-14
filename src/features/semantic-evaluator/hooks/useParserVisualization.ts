@@ -19,6 +19,7 @@ export type ParserVisualization = {
 
 export function useParserVisualization(): ParserVisualization {
     const input = useFormulaStore((state) => state.formula);
+    const constantSymbols = useFormulaStore((state) => state.constantSymbols);
     const globalStep = useProcedureStore((state) => state.stepIndex);
     const procedures = useProcedureStore((state) => state.procedures);
     const registerProcedure = useProcedureStore((state) => state.registerProcedure);
@@ -27,12 +28,12 @@ export function useParserVisualization(): ParserVisualization {
     const result = useMemo(() => {
         if (!input.trim()) return { formula: undefined, tokens: [], steps: [], error: "" };
         try {
-            const parsed = parseFormulaWithSteps(input);
+            const parsed = parseFormulaWithSteps(input, new Set(constantSymbols));
             return { ...parsed, error: "" };
         } catch (error) {
             return { formula: undefined, tokens: [], steps: [], error: error instanceof Error ? error.message : String(error) };
         }
-    }, [input]);
+    }, [constantSymbols, input]);
 
     useEffect(() => {
         registerProcedure("parser", result.steps.length, 0);
