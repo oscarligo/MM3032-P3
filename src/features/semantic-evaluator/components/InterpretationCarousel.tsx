@@ -16,20 +16,60 @@ export default function InterpretationCarousel({ children, previousLabel, nextLa
 
     useEffect(() => setPage((current) => Math.min(current, pageCount - 1)), [pageCount]);
 
+    const pages = Array.from({ length: pageCount }, (_, pageIndex) =>
+        items.slice(pageIndex * PAGE_SIZE, pageIndex * PAGE_SIZE + PAGE_SIZE)
+    );
+
     return (
         <div className={styles.carousel}>
-            <div
-                className={`${styles.viewport} ${pageCount > 1 ? styles.withControls : ""}`}
-                aria-live="polite"
-            >
-                {items.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE).map((item, index) => (
-                    <div className={styles.slide} key={page * PAGE_SIZE + index}>{item}</div>
-                ))}
+            <div className={styles.viewport} aria-live="polite">
+                <div
+                    className={styles.track}
+                    style={{ transform: `translateX(-${page * 100}%)` }}
+                >
+                    {pages.map((pageItems, pageIndex) => {
+                        const isActive = pageIndex === page;
+                        return (
+                            <div
+                                className={styles.page}
+                                key={pageIndex}
+                                aria-hidden={!isActive}
+                                inert={!isActive ? true : undefined}
+                            >
+                                {pageItems.map((item, itemIndex) => (
+                                    <div className={styles.slide} key={pageIndex * PAGE_SIZE + itemIndex}>
+                                        {item}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
+
             {pageCount > 1 && (
                 <div className={styles.controls}>
-                    <button type="button" onClick={() => setPage((current) => current - 1)} disabled={page === 0} aria-label={previousLabel}>←</button>
-                    <button type="button" onClick={() => setPage((current) => current + 1)} disabled={page >= pageCount - 1} aria-label={nextLabel}>→</button>
+                    <button
+                        type="button"
+                        onClick={() => setPage((current) => current - 1)}
+                        disabled={page === 0}
+                        aria-label={previousLabel}
+                    >
+                        ←
+                    </button>
+                    <div className={styles.progress} aria-hidden="true">
+                        {Array.from({ length: pageCount }, (_, index) => (
+                            <span className={index === page ? styles.active : ""} key={index} />
+                        ))}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setPage((current) => current + 1)}
+                        disabled={page >= pageCount - 1}
+                        aria-label={nextLabel}
+                    >
+                        →
+                    </button>
                 </div>
             )}
         </div>

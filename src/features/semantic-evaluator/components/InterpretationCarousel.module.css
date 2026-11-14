@@ -5,14 +5,25 @@
 }
 
 .viewport {
+    width: 100%;
+    overflow: hidden;
+}
+
+.track {
+    display: flex;
+    width: 100%;
+    transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+    will-change: transform;
+}
+
+.page {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 0;
     display: grid;
     grid-auto-rows: max-content;
     align-content: start;
     gap: .25rem;
-}
-
-.viewport.withControls {
-    padding-inline: 2.5rem;
 }
 
 .slide {
@@ -21,35 +32,70 @@
 }
 
 .controls {
-    position: absolute;
-    inset: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    pointer-events: none;
+    justify-content: center;
+    gap: .65rem;
+    margin-top: .75rem;
+    padding-top: .45rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-presentation-control-border) 50%, transparent);
 }
 
 .controls button {
-    min-width: 2rem;
-    height: 1.8rem;
-    padding: 0 .55rem;
-    border: 1px solid var(--color-presentation-control-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-presentation-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 .25rem;
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
     color: var(--color-presentation-text);
     font: inherit;
     font-size: .75rem;
+    line-height: 1;
+    opacity: .6;
     cursor: pointer;
-    pointer-events: auto;
+    transition: opacity .15s ease, border-color .15s ease;
 }
 
-.controls button:hover:not(:disabled) {
-    border-color: var(--color-presentation-text);
-    background: var(--color-presentation-control-hover);
+.controls button:hover:not(:disabled),
+.controls button:focus-visible:not(:disabled) {
+    opacity: 1;
+    border-bottom-color: var(--color-presentation-text);
+    outline: none;
 }
 
 .controls button:disabled {
-    opacity: .3;
-    cursor: not-allowed;
+    opacity: .2;
+    cursor: default;
 }
 
+.progress {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.progress span {
+    width: .3rem;
+    height: .3rem;
+    border-radius: 50%;
+    border: 1px solid var(--color-presentation-text);
+    background: transparent;
+    opacity: .35;
+    transition: opacity .2s ease, background-color .2s ease;
+}
+
+.progress span.active {
+    background: var(--color-presentation-text);
+    opacity: .85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .track {
+        transition: none;
+    }
+}
