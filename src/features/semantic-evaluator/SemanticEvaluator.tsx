@@ -21,8 +21,8 @@ export default function SemanticEvaluator() {
                 maxScale={1.5}
                 centerOnInit
                 limitToBounds={false}
-                wheel={{ step: 0.005, excluded: ["nested-tree-canvas"] }}
-                panning={{ velocityDisabled: true, excluded: ["nested-tree-canvas", "button", "input", "textarea", "select", "a"] }}
+                wheel={{ step: 0.005, excluded: ["nested-tree-canvas", "subtle-scrollbar"] }}
+                panning={{ velocityDisabled: true, excluded: ["nested-tree-canvas", "subtle-scrollbar", "button", "input", "textarea", "select", "a"] }}
                 doubleClick={{ disabled: true }}
                 onInit={({ centerView }) => {
                     window.requestAnimationFrame(() => window.requestAnimationFrame(() => centerView(0.5, 0)));

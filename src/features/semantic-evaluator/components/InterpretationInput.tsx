@@ -5,9 +5,9 @@ import {
     analyzeFormula,
     canAddPredicateTuple,
     cleanDomain,
-    cleanFunctionRows,
     cleanPredicateRows,
     domainState,
+    functionRowsForDomain,
     symbolLabel,
     updatePredicateTuple,
     type FunctionRow,
@@ -35,12 +35,25 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
         if (isEditing) return;
 
         setDomain(cleanDomain);
-        setFunctionRows(cleanFunctionRows);
         setPredicateRows(cleanPredicateRows);
         setDuplicatePredicates({});
     }, [isEditing]);
 
     const { options, hasDuplicates: duplicateDomain } = domainState(domain);
+    const domainSignature = options.join("\u0000");
+
+    useEffect(() => {
+        setFunctionRows((current) => Object.fromEntries(symbols.functions.map((fn) => {
+            const previousResults = new Map(
+                (current[fn.key] ?? []).map((row) => [row.args.join("\u0000"), row.result])
+            );
+            const rows = functionRowsForDomain(options, fn.arity).map((row) => ({
+                ...row,
+                result: previousResults.get(row.args.join("\u0000")) ?? "",
+            }));
+            return [fn.key, rows];
+        })));
+    }, [domainSignature, symbols.functions]);
 
     const handleDomainChange = (index: number, nextValue: string) => {
         setDomain((values) =>
@@ -57,41 +70,6 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
 
     const handleEnvironmentChange = (variable: string, nextValue: string) => {
         setEnvironment((current) => ({ ...current, [variable]: nextValue }));
-    };
-
-    const addFunctionRow = (fn: SymbolInfo) => {
-        setFunctionRows((rows) => ({
-            ...rows,
-            [fn.key]: [...(rows[fn.key] ?? []), { args: Array(fn.arity).fill(""), result: "" }],
-        }));
-    };
-
-    const removeFunctionRow = (key: string) => {
-        setFunctionRows((rows) => ({
-            ...rows,
-            [key]: (rows[key] ?? []).slice(0, -1),
-        }));
-    };
-
-    const updateFunctionArgument = (
-        key: string,
-        rowIndex: number,
-        argumentIndex: number,
-        nextValue: string
-    ) => {
-        setFunctionRows((current) => ({
-            ...current,
-            [key]: current[key].map((item, index) =>
-                index === rowIndex
-                    ? {
-                            ...item,
-                            args: item.args.map((arg, argIndex) =>
-                                argIndex === argumentIndex ? nextValue : arg
-                            ),
-                        }
-                    : item
-            ),
-        }));
     };
 
     const updateFunctionResult = (key: string, rowIndex: number, nextValue: string) => {
@@ -192,12 +170,9 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
                 <p className={styles.intro}>{LL.interpretation.exampleIntro()}</p>
             </div>
 
-            <div
-                className={`${styles.interpretationLayout} ${
-                    symbols.freeVariables.length > 0 ? styles.withEnvironment : ""
-                }`}
-            >
+            <div className={`${styles.interpretationLayout} ${symbols.functions.length > 0 ? styles.hasFunctions : ""} ${symbols.freeVariables.length > 0 ? styles.hasEnvironment : ""}`}>
                 <InterpretationCarousel
+                    className={styles.interpretationsPanel}
                     previousLabel={LL.procedure.previous()}
                     nextLabel={LL.procedure.next()}
                 >
@@ -249,55 +224,6 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
                     )}
                 </div>
             ))}
-
-            {symbols.functions.map((fn) => (
-                <div className={styles.mathLine} key={fn.key}>
-                        {symbolLabel(fn, symbols.functions)}
-                        <sup>ℐ</sup>
-                    <span>≝</span>
-                    <span className={styles.inlineValues}>
-                        <span>{"{"}</span>
-                        {(functionRows[fn.key] ?? []).map((row, rowIndex, rows) => (
-                            <span className={styles.tuple} key={rowIndex}>
-                                ({" "}
-                                {row.args.map((argument, argumentIndex) => (
-                                    <span key={argumentIndex}>
-                                        {editableValue(
-                                            rowIndex === rows.length - 1,
-                                            argument,
-                                            (value) =>
-                                                updateFunctionArgument(
-                                                    fn.key,
-                                                    rowIndex,
-                                                    argumentIndex,
-                                                    value
-                                                ),
-                                            `${fn.name} ${LL.interpretation.argument()} ${argumentIndex + 1}`
-                                        )}
-                                        {argumentIndex < row.args.length - 1 && ","}
-                                    </span>
-                                ))}{" "}
-                                ) →{" "}
-                                {editableValue(
-                                    rowIndex === rows.length - 1,
-                                    row.result,
-                                    (value) => updateFunctionResult(fn.key, rowIndex, value),
-                                    `${fn.name} ${LL.interpretation.result()}`
-                                )}
-                                {rowIndex < rows.length - 1 && ","}
-                            </span>
-                        ))}
-                        <span>{"}"}</span>
-                    </span>
-                    {actionButtons(
-                        () => addFunctionRow(fn),
-                        () => removeFunctionRow(fn.key),
-                        options.length > 0,
-                        (functionRows[fn.key]?.length ?? 0) > 0
-                    )}
-                </div>
-            ))}
-
             {symbols.predicates.map((predicate) => (
                 <div className={styles.predicateItem} key={predicate.key}>
                 <div className={`${styles.mathLine} ${styles.predicateLine}`}>
@@ -361,6 +287,50 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
                 </div>
             ))}
                 </InterpretationCarousel>
+
+                {symbols.functions.length > 0 && <InterpretationCarousel
+                    className={styles.functionsPanel}
+                    previousLabel={LL.procedure.previous()}
+                    nextLabel={LL.procedure.next()}
+                    pageSize={1}
+                >
+            {symbols.functions.map((fn) => (
+                <div className={`${styles.mathLine} ${styles.functionDefinition}`} key={fn.key}>
+                    <strong className={styles.functionSymbol}>
+                        {symbolLabel(fn, symbols.functions)}
+                        <sup>ℐ</sup>
+                    </strong>
+                    <span>:</span>
+                    <strong>𝒟<sup>{fn.arity}</sup></strong>
+                    <span>→</span>
+                    <strong>𝒟</strong>
+                    <span className={styles.functionDefinitionLabel}>definida por:</span>
+                    <span className={styles.functionMappings}>
+                        {(functionRows[fn.key] ?? []).map((row, rowIndex) => (
+                            <span className={styles.functionApplication} key={row.args.join("\u0000")}>
+                                {rowIndex === 0 && (
+                                    <span className={styles.functionMapPrefix}>
+                                        <strong className={styles.functionSymbol}>
+                                            {symbolLabel(fn, symbols.functions)}<sup>ℐ</sup>
+                                        </strong>
+                                        <span>≝ {"{"}</span>
+                                    </span>
+                                )}
+                                <span>({row.args.join(", ")}) ↦ [</span>
+                                {editableValue(
+                                    true,
+                                    row.result,
+                                    (value) => updateFunctionResult(fn.key, rowIndex, value),
+                                    `${fn.name} ${LL.interpretation.result()}`
+                                )}
+                                <span>]{rowIndex < (functionRows[fn.key]?.length ?? 0) - 1 && ","}</span>
+                                {rowIndex === (functionRows[fn.key]?.length ?? 0) - 1 && <span>{"}"}</span>}
+                            </span>
+                        ))}
+                    </span>
+                </div>
+            ))}
+                </InterpretationCarousel>}
 
                 {symbols.freeVariables.length > 0 && (
                     <aside className={styles.environmentPanel}>

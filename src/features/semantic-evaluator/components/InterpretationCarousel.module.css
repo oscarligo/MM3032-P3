@@ -1,29 +1,58 @@
 .carousel {
     position: relative;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) max-content;
     width: 100%;
+    height: 100%;
     min-width: 0;
+    min-height: 0;
 }
 
 .viewport {
     width: 100%;
-    overflow: hidden;
+    height: 100%;
+    min-height: min(14rem, calc(100% - 2.75rem));
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    touch-action: pan-y;
+}
+
+.viewport::-webkit-scrollbar {
+    display: none;
 }
 
 .track {
     display: flex;
     width: 100%;
-    transition: transform .38s cubic-bezier(.22, 1, .36, 1);
-    will-change: transform;
+    height: 100%;
 }
 
 .page {
     flex: 0 0 100%;
     width: 100%;
     min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    padding-right: .25rem;
     display: grid;
     grid-auto-rows: max-content;
     align-content: start;
     gap: .25rem;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.page:not(.activePage) {
+    pointer-events: none;
+}
+
+.page.activePage {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .slide {
@@ -32,6 +61,8 @@
 }
 
 .controls {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,6 +70,7 @@
     margin-top: .75rem;
     padding-top: .45rem;
     border-top: 1px solid color-mix(in srgb, var(--color-presentation-control-border) 50%, transparent);
+    background: var(--color-presentation-surface);
 }
 
 .controls button {
@@ -94,8 +126,14 @@
     opacity: .85;
 }
 
+@media (max-width: 560px) {
+    .viewport {
+        min-height: min(11rem, calc(100% - 2.75rem));
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .track {
-        transition: none;
+    .viewport {
+        scroll-behavior: auto;
     }
 }

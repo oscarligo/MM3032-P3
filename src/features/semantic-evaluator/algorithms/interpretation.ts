@@ -83,6 +83,14 @@ export const cleanFunctionRows = (rows: Record<string, FunctionRow[]>) =>
         ])
     );
 
+export const functionRowsForDomain = (domain: string[], arity: number): FunctionRow[] => {
+    let tuples: string[][] = [[]];
+    for (let index = 0; index < arity; index += 1) {
+        tuples = tuples.flatMap((tuple) => domain.map((value) => [...tuple, value]));
+    }
+    return tuples.map((args) => ({ args, result: "" }));
+};
+
 export const cleanPredicateRows = (rows: Record<string, string[][]>) =>
     Object.fromEntries(
         Object.entries(rows).map(([key, values]) => [
