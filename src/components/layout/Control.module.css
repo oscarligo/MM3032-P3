@@ -69,13 +69,36 @@
 
 @media (max-width: 560px) {
     .controls {
-        bottom: var(--space-sm);
-        padding: 0.4rem 0.75rem;
-        gap: var(--space-sm);
+        position: fixed;
+        right: max(var(--space-sm), env(safe-area-inset-right));
+        bottom: max(var(--space-sm), env(safe-area-inset-bottom));
+        left: max(var(--space-sm), env(safe-area-inset-left));
+        width: auto;
+        max-width: none;
+        margin: 0;
+        padding: 0.35rem;
+        gap: var(--space-xs);
         border-radius: var(--radius-lg);
     }
 
     .progress {
         display: none; 
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: 100%;
+        min-width: 0;
+    }
+
+    .actions button {
+        width: 100%;
+        min-width: 0;
+        padding: .4rem .2rem;
+        overflow: hidden;
+        font-size: clamp(.65rem, 3vw, .75rem);
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }

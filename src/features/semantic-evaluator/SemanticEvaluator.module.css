@@ -3,10 +3,16 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     width: 100%;
-    height: calc(100dvh - 8rem);
-    min-height: 32rem;
+    height: 100%;
+    min-height: 0;
     border-block: 1px solid var(--color-border);
     background: var(--wall-color);
+}
+
+@media (max-width: 620px) {
+    .boards {
+        padding: var(--space-md);
+    }
 }
 
 .canvasViewport {

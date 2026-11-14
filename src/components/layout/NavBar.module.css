@@ -77,11 +77,38 @@
 
 @media (max-width: 560px) {
     .navbar {
-        top: var(--space-sm, 0.5rem);
-        width: calc(100vw - 1.5rem);
+        position: fixed;
+        top: max(var(--space-sm, 0.5rem), env(safe-area-inset-top));
+        right: max(var(--space-sm, 0.5rem), env(safe-area-inset-right));
+        left: max(var(--space-sm, 0.5rem), env(safe-area-inset-left));
+        width: auto;
+        max-width: none;
+        margin: 0;
         padding: 0.4rem 0.75rem;
         gap: var(--space-sm);
         border-radius: var(--radius-lg, 0.75rem);
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        width: 100%;
+        min-width: 0;
+    }
+
+    .controls label {
+        min-width: 0;
+    }
+
+    .controls select,
+    .controls button {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        padding-inline: 0.65rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .controls label > span {

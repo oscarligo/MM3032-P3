@@ -92,8 +92,24 @@
 
 @media (max-width: 620px) {
     .controls {
-        bottom: var(--space-sm);
-        right: var(--space-sm);
+        right: max(var(--space-sm), env(safe-area-inset-right));
+        bottom: calc(4.5rem + env(safe-area-inset-bottom));
         gap: var(--space-xs);
+    }
+
+    .panel {
+        padding: .2rem .3rem;
+    }
+
+    .panel button {
+        min-width: 1.6rem;
+        min-height: 1.6rem;
+    }
+
+    .navigation button {
+        width: 1.75rem;
+        height: 1.75rem;
+        min-width: 1.75rem;
+        min-height: 1.75rem;
     }
 }
