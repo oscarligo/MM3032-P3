@@ -12,7 +12,7 @@ import {
     fitEvaluationScale,
     formulaToText,
 } from "../algorithms/evaluation";
-import { buildTruthTrace, type TruthTrace } from "../algorithms/truth";
+import { buildTruthTrace, type TruthTrace } from "../algorithms/Truth";
 import type { Formula } from "../types";
 import TreeCanvasControls from "./TreeCanvasControls";
 import Truth from "./Truth";
