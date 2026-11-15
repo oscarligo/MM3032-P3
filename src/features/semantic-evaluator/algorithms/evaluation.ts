@@ -93,6 +93,30 @@ export const buildEvaluationMap = (formula: Formula, interpretation: Interpretat
     return { variables, rowVariables, columnVariables, rowAssignments, columnAssignments, results };
 };
 
+const termToText = (term: Term): string =>
+    term.kind === "func"
+        ? `${term.name}(${term.args.map(termToText).join(", ")})`
+        : term.name;
+
+export const formulaToText = (formula: Formula): string => {
+    if (formula.kind === "atom") {
+        return formula.args.length > 0
+            ? `${formula.predicate}(${formula.args.map(termToText).join(", ")})`
+            : formula.predicate;
+    }
+    if (formula.kind === "not") return `¬${formulaToText(formula.inner)}`;
+    if (formula.kind === "forall" || formula.kind === "exists") {
+        return `${formula.kind === "forall" ? "∀" : "∃"}${formula.variable} ${formulaToText(formula.inner)}`;
+    }
+    const operator = formula.kind === "and" ? "∧" : formula.kind === "or" ? "∨" : "→";
+    return `(${formulaToText(formula.left)} ${operator} ${formulaToText(formula.right)})`;
+};
+
+export const evaluateUnderInterpretation = (
+    formula: Formula,
+    interpretation: InterpretationDefinition
+) => evaluateFormula(formula, interpretation, new Map(Object.entries(interpretation.environment)));
+
 export const fitEvaluationScale = (
     viewportWidth: number,
     viewportHeight: number,

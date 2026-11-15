@@ -1,13 +1,22 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
 import rough from "roughjs";
+import { TegakiRenderer } from "tegaki/react";
+import caveat from "tegaki/fonts/caveat";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useLocaleStore } from "../../../store/store_local";
 import { useInterpretationStore } from "../../../store/store_interpretation";
-import { buildEvaluationMap, fitEvaluationScale } from "../algorithms/evaluation";
+import {
+    buildEvaluationMap,
+    evaluateUnderInterpretation,
+    fitEvaluationScale,
+    formulaToText,
+} from "../algorithms/evaluation";
 import type { Formula } from "../types";
 import TreeCanvasControls from "./TreeCanvasControls";
 import styles from "./Evaluation.module.css";
+
+const WRITING_TIMING = { glyphGap: 0, stagger: { advance: .025, duration: .12 } } as const;
 
 function AutoCenter({ rowCount, columnCount }: { rowCount: number; columnCount: number }) {
     const { instance, centerView } = useControls();
@@ -45,6 +54,12 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
         () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
         [formula, interpretation]
     );
+    const finalEvaluation = useMemo(
+        () => formula && interpretation ? evaluateUnderInterpretation(formula, interpretation) : null,
+        [formula, interpretation]
+    );
+    const renderedFormula = useMemo(() => formula ? formulaToText(formula) : "", [formula]);
+    const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
 
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -267,6 +282,16 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             rowCount={evaluationMap.rowAssignments.length}
                             columnCount={evaluationMap.columnAssignments.length}
                         />
+                        <p className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                            <TegakiRenderer
+                                key={`${finalEvaluation}-${usesEnvironment}-${renderedFormula}`}
+                                font={caveat}
+                                reducedMotion="user"
+                                timing={WRITING_TIMING}
+                            >
+                                {`ℐ ${finalEvaluation === true ? "⊨" : "⊭"}${usesEnvironment ? "ₗ" : ""} ${renderedFormula}`}
+                            </TegakiRenderer>
+                        </p>
                         <TreeCanvasControls />
                     </TransformWrapper>
                 </div>

@@ -140,3 +140,26 @@
     font-weight: 700;
     opacity: .45;
 }
+
+.satisfaction {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    justify-content: center;
+    gap: .4rem;
+    max-width: 100%;
+    margin: var(--space-xs) 0 0;
+    font-family: var(--font-family-math);
+    font-size: 1.4rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.satisfied {
+    color: var(--color-success);
+}
+
+.notSatisfied {
+    color: var(--color-annotation);
+}
