@@ -430,6 +430,24 @@ type RootTranslation = {
 		 */
 		trueValue: string
 	}
+	evaluation: {
+		/**
+		 * E​v​a​l​u​a​c​i​ó​n
+		 */
+		title: string
+		/**
+		 * C​o​m​p​l​e​t​a​ ​e​l​ ​d​o​m​i​n​i​o​ ​y​ ​l​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​p​a​r​a​ ​g​e​n​e​r​a​r​ ​l​a​ ​t​a​b​l​a​.
+		 */
+		waiting: string
+		/**
+		 * R​e​s​u​l​t​a​d​o
+		 */
+		result: string
+		/**
+		 * V​a​l​o​r
+		 */
+		value: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -840,6 +858,24 @@ export type TranslationFunctions = {
 		 * Verdadero
 		 */
 		trueValue: () => LocalizedString
+	}
+	evaluation: {
+		/**
+		 * Evaluación
+		 */
+		title: () => LocalizedString
+		/**
+		 * Completa el dominio y la interpretación para generar la tabla.
+		 */
+		waiting: () => LocalizedString
+		/**
+		 * Resultado
+		 */
+		result: () => LocalizedString
+		/**
+		 * Valor
+		 */
+		value: () => LocalizedString
 	}
 }
 

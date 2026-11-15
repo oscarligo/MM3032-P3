@@ -16,6 +16,7 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
     const constantSymbols = useFormulaStore((state) => state.constantSymbols);
     const toggleConstantSymbol = useFormulaStore((state) => state.toggleConstantSymbol);
     const [isEditingInterpretation, setIsEditingInterpretation] = useState(false);
+    const [isInterpretationConfirmed, setIsInterpretationConfirmed] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const termSymbols = parsedFormula
         ? [...analyzeFormula(parsedFormula).freeVariables, ...analyzeFormula(parsedFormula).constants].sort()
@@ -39,7 +40,10 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                     <button
                         className={styles.topBarEdit}
                         type="button"
-                        onClick={() => setIsEditingInterpretation((value) => !value)}
+                        onClick={() => {
+                            setIsInterpretationConfirmed(isEditingInterpretation);
+                            setIsEditingInterpretation(!isEditingInterpretation);
+                        }}
                     >
                         {isEditingInterpretation ? LL.interpretation.done() : LL.interpretation.edit()}
                     </button>
@@ -51,6 +55,7 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                     <InterpretationInput
                         formula={interpretationFormula}
                         isEditing={isEditingInterpretation}
+                        isConfirmed={isInterpretationConfirmed}
                     />
                 ) : <div className={styles.card}>
                     <label className={styles.label} htmlFor="formula-input">{LL.lexer.inputLabel()}</label>

@@ -30,3 +30,11 @@ export interface Interpretation {
 
 // Representación de un entorno de evaluación.
 export type Environment = ReadonlyMap<string, string>;
+
+export type InterpretationDefinition = {
+    domain: string[];
+    constants: Record<string, string>;
+    functions: Record<string, { arity: number; rows: { args: string[]; result: string }[] }>;
+    predicates: Record<string, { arity: number; rows: string[][]; truth: boolean }>;
+    environment: Record<string, string>;
+};

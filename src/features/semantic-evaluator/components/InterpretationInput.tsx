@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useFormulaStore } from "../../../store/store_formula";
+import { useInterpretationStore } from "../../../store/store_interpretation";
 import {
     analyzeFormula,
     canAddPredicateTuple,
@@ -13,13 +14,18 @@ import {
     type FunctionRow,
     type SymbolInfo,
 } from "../algorithms/interpretation";
-import type { Formula } from "../types";
+import type { Formula, InterpretationDefinition } from "../types";
 import InterpretationCarousel from "./InterpretationCarousel";
 import styles from "./InterpretationInput.module.css";
 
-export default function InterpretationInput({ formula, isEditing }: { formula: Formula; isEditing: boolean }) {
+export default function InterpretationInput({ formula, isEditing, isConfirmed }: {
+    formula: Formula;
+    isEditing: boolean;
+    isConfirmed: boolean;
+}) {
     const { LL } = useI18nContext();
     const formulaText = useFormulaStore((state) => state.formula);
+    const setInterpretationDefinition = useInterpretationStore((state) => state.setDefinition);
 
     const [domain, setDomain] = useState(["0"]);
     const [constants, setConstants] = useState<Record<string, string>>({});
@@ -41,6 +47,46 @@ export default function InterpretationInput({ formula, isEditing }: { formula: F
 
     const { options, hasDuplicates: duplicateDomain } = domainState(domain);
     const domainSignature = options.join("\u0000");
+
+    const interpretationDefinition = useMemo<InterpretationDefinition | undefined>(() => {
+        const constantsComplete = symbols.constants.every((symbol) => options.includes(constants[symbol]));
+        const functionsComplete = symbols.functions.every((fn) => {
+            const rows = functionRows[fn.key] ?? [];
+            return rows.length === options.length ** fn.arity
+                && rows.every((row) => row.args.every((value) => options.includes(value)) && options.includes(row.result));
+        });
+        const predicatesComplete = symbols.predicates.every((predicate) =>
+            !duplicatePredicates[predicate.key]
+            && (predicateRows[predicate.key] ?? []).every((tuple) =>
+                tuple.length === predicate.arity && tuple.every((value) => options.includes(value))
+            )
+        );
+        const environmentComplete = symbols.freeVariables.every((variable) => options.includes(environment[variable]));
+
+        if (options.length === 0 || duplicateDomain || !constantsComplete || !functionsComplete
+            || !predicatesComplete || !environmentComplete) return undefined;
+
+        return {
+            domain: options,
+            constants: Object.fromEntries(symbols.constants.map((symbol) => [symbol, constants[symbol]])),
+            functions: Object.fromEntries(symbols.functions.map((fn) => [fn.key, {
+                arity: fn.arity,
+                rows: functionRows[fn.key] ?? [],
+            }])),
+            predicates: Object.fromEntries(symbols.predicates.map((predicate) => [predicate.key, {
+                arity: predicate.arity,
+                rows: predicateRows[predicate.key] ?? [],
+                truth: predicateTruth[predicate.key] ?? false,
+            }])),
+            environment: Object.fromEntries(symbols.freeVariables.map((variable) => [variable, environment[variable]])),
+        };
+    }, [constants, domainSignature, duplicateDomain, duplicatePredicates, environment, functionRows, predicateRows, predicateTruth, symbols]);
+
+    useEffect(
+        () => setInterpretationDefinition(isConfirmed ? interpretationDefinition : undefined),
+        [interpretationDefinition, isConfirmed, setInterpretationDefinition]
+    );
+    useEffect(() => () => setInterpretationDefinition(undefined), [setInterpretationDefinition]);
 
     useEffect(() => {
         setFunctionRows((current) => Object.fromEntries(symbols.functions.map((fn) => {

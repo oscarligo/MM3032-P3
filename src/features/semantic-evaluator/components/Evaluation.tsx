@@ -1,0 +1,276 @@
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
+import rough from "roughjs";
+import { useI18nContext } from "../../../i18n/i18n-react";
+import { useLocaleStore } from "../../../store/store_local";
+import { useInterpretationStore } from "../../../store/store_interpretation";
+import { buildEvaluationMap, fitEvaluationScale } from "../algorithms/evaluation";
+import type { Formula } from "../types";
+import TreeCanvasControls from "./TreeCanvasControls";
+import styles from "./Evaluation.module.css";
+
+function AutoCenter({ rowCount, columnCount }: { rowCount: number; columnCount: number }) {
+    const { instance, centerView } = useControls();
+
+    useEffect(() => {
+        const frame = window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+            const wrapper = instance.wrapperComponent;
+            const content = instance.contentComponent;
+            if (!wrapper || !content) return;
+            const scale = fitEvaluationScale(
+                wrapper.clientWidth,
+                wrapper.clientHeight,
+                content.offsetWidth,
+                content.offsetHeight
+            );
+            centerView(scale, 250, "easeOut");
+        }));
+        return () => window.cancelAnimationFrame(frame);
+    }, [centerView, columnCount, instance, rowCount]);
+
+    return null;
+}
+
+function TruthCell({ value, trueLabel }: { value: boolean | null; trueLabel: string }) {
+    const className = value === null ? styles.pendingCell : value ? styles.trueCell : styles.falseCell;
+    return <td className={className}>{value === null ? "-" : value ? trueLabel : "F"}</td>;
+}
+
+export default function Evaluation({ formula }: { formula?: Formula }) {
+    const { LL } = useI18nContext();
+    const locale = useLocaleStore((state) => state.locale);
+    const interpretation = useInterpretationStore((state) => state.definition);
+    const trueLabel = locale === "es" ? "V" : "T";
+    const evaluationMap = useMemo(
+        () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
+        [formula, interpretation]
+    );
+
+    const wrapRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const tableRef = useRef<HTMLTableElement>(null);
+
+        useLayoutEffect(() => {
+        const wrap = wrapRef.current;
+        const canvas = canvasRef.current;
+        const tableEl = tableRef.current;
+        if (!wrap || !canvas || !tableEl || !formula) return;
+
+        const getUnscaledBox = (el: HTMLElement, root: HTMLElement) => {
+            let x = 0;
+            let y = 0;
+            let curr: HTMLElement | null = el;
+            while (curr && curr !== root) {
+                x += curr.offsetLeft;
+                y += curr.offsetTop;
+                curr = curr.offsetParent as HTMLElement | null;
+            }
+            return { x, y, width: el.offsetWidth, height: el.offsetHeight };
+        };
+
+        const drawHandDrawnTable = () => {
+            const wrapWidth = wrap.offsetWidth;
+            const wrapHeight = wrap.offsetHeight;
+            if (wrapWidth === 0 || wrapHeight === 0) return;
+
+            const dpr = Math.max(window.devicePixelRatio || 1, 2);
+            canvas.width = wrapWidth * dpr;
+            canvas.height = wrapHeight * dpr;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, wrapWidth, wrapHeight);
+
+            const computed = getComputedStyle(wrap);
+            const inkColor = computed.getPropertyValue("--color-whiteboard-ink").trim() || "#1e293b";
+            const accentColor = computed.getPropertyValue("--color-annotation").trim() || "#dc2626";
+
+            const rc = rough.canvas(canvas);
+            const { x: offsetX, y: offsetY, width, height } = getUnscaledBox(tableEl, wrap);
+
+            const theadEl = tableEl.querySelector<HTMLElement>("thead");
+
+            if (theadEl) {
+                const theadHeight = theadEl.offsetHeight;
+                
+                const headerBottomY = offsetY + theadHeight;
+                rc.line(offsetX - 2, headerBottomY, offsetX + width + 2, headerBottomY, {
+                    stroke: inkColor,
+                    strokeWidth: 1.1,
+                    roughness: 1.3,
+                    bowing: 0.9,
+                    disableMultiStroke: true,
+                });
+                rc.line(offsetX - 1, headerBottomY + 2.5, offsetX + width + 1, headerBottomY + 2.5, {
+                    stroke: inkColor,
+                    strokeWidth: 0.7,
+                    roughness: 1.4,
+                    bowing: 0.9,
+                    disableMultiStroke: true,
+                });
+            }
+
+            rc.rectangle(offsetX, offsetY, width, height, {
+                stroke: inkColor,
+                strokeWidth: 1.1,
+                roughness: 1.35,
+                bowing: 0.9,
+                disableMultiStroke: true,
+            });
+
+            const axisCorner = tableEl.querySelector<HTMLElement>("[data-axis-corner]");
+            if (axisCorner) {
+                const box = getUnscaledBox(axisCorner, wrap);
+                const separatorX = box.x + box.width;
+                rc.line(separatorX, offsetY - 2, separatorX, offsetY + height + 2, {
+                    stroke: accentColor,
+                    strokeWidth: 1.1,
+                    roughness: 1.25,
+                    bowing: 0.8,
+                    disableMultiStroke: true,
+                });
+            }
+
+            const firstBodyRow = tableEl.querySelector<HTMLElement>("tbody tr");
+            const bodyCells = firstBodyRow
+                ? Array.from(firstBodyRow.children) as HTMLElement[]
+                : [];
+            const axisSeparatorX = axisCorner
+                ? (() => {
+                    const box = getUnscaledBox(axisCorner, wrap);
+                    return box.x + box.width;
+                })()
+                : undefined;
+
+            bodyCells.slice(0, -1).forEach((cell) => {
+                const box = getUnscaledBox(cell, wrap);
+                const x = box.x + box.width;
+                if (axisSeparatorX !== undefined && Math.abs(x - axisSeparatorX) < 1) return;
+                rc.line(x, offsetY + 2, x, offsetY + height - 2, {
+                    stroke: inkColor,
+                    strokeWidth: .65,
+                    roughness: 1.2,
+                    bowing: .7,
+                    strokeLineDash: [5, 4],
+                    disableMultiStroke: true,
+                });
+            });
+
+            const bodyRows = Array.from(tableEl.querySelectorAll<HTMLElement>("tbody tr"));
+            bodyRows.slice(0, -1).forEach((row) => {
+                const box = getUnscaledBox(row, wrap);
+                const y = box.y + box.height;
+                rc.line(offsetX + 2, y, offsetX + width - 2, y, {
+                    stroke: inkColor,
+                    strokeWidth: .65,
+                    roughness: 1.2,
+                    bowing: .7,
+                    strokeLineDash: [5, 4],
+                    disableMultiStroke: true,
+                });
+            });
+        };
+
+        drawHandDrawnTable();
+
+        const observer = new ResizeObserver(drawHandDrawnTable);
+        observer.observe(tableEl);
+        document.fonts?.ready.then(drawHandDrawnTable);
+
+        return () => observer.disconnect();
+    }, [evaluationMap, formula, locale]);
+
+
+    return (
+        <section className={styles.container}>
+            <h2>{LL.evaluation.title()}</h2>
+            {!evaluationMap ? (
+                <p className={styles.waiting}>{LL.evaluation.waiting()}</p>
+            ) : (
+                <div className={styles.canvasPanel}>
+                    <TransformWrapper
+                        initialScale={.5}
+                        minScale={.0000001}
+                        maxScale={2}
+                        centerOnInit
+                        limitToBounds={false}
+                        wheel={{ step: .005 }}
+                        panning={{ velocityDisabled: true }}
+                        doubleClick={{ disabled: true }}
+                    >
+                        <TransformComponent
+                            wrapperClass={`${styles.viewport} nested-tree-canvas`}
+                            contentClass={styles.canvasContent}
+                            wrapperStyle={{ width: "100%", height: "100%" }}
+                        >
+                            <div ref={wrapRef} className={styles.tableCanvasWrap}>
+                                <canvas ref={canvasRef} className={styles.roughCanvas} />
+                                <table ref={tableRef} className={styles.table}>
+                                    {evaluationMap.variables.length === 0 ? (
+                                        <tbody>
+                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} /></tr>
+                                        </tbody>
+                                    ) : evaluationMap.variables.length === 1 ? (
+                                        <>
+                                            <thead>
+                                                <tr>
+                                                    <th data-axis-corner>{evaluationMap.variables[0]}</th>
+                                                    <th>{LL.evaluation.value()}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
+                                                    <tr key={rowIndex}>
+                                                        <th className={styles.rowValue}>{assignment[0]}</th>
+                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} />
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <thead>
+                                                {evaluationMap.columnVariables.map((variable, variableIndex) => (
+                                                    <tr key={variable}>
+                                                        {evaluationMap.rowVariables.map((rowVariable) => (
+                                                            <th className={styles.rowAxisHeader} key={rowVariable}>
+                                                                {variableIndex === evaluationMap.columnVariables.length - 1 ? rowVariable : ""}
+                                                            </th>
+                                                        ))}
+                                                        <th className={styles.axisCorner} data-axis-corner>{variable}</th>
+                                                        {evaluationMap.columnAssignments.map((assignment, columnIndex) => (
+                                                            <th className={styles.columnValue} key={columnIndex}>{assignment[variableIndex]}</th>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </thead>
+                                            <tbody>
+                                                {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
+                                                    <tr key={rowIndex}>
+                                                        {evaluationMap.rowVariables.map((variable, variableIndex) => (
+                                                            <th className={styles.rowValue} key={variable}>{assignment[variableIndex]}</th>
+                                                        ))}
+                                                        <th className={styles.axisCorner} aria-hidden="true" />
+                                                        {evaluationMap.results[rowIndex].map((result, columnIndex) => (
+                                                            <TruthCell value={result} trueLabel={trueLabel} key={columnIndex} />
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </>
+                                    )}
+                                </table>
+                            </div>
+                        </TransformComponent>
+                        <AutoCenter
+                            rowCount={evaluationMap.rowAssignments.length}
+                            columnCount={evaluationMap.columnAssignments.length}
+                        />
+                        <TreeCanvasControls />
+                    </TransformWrapper>
+                </div>
+            )}
+        </section>
+    );
+}

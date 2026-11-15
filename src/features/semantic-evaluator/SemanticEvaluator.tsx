@@ -3,6 +3,7 @@ import Whiteboard from "./components/Whiteboard";
 import Lexer from "./components/Lexer";
 import FormulaInput from "./components/FormulaInput";
 import ParseTree from "./components/ParseTree";
+import Evaluation from "./components/Evaluation";
 import { useParserVisualization } from "./hooks/useParserVisualization";
 import { useI18nContext } from "../../i18n/i18n-react";
 import CanvasControls from "../../components/layout/CanvasControls";
@@ -68,7 +69,9 @@ export default function SemanticEvaluator() {
                             padding="var(--space-lg)"
                             className={styles.secondaryBoard}
                             ariaLabel={LL.semanticEvaluator.rightBoard()}
-                        />
+                        >
+                            <Evaluation formula={parser.formula} />
+                        </Whiteboard>
                     </div>
                 </TransformComponent>
                 <CanvasControls />

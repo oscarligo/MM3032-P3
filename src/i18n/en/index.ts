@@ -60,6 +60,9 @@ const en = {
 		duplicateDomain: 'Domain elements cannot be repeated.',
 		duplicatePredicate: 'Predicate interpretation elements cannot be repeated.', trueValue: 'True',
 	},
+	evaluation: {
+		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', result: 'Result', value: 'Value',
+	},
 } satisfies Translation
 
 export default en

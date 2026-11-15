@@ -60,6 +60,9 @@ const es = {
 		duplicateDomain: 'Los elementos del dominio no pueden repetirse.',
 		duplicatePredicate: 'Los elementos de la interpretación del predicado no pueden repetirse.', trueValue: 'Verdadero',
 	},
+	evaluation: {
+		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', result: 'Resultado', value: 'Valor',
+	},
 } satisfies BaseTranslation
 
 export default es
