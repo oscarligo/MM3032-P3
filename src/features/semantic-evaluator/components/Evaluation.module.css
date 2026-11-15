@@ -65,14 +65,14 @@
 
 .canvasStage {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0;
     width: max-content;
     height: max-content;
 }
 
 .canvasStageOpen {
-    gap: var(--space-md);
+    gap: var(--space-xs);
 }
 
 .procedureSlot {
@@ -83,8 +83,8 @@
 }
 
 .procedureSlotOpen {
-    flex-basis: 14rem;
-    width: 14rem;
+    flex-basis: 10rem;
+    width: 10rem;
     opacity: 1;
 }
 
@@ -92,6 +92,7 @@
     position: relative;
     display: inline-block;
     padding: 1.5rem;
+    padding-left: .75rem;
     min-width: min-content;
 }
 
