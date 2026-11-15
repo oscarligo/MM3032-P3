@@ -99,7 +99,6 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
 
             const computed = getComputedStyle(wrap);
             const inkColor = computed.getPropertyValue("--color-whiteboard-ink").trim() || "#1e293b";
-            const accentColor = computed.getPropertyValue("--color-annotation").trim() || "#dc2626";
 
             const rc = rough.canvas(canvas);
             const { x: offsetX, y: offsetY, width, height } = getUnscaledBox(tableEl, wrap);
@@ -124,6 +123,20 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     bowing: 0.9,
                     disableMultiStroke: true,
                 });
+
+                const headerRows = Array.from(theadEl.querySelectorAll<HTMLElement>("tr"));
+                headerRows.slice(0, -1).forEach((row) => {
+                    const box = getUnscaledBox(row, wrap);
+                    const y = box.y + box.height;
+                    rc.line(offsetX + 2, y, offsetX + width - 2, y, {
+                        stroke: inkColor,
+                        strokeWidth: .65,
+                        roughness: 1.2,
+                        bowing: .7,
+                        strokeLineDash: [5, 4],
+                        disableMultiStroke: true,
+                    });
+                });
             }
 
             rc.rectangle(offsetX, offsetY, width, height, {
@@ -137,9 +150,9 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             const axisCorner = tableEl.querySelector<HTMLElement>("[data-axis-corner]");
             if (axisCorner) {
                 const box = getUnscaledBox(axisCorner, wrap);
-                const separatorX = box.x + box.width;
+                const separatorX = box.x;
                 rc.line(separatorX, offsetY - 2, separatorX, offsetY + height + 2, {
-                    stroke: accentColor,
+                    stroke: inkColor,
                     strokeWidth: 1.1,
                     roughness: 1.25,
                     bowing: 0.8,
@@ -154,7 +167,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             const axisSeparatorX = axisCorner
                 ? (() => {
                     const box = getUnscaledBox(axisCorner, wrap);
-                    return box.x + box.width;
+                    return box.x;
                 })()
                 : undefined;
 
@@ -184,6 +197,26 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeLineDash: [5, 4],
                     disableMultiStroke: true,
                 });
+            });
+
+            const emptyCells = Array.from(tableEl.querySelectorAll<HTMLElement>("[data-empty-cell]"));
+            emptyCells.forEach((cell) => {
+                const box = getUnscaledBox(cell, wrap);
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(box.x, box.y, box.width, box.height);
+                ctx.clip();
+                ctx.globalAlpha = .58;
+                for (let start = box.x - box.height; start < box.x + box.width; start += 9) {
+                    rc.line(start, box.y + box.height, start + box.height, box.y, {
+                        stroke: inkColor,
+                        strokeWidth: .55,
+                        roughness: 1.3,
+                        bowing: .8,
+                        disableMultiStroke: true,
+                    });
+                }
+                ctx.restore();
             });
         };
 
@@ -249,9 +282,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                 {evaluationMap.columnVariables.map((variable, variableIndex) => (
                                                     <tr key={variable}>
                                                         {evaluationMap.rowVariables.map((rowVariable) => (
-                                                            <th className={styles.rowAxisHeader} key={rowVariable}>
-                                                                {variableIndex === evaluationMap.columnVariables.length - 1 ? rowVariable : ""}
-                                                            </th>
+                                                            <th className={styles.rowAxisHeader} data-empty-cell key={rowVariable} />
                                                         ))}
                                                         <th className={styles.axisCorner} data-axis-corner>{variable}</th>
                                                         {evaluationMap.columnAssignments.map((assignment, columnIndex) => (
@@ -261,12 +292,19 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                 ))}
                                             </thead>
                                             <tbody>
+                                                <tr className={styles.axisSpacerRow}>
+                                                    {evaluationMap.rowVariables.map((variable) => (
+                                                        <th className={styles.rowAxisHeader} key={variable}>{variable}</th>
+                                                    ))}
+                                                    <th className={styles.axisCorner} data-empty-cell />
+                                                    {evaluationMap.columnAssignments.map((_, columnIndex) => <td data-empty-cell key={columnIndex} />)}
+                                                </tr>
                                                 {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
                                                     <tr key={rowIndex}>
                                                         {evaluationMap.rowVariables.map((variable, variableIndex) => (
                                                             <th className={styles.rowValue} key={variable}>{assignment[variableIndex]}</th>
                                                         ))}
-                                                        <th className={styles.axisCorner} aria-hidden="true" />
+                                                        <th className={styles.axisCorner} data-empty-cell aria-hidden="true" />
                                                         {evaluationMap.results[rowIndex].map((result, columnIndex) => (
                                                             <TruthCell value={result} trueLabel={trueLabel} key={columnIndex} />
                                                         ))}

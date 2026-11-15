@@ -122,6 +122,11 @@
     min-width: 2.5rem;
 }
 
+.table .axisSpacerRow > * {
+    height: 2.5rem;
+    padding-block: 0;
+}
+
 .trueCell {
     color: var(--color-success);
     font-size: 1.45rem;
@@ -139,6 +144,27 @@
     font-size: 1.45rem;
     font-weight: 700;
     opacity: .45;
+}
+
+.trueCell,
+.falseCell,
+.pendingCell {
+    cursor: pointer;
+    transition: color .15s ease, background-color .15s ease;
+}
+
+.trueCell:hover {
+    background-color: color-mix(in srgb, var(--color-whiteboard-ink) 14%, transparent);
+}
+
+.falseCell:hover {
+    background-color: color-mix(in srgb, var(--color-whiteboard-ink) 14%, transparent);
+}
+
+.pendingCell:hover {
+    color: var(--color-whiteboard-ink);
+    background-color: color-mix(in srgb, var(--color-whiteboard-ink) 10%, transparent);
+    opacity: .8;
 }
 
 .satisfaction {
