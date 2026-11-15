@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
 import rough from "roughjs";
 import { TegakiRenderer } from "tegaki/react";
@@ -12,37 +12,67 @@ import {
     fitEvaluationScale,
     formulaToText,
 } from "../algorithms/evaluation";
+import { buildTruthTrace, type TruthTrace } from "../algorithms/truth";
 import type { Formula } from "../types";
 import TreeCanvasControls from "./TreeCanvasControls";
+import Truth from "./Truth";
 import styles from "./Evaluation.module.css";
 
 const WRITING_TIMING = { glyphGap: 0, stagger: { advance: .025, duration: .12 } } as const;
 
-function AutoCenter({ rowCount, columnCount }: { rowCount: number; columnCount: number }) {
-    const { instance, centerView } = useControls();
+function AutoCenter({ rowCount, columnCount, procedureOpen }: {
+    rowCount: number;
+    columnCount: number;
+    procedureOpen: boolean;
+}) {
+    const { instance, centerView, setTransform } = useControls();
+    const previousWidth = useRef<number | undefined>(undefined);
 
-    useEffect(() => {
-        const frame = window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+    useLayoutEffect(() => {
+        const frame = window.requestAnimationFrame(() => {
             const wrapper = instance.wrapperComponent;
             const content = instance.contentComponent;
             if (!wrapper || !content) return;
-            const scale = fitEvaluationScale(
-                wrapper.clientWidth,
-                wrapper.clientHeight,
-                content.offsetWidth,
-                content.offsetHeight
-            );
-            centerView(scale, 250, "easeOut");
-        }));
+            const width = content.offsetWidth;
+
+            if (previousWidth.current === undefined) {
+                const scale = fitEvaluationScale(
+                    wrapper.clientWidth,
+                    wrapper.clientHeight,
+                    width,
+                    content.offsetHeight
+                );
+                previousWidth.current = width;
+                centerView(scale, 250, "easeOut");
+                return;
+            }
+
+            const { positionX, positionY, scale } = instance.state;
+            const widthDelta = width - previousWidth.current;
+            previousWidth.current = width;
+            setTransform(positionX - widthDelta * scale, positionY, scale, 0);
+            window.requestAnimationFrame(() => centerView(scale, 300, "easeOut"));
+        });
         return () => window.cancelAnimationFrame(frame);
-    }, [centerView, columnCount, instance, rowCount]);
+    }, [centerView, columnCount, instance, procedureOpen, rowCount, setTransform]);
 
     return null;
 }
 
-function TruthCell({ value, trueLabel }: { value: boolean | null; trueLabel: string }) {
-    const className = value === null ? styles.pendingCell : value ? styles.trueCell : styles.falseCell;
-    return <td className={className}>{value === null ? "-" : value ? trueLabel : "F"}</td>;
+function TruthCell({ value, trueLabel, active, onClick }: {
+    value: boolean | null;
+    trueLabel: string;
+    active: boolean;
+    onClick: () => void;
+}) {
+    const valueClass = value === null ? styles.pendingCell : value ? styles.trueCell : styles.falseCell;
+    return (
+        <td className={`${valueClass} ${active ? styles.activeCell : ""}`}>
+            <button className={styles.truthButton} data-truth-cell type="button" onClick={onClick}>
+                {value === null ? "-" : value ? trueLabel : "F"}
+            </button>
+        </td>
+    );
 }
 
 export default function Evaluation({ formula }: { formula?: Formula }) {
@@ -60,6 +90,37 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     );
     const renderedFormula = useMemo(() => formula ? formulaToText(formula) : "", [formula]);
     const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
+    const [truthTrace, setTruthTrace] = useState<TruthTrace>();
+    const [activeTruthCell, setActiveTruthCell] = useState<string>();
+
+    useEffect(() => {
+        setTruthTrace(undefined);
+        setActiveTruthCell(undefined);
+    }, [formula, interpretation]);
+
+    const closeTruth = () => {
+        setTruthTrace(undefined);
+        setActiveTruthCell(undefined);
+    };
+
+    const openTruth = (rowIndex: number, columnIndex: number) => {
+        if (!formula || !interpretation || !evaluationMap) return;
+        const cellId = `${rowIndex}:${columnIndex}`;
+        if (activeTruthCell === cellId) {
+            closeTruth();
+            return;
+        }
+        setTruthTrace(buildTruthTrace(
+            formula,
+            interpretation,
+            evaluationMap.rowVariables,
+            evaluationMap.rowAssignments[rowIndex],
+            evaluationMap.columnVariables,
+            evaluationMap.columnAssignments[columnIndex],
+            trueLabel
+        ));
+        setActiveTruthCell(cellId);
+    };
 
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -244,7 +305,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                         centerOnInit
                         limitToBounds={false}
                         wheel={{ step: .005 }}
-                        panning={{ velocityDisabled: true }}
+                        panning={{ velocityDisabled: true, excluded: ["button"] }}
                         doubleClick={{ disabled: true }}
                     >
                         <TransformComponent
@@ -252,12 +313,16 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             contentClass={styles.canvasContent}
                             wrapperStyle={{ width: "100%", height: "100%" }}
                         >
-                            <div ref={wrapRef} className={styles.tableCanvasWrap}>
+                            <div className={`${styles.canvasStage} ${truthTrace ? styles.canvasStageOpen : ""}`}>
+                                <div className={`${styles.procedureSlot} ${truthTrace ? styles.procedureSlotOpen : ""}`}>
+                                    {truthTrace && <Truth trace={truthTrace} trueLabel={trueLabel} onClose={closeTruth} />}
+                                </div>
+                                <div ref={wrapRef} className={styles.tableCanvasWrap}>
                                 <canvas ref={canvasRef} className={styles.roughCanvas} />
                                 <table ref={tableRef} className={styles.table}>
                                     {evaluationMap.variables.length === 0 ? (
                                         <tbody>
-                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} /></tr>
+                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} active={activeTruthCell === "0:0"} onClick={() => openTruth(0, 0)} /></tr>
                                         </tbody>
                                     ) : evaluationMap.variables.length === 1 ? (
                                         <>
@@ -271,7 +336,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                 {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
                                                     <tr key={rowIndex}>
                                                         <th className={styles.rowValue}>{assignment[0]}</th>
-                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} />
+                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} active={activeTruthCell === `${rowIndex}:0`} onClick={() => openTruth(rowIndex, 0)} />
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -306,7 +371,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                         ))}
                                                         <th className={styles.axisCorner} data-empty-cell aria-hidden="true" />
                                                         {evaluationMap.results[rowIndex].map((result, columnIndex) => (
-                                                            <TruthCell value={result} trueLabel={trueLabel} key={columnIndex} />
+                                                            <TruthCell
+                                                                value={result}
+                                                                trueLabel={trueLabel}
+                                                                active={activeTruthCell === `${rowIndex}:${columnIndex}`}
+                                                                onClick={() => openTruth(rowIndex, columnIndex)}
+                                                                key={columnIndex}
+                                                            />
                                                         ))}
                                                     </tr>
                                                 ))}
@@ -314,11 +385,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                         </>
                                     )}
                                 </table>
+                                </div>
                             </div>
                         </TransformComponent>
                         <AutoCenter
                             rowCount={evaluationMap.rowAssignments.length}
                             columnCount={evaluationMap.columnAssignments.length}
+                            procedureOpen={Boolean(truthTrace)}
                         />
                         <p className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
                             <TegakiRenderer

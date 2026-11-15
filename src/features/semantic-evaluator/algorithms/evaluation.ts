@@ -117,6 +117,12 @@ export const evaluateUnderInterpretation = (
     interpretation: InterpretationDefinition
 ) => evaluateFormula(formula, interpretation, new Map(Object.entries(interpretation.environment)));
 
+export const evaluateFormulaInEnvironment = (
+    formula: Formula,
+    interpretation: InterpretationDefinition,
+    environment: ReadonlyMap<string, string>
+) => evaluateFormula(formula, interpretation, environment);
+
 export const fitEvaluationScale = (
     viewportWidth: number,
     viewportHeight: number,

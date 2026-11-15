@@ -1,4 +1,5 @@
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -39,6 +40,7 @@
     flex: 1;
     flex-direction: column;
     width: 100%;
+    min-width: 0;
     min-height: 0;
 }
 
@@ -59,6 +61,31 @@
 .canvasContent {
     width: max-content !important;
     height: max-content !important;
+}
+
+.canvasStage {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: max-content;
+    height: max-content;
+}
+
+.canvasStageOpen {
+    gap: var(--space-md);
+}
+
+.procedureSlot {
+    flex: 0 0 0;
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.procedureSlotOpen {
+    flex-basis: 14rem;
+    width: 14rem;
+    opacity: 1;
 }
 
 .tableCanvasWrap {
@@ -153,6 +180,25 @@
     transition: color .15s ease, background-color .15s ease;
 }
 
+.truthButton {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 3.75rem;
+    padding: 0.55rem 1.05rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: inherit;
+}
+
+.table .trueCell,
+.table .falseCell,
+.table .pendingCell {
+    padding: 0;
+}
+
 .trueCell:hover {
     background-color: color-mix(in srgb, var(--color-whiteboard-ink) 14%, transparent);
 }
@@ -165,6 +211,10 @@
     color: var(--color-whiteboard-ink);
     background-color: color-mix(in srgb, var(--color-whiteboard-ink) 10%, transparent);
     opacity: .8;
+}
+
+.table .activeCell {
+    background-color: color-mix(in srgb, var(--color-whiteboard-ink) 14%, transparent);
 }
 
 .satisfaction {

@@ -448,6 +448,34 @@ type RootTranslation = {
 		 */
 		value: string
 	}
+	truth: {
+		/**
+		 * D​e​c​i​s​i​ó​n​ ​d​e​l​ ​v​a​l​o​r​ ​d​e​ ​v​e​r​d​a​d
+		 */
+		title: string
+		/**
+		 * C​e​r​r​a​r
+		 */
+		close: string
+		/**
+		 * V​a​l​o​r​e​s​ ​d​e​ ​l​o​s​ ​á​t​o​m​o​s
+		 */
+		atoms: string
+		/**
+		 * P​a​s​o​ ​{​c​u​r​r​e​n​t​}​ ​d​e​ ​{​t​o​t​a​l​}
+		 * @param {number} current
+		 * @param {number} total
+		 */
+		progress: RequiredParams<'current' | 'total'>
+		/**
+		 * A​n​t​e​r​i​o​r
+		 */
+		previous: string
+		/**
+		 * S​i​g​u​i​e​n​t​e
+		 */
+		next: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -876,6 +904,32 @@ export type TranslationFunctions = {
 		 * Valor
 		 */
 		value: () => LocalizedString
+	}
+	truth: {
+		/**
+		 * Decisión del valor de verdad
+		 */
+		title: () => LocalizedString
+		/**
+		 * Cerrar
+		 */
+		close: () => LocalizedString
+		/**
+		 * Valores de los átomos
+		 */
+		atoms: () => LocalizedString
+		/**
+		 * Paso {current} de {total}
+		 */
+		progress: (arg: { current: number, total: number }) => LocalizedString
+		/**
+		 * Anterior
+		 */
+		previous: () => LocalizedString
+		/**
+		 * Siguiente
+		 */
+		next: () => LocalizedString
 	}
 }
 

@@ -63,6 +63,10 @@ const en = {
 	evaluation: {
 		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', result: 'Result', value: 'Value',
 	},
+	truth: {
+		title: 'Truth-value decision', close: 'Close', atoms: 'Evaluation history',
+		progress: 'Step {current} of {total}', previous: 'Previous', next: 'Next',
+	},
 } satisfies Translation
 
 export default en

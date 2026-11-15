@@ -63,6 +63,10 @@ const es = {
 	evaluation: {
 		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', result: 'Resultado', value: 'Valor',
 	},
+	truth: {
+		title: 'Decisión del valor de verdad', close: 'Cerrar', atoms: 'Historial de evaluación',
+		progress: 'Paso {current:number} de {total:number}', previous: 'Anterior', next: 'Siguiente',
+	},
 } satisfies BaseTranslation
 
 export default es
