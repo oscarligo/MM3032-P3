@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useI18nContext } from "../../i18n/i18n-react";
 import type { Locales } from "../../i18n/i18n-types";
 import { useLocaleStore } from "../../store/store_local";
@@ -11,9 +11,24 @@ export default function NavBar() {
     const setLocale = useLocaleStore((state) => state.setLocale);
     const theme = useUIStore((state) => state.theme);
     const toggleTheme = useUIStore((state) => state.toggleTheme);
+    const initializedTheme = useRef(false);
 
     useEffect(() => {
-        document.documentElement.dataset.theme = theme;
+        const root = document.documentElement;
+        if (!initializedTheme.current) {
+            root.dataset.theme = theme;
+            initializedTheme.current = true;
+            return;
+        }
+
+        root.classList.add("theme-transition");
+        root.getBoundingClientRect();
+        root.dataset.theme = theme;
+        const timer = window.setTimeout(() => root.classList.remove("theme-transition"), 300);
+        return () => {
+            window.clearTimeout(timer);
+            root.classList.remove("theme-transition");
+        };
     }, [theme]);
 
     return (
@@ -26,7 +41,7 @@ export default function NavBar() {
                         <option value="en">{LL.navbar.english()}</option>
                     </select>
                 </label>
-                <button type="button" onClick={toggleTheme} aria-pressed={theme === "dark"}>
+                <button className={styles.themeToggle} type="button" onClick={toggleTheme} aria-pressed={theme === "dark"}>
                     {theme === "dark" ? LL.navbar.lightTheme() : LL.navbar.darkTheme()}
                 </button>
             </div>
