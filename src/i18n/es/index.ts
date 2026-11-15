@@ -38,7 +38,7 @@ const es = {
 		buildPredicate: 'Crea un nodo de predicado y prepara la lectura de sus argumentos.',
 	},
 	lexer: {
-		title: 'Analizador léxico', subtitle: 'Observa cómo la fórmula se convierte en tokens, paso a paso.',
+		title: 'Construcción de árbol sintáctico', subtitle: 'Observa cómo la fórmula se convierte en tokens, paso a paso.',
 		language: 'Idioma', spanish: 'Español', english: 'Inglés', inputLabel: 'Fórmula de entrada',
 		inputHint: 'También puedes usar \\forall, \\exists, &, |, ->, ~ o !.', stepsTitle: 'Procedimiento',
 		stepCounter: 'Paso {current:number} de {total:number}', previous: 'Anterior', next: 'Siguiente',

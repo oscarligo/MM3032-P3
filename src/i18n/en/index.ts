@@ -38,7 +38,7 @@ const en = {
 		buildPredicate: 'Creates a predicate node and prepares to read its arguments.',
 	},
 	lexer: {
-		title: 'Lexical analyzer', subtitle: 'See how the formula becomes tokens, one step at a time.',
+		title: 'Syntax tree construction', subtitle: 'See how the formula becomes tokens, one step at a time.',
 		language: 'Language', spanish: 'Spanish', english: 'English', inputLabel: 'Input formula',
 		inputHint: 'You can also use \\forall, \\exists, &, |, ->, ~ or !.', stepsTitle: 'Procedure',
 		stepCounter: 'Step {current} of {total}', previous: 'Previous', next: 'Next',

@@ -293,7 +293,11 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
 
     return (
         <section className={styles.container}>
-            <h2>{LL.evaluation.title()}</h2>
+            <h2>
+                <TegakiRenderer font={caveat} reducedMotion="always">
+                    {LL.evaluation.title()}
+                </TegakiRenderer>
+            </h2>
             {!evaluationMap ? (
                 <p className={styles.waiting}>{LL.evaluation.waiting()}</p>
             ) : (
