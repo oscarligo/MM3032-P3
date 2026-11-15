@@ -33,10 +33,10 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
     };
 
     return (
-        <div className={styles.slideWrapper}>
-            <div className={styles.topBar}>
-                <span>{LL.semanticEvaluator.example()}</span>
-                {interpretationFormula && (
+        <div className={`${styles.slideWrapper} ${!interpretationFormula ? styles.inputSlide : ""}`}>
+            {interpretationFormula && (
+                <div className={styles.topBar}>
+                    <span>{LL.semanticEvaluator.example()}</span>
                     <button
                         className={styles.topBarEdit}
                         type="button"
@@ -47,8 +47,8 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                     >
                         {isEditingInterpretation ? LL.interpretation.done() : LL.interpretation.edit()}
                     </button>
-                )}
-            </div>
+                </div>
+            )}
             
             <div className={styles.mainContent}>
                 {interpretationFormula ? (
@@ -57,45 +57,53 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                         isEditing={isEditingInterpretation}
                         isConfirmed={isInterpretationConfirmed}
                     />
-                ) : <div className={styles.card}>
-                    <label className={styles.label} htmlFor="formula-input">{LL.lexer.inputLabel()}</label>
-                    <input 
-                        ref={inputRef}
-                        id="formula-input" 
-                        className={styles.input} 
-                        value={formula} 
-                        onChange={(event) => setFormula(event.target.value)} 
-                        spellCheck={false} 
-                    />
-                    <div className={styles.symbolKeyboard} role="group" aria-label="Símbolos de lógica de predicados">
-                        {LOGIC_SYMBOLS.map((symbol) => (
-                            <button
-                                key={symbol}
-                                type="button"
-                                onMouseDown={(event) => event.preventDefault()}
-                                onClick={() => insertSymbol(symbol)}
-                                aria-label={`Insertar ${symbol}`}
-                            >
-                                {symbol}
-                            </button>
-                        ))}
+                ) : <section className={styles.objective}>
+                    <h1>{LL.semanticEvaluator.objective()}</h1>
+                    <div className={styles.cardsRow}>
+                        <div className={styles.card}>
+                            <label className={styles.label} htmlFor="formula-input">{LL.semanticEvaluator.objectiveAnalyze()}</label>
+                            <input
+                                ref={inputRef}
+                                id="formula-input"
+                                className={styles.input}
+                                value={formula}
+                                onChange={(event) => setFormula(event.target.value)}
+                                spellCheck={false}
+                            />
+                            <p className={styles.objectiveText}>{LL.semanticEvaluator.objectiveResult()}</p>
+                        </div>
+                        <div className={styles.toolsPanel}>
+                            <div className={styles.symbolKeyboard} role="group" aria-label={LL.semanticEvaluator.logicKeyboard()}>
+                                {LOGIC_SYMBOLS.map((symbol) => (
+                                    <button
+                                        key={symbol}
+                                        type="button"
+                                        onMouseDown={(event) => event.preventDefault()}
+                                        onClick={() => insertSymbol(symbol)}
+                                        aria-label={LL.semanticEvaluator.insertSymbol({ symbol })}
+                                    >
+                                        {symbol}
+                                    </button>
+                                ))}
+                            </div>
+                            {termSymbols.length > 0 && (
+                                <fieldset className={styles.constantSelector} aria-label={LL.lexer.constantSelection()}>
+                                    <span className={styles.constantTitle}>{LL.lexer.constantSelection()}</span>
+                                    {termSymbols.map((symbol) => (
+                                        <label key={symbol}>
+                                            <input
+                                                type="checkbox"
+                                                checked={constantSymbols.includes(symbol)}
+                                                onChange={() => toggleConstantSymbol(symbol)}
+                                            />
+                                            <span>{symbol}</span>
+                                        </label>
+                                    ))}
+                                </fieldset>
+                            )}
+                        </div>
                     </div>
-                    {termSymbols.length > 0 && (
-                        <fieldset className={styles.constantSelector}>
-                            <legend>{LL.lexer.constantSelection()}</legend>
-                            {termSymbols.map((symbol) => (
-                                <label key={symbol}>
-                                    <input
-                                        type="checkbox"
-                                        checked={constantSymbols.includes(symbol)}
-                                        onChange={() => toggleConstantSymbol(symbol)}
-                                    />
-                                    <span>{symbol}</span>
-                                </label>
-                            ))}
-                        </fieldset>
-                    )}
-                </div>}
+                </section>}
             </div>
 
             <div className={styles.bottomBar}>

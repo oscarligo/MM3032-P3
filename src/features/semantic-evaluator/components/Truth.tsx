@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TegakiRenderer } from "tegaki/react";
 import caveat from "tegaki/fonts/caveat";
 import { useI18nContext } from "../../../i18n/i18n-react";
-import type { TruthTrace } from "../algorithms/Truth";
+import type { TruthTrace } from "../algorithms/truth";
 import styles from "./Truth.module.css";
 
 const WRITING_TIMING = { glyphGap: 0, stagger: { advance: .02, duration: .1 } } as const;

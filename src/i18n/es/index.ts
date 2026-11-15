@@ -10,6 +10,9 @@ const es = {
 		title: 'Evaluador semántico', example: 'Ejemplo',
 		description: 'Esta sección permite evaluar fórmulas lógicas y visualizar su estructura.',
 		leftBoard: 'Pizarrón izquierdo', centerBoard: 'Pizarrón central', rightBoard: 'Pizarrón derecho',
+		objective: 'Objetivo', objectiveAnalyze: 'Analizar la fórmula',
+		objectiveResult: 'y determinar si es verdadera o falsa en una interpretación finita ingresada.',
+		logicKeyboard: 'Símbolos de lógica de predicados', insertSymbol: 'Insertar {symbol:string}',
 	},
 	procedure: {
 		controls: 'Controles del procedimiento', progress: 'Paso {current:number} de {total:number}',
@@ -44,7 +47,7 @@ const es = {
 		stepCounter: 'Paso {current:number} de {total:number}', previous: 'Anterior', next: 'Siguiente',
 		restart: 'Reiniciar', play: 'Reproducir', pause: 'Pausar', cursor: 'Cursor', matched: 'Coincidencia',
 		remaining: 'Por analizar', nothing: 'Nada', whitespace: 'Se ignoró un espacio en blanco.',
-		constantSelection: 'Selecciona los símbolos que se comportan como constantes',
+		constantSelection: 'Constantes',
 		recognized: 'Se reconoció {type:string}: «{value:string}».', tokensTitle: 'Tokens encontrados',
 		tokenType: 'Tipo', tokenValue: 'Valor', empty: 'Escribe una fórmula para comenzar.',
 		invalid: 'La fórmula contiene un carácter no reconocido.',

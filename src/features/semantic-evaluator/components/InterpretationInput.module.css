@@ -55,6 +55,12 @@
     font-style: italic;
 }
 
+.constantSymbol {
+    font-size: 1.2em;
+    font-style: italic;
+    font-weight: 400;
+}
+
 .mathLine sup {
     margin-left: .08em;
     font-size: .65em;

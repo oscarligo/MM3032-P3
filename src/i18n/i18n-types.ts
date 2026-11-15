@@ -73,6 +73,27 @@ type RootTranslation = {
 		 * P​i​z​a​r​r​ó​n​ ​d​e​r​e​c​h​o
 		 */
 		rightBoard: string
+		/**
+		 * O​b​j​e​t​i​v​o
+		 */
+		objective: string
+		/**
+		 * A​n​a​l​i​z​a​r​ ​l​a​ ​f​ó​r​m​u​l​a
+		 */
+		objectiveAnalyze: string
+		/**
+		 * y​ ​d​e​t​e​r​m​i​n​a​r​ ​s​i​ ​e​s​ ​v​e​r​d​a​d​e​r​a​ ​o​ ​f​a​l​s​a​ ​e​n​ ​u​n​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​f​i​n​i​t​a​ ​i​n​g​r​e​s​a​d​a​.
+		 */
+		objectiveResult: string
+		/**
+		 * S​í​m​b​o​l​o​s​ ​d​e​ ​l​ó​g​i​c​a​ ​d​e​ ​p​r​e​d​i​c​a​d​o​s
+		 */
+		logicKeyboard: string
+		/**
+		 * I​n​s​e​r​t​a​r​ ​{​s​y​m​b​o​l​}
+		 * @param {string} symbol
+		 */
+		insertSymbol: RequiredParams<'symbol'>
 	}
 	procedure: {
 		/**
@@ -234,7 +255,7 @@ type RootTranslation = {
 	}
 	lexer: {
 		/**
-		 * A​n​a​l​i​z​a​d​o​r​ ​l​é​x​i​c​o
+		 * C​o​n​s​t​r​u​c​c​i​ó​n​ ​d​e​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o
 		 */
 		title: string
 		/**
@@ -312,7 +333,7 @@ type RootTranslation = {
 		 */
 		whitespace: string
 		/**
-		 * S​e​l​e​c​c​i​o​n​a​ ​l​o​s​ ​s​í​m​b​o​l​o​s​ ​q​u​e​ ​s​e​ ​c​o​m​p​o​r​t​a​n​ ​c​o​m​o​ ​c​o​n​s​t​a​n​t​e​s
+		 * C​o​n​s​t​a​n​t​e​s
 		 */
 		constantSelection: string
 		/**
@@ -458,7 +479,7 @@ type RootTranslation = {
 		 */
 		close: string
 		/**
-		 * V​a​l​o​r​e​s​ ​d​e​ ​l​o​s​ ​á​t​o​m​o​s
+		 * H​i​s​t​o​r​i​a​l​ ​d​e​ ​e​v​a​l​u​a​c​i​ó​n
 		 */
 		atoms: string
 		/**
@@ -538,6 +559,26 @@ export type TranslationFunctions = {
 		 * Pizarrón derecho
 		 */
 		rightBoard: () => LocalizedString
+		/**
+		 * Objetivo
+		 */
+		objective: () => LocalizedString
+		/**
+		 * Analizar la fórmula
+		 */
+		objectiveAnalyze: () => LocalizedString
+		/**
+		 * y determinar si es verdadera o falsa en una interpretación finita ingresada.
+		 */
+		objectiveResult: () => LocalizedString
+		/**
+		 * Símbolos de lógica de predicados
+		 */
+		logicKeyboard: () => LocalizedString
+		/**
+		 * Insertar {symbol}
+		 */
+		insertSymbol: (arg: { symbol: string }) => LocalizedString
 	}
 	procedure: {
 		/**
@@ -697,7 +738,7 @@ export type TranslationFunctions = {
 	}
 	lexer: {
 		/**
-		 * Analizador léxico
+		 * Construcción de árbol sintáctico
 		 */
 		title: () => LocalizedString
 		/**
@@ -773,7 +814,7 @@ export type TranslationFunctions = {
 		 */
 		whitespace: () => LocalizedString
 		/**
-		 * Selecciona los símbolos que se comportan como constantes
+		 * Constantes
 		 */
 		constantSelection: () => LocalizedString
 		/**
@@ -915,7 +956,7 @@ export type TranslationFunctions = {
 		 */
 		close: () => LocalizedString
 		/**
-		 * Valores de los átomos
+		 * Historial de evaluación
 		 */
 		atoms: () => LocalizedString
 		/**

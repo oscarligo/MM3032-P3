@@ -10,6 +10,9 @@ const en = {
 		title: 'Semantic evaluator', example: 'Example',
 		description: 'This section evaluates logical formulas and visualizes their structure.',
 		leftBoard: 'Left whiteboard', centerBoard: 'Center whiteboard', rightBoard: 'Right whiteboard',
+		objective: 'Objective', objectiveAnalyze: 'Analyze the formula',
+		objectiveResult: 'and determine whether it is true or false under a supplied finite interpretation.',
+		logicKeyboard: 'Predicate logic symbols', insertSymbol: 'Insert {symbol}',
 	},
 	procedure: {
 		controls: 'Procedure controls', progress: 'Step {current} of {total}',
@@ -44,7 +47,7 @@ const en = {
 		stepCounter: 'Step {current} of {total}', previous: 'Previous', next: 'Next',
 		restart: 'Restart', play: 'Play', pause: 'Pause', cursor: 'Cursor', matched: 'Match',
 		remaining: 'Remaining', nothing: 'Nothing', whitespace: 'Whitespace was ignored.',
-		constantSelection: 'Select the symbols that behave as constants',
+		constantSelection: 'Constants',
 		recognized: '{type} was recognized: “{value}”.', tokensTitle: 'Tokens found',
 		tokenType: 'Type', tokenValue: 'Value', empty: 'Enter a formula to begin.',
 		invalid: 'The formula contains an unrecognized character.',

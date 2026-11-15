@@ -257,10 +257,10 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
 
             {symbols.constants.map((constant) => (
                 <div className={styles.mathLine} key={constant}>
-                    <strong>
+                    <span className={styles.constantSymbol}>
                         {constant}
                         <sup>ℐ</sup>
-                    </strong>
+                    </span>
                     <span>≝</span>
                     {editableValue(
                         isEditing,
