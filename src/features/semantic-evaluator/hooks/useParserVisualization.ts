@@ -5,6 +5,8 @@ import type { RenderTreeNode } from "../algorithms/parser-tree";
 import type { Token } from "../algorithms/lexer";
 import { useFormulaStore } from "../../../store/store_formula";
 import { procedureOffset, useProcedureStore } from "../../../store/store_control";
+import { useI18nContext } from "../../../i18n/i18n-react";
+import { localizeParserError } from "../localization/parser-error";
 
 export type ParserVisualization = {
     formula?: Formula;
@@ -18,6 +20,7 @@ export type ParserVisualization = {
 };
 
 export function useParserVisualization(): ParserVisualization {
+    const { LL } = useI18nContext();
     const input = useFormulaStore((state) => state.formula);
     const constantSymbols = useFormulaStore((state) => state.constantSymbols);
     const globalStep = useProcedureStore((state) => state.stepIndex);
@@ -26,14 +29,13 @@ export function useParserVisualization(): ParserVisualization {
     const unregisterProcedure = useProcedureStore((state) => state.unregisterProcedure);
 
     const result = useMemo(() => {
-        if (!input.trim()) return { formula: undefined, tokens: [], steps: [], error: "" };
         try {
             const parsed = parseFormulaWithSteps(input, new Set(constantSymbols));
             return { ...parsed, error: "" };
         } catch (error) {
-            return { formula: undefined, tokens: [], steps: [], error: error instanceof Error ? error.message : String(error) };
+            return { formula: undefined, tokens: [], steps: [], error: localizeParserError(error, LL.parser) };
         }
-    }, [constantSymbols, input]);
+    }, [LL.parser, constantSymbols, input]);
 
     useEffect(() => {
         registerProcedure("parser", result.steps.length, 0);

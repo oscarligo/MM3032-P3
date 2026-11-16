@@ -305,7 +305,11 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 </TegakiRenderer>
             </h2>
             {!evaluationMap ? (
-                <p className={styles.waiting}>{LL.evaluation.waiting()}</p>
+                <p className={styles.waiting}>
+                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
+                        {LL.evaluation.waiting()}
+                    </TegakiRenderer>
+                </p>
             ) : (
                 <div className={styles.canvasPanel}>
                     <TransformWrapper

@@ -1,4 +1,5 @@
 import { Token, TokenType } from "./lexer";
+import { FormulaSyntaxError } from "./parse-errors";
 
 export type LexerStep = {
     stage: "lexer";
@@ -33,8 +34,8 @@ export function tokenizeWithSteps(input: string): LexerStepsResult {
         description,
     });
 
-    const addToken = (token: Token, cursor: number, matchedText: string) => {
-        tokens.push(token);
+    const addToken = (token: Omit<Token, "position">, cursor: number, matchedText: string) => {
+        tokens.push({ ...token, position: cursor });
         collect(cursor, matchedText, token.type, `Se reconoció ${token.type}: '${token.value}'`);
     };
 
@@ -86,7 +87,7 @@ export function tokenizeWithSteps(input: string): LexerStepsResult {
             }
             addToken({ type: "IDENT", value: ident }, start, ident);
         } else {
-            throw new Error(`Carácter inesperado en la entrada: '${char}' en posición ${i}`);
+            throw new FormulaSyntaxError({ code: "UNEXPECTED_CHARACTER", character: char, position: i });
         }
     }
 
