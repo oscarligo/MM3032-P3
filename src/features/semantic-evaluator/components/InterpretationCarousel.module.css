@@ -126,12 +126,6 @@
     opacity: .85;
 }
 
-@media (max-width: 560px) {
-    .viewport {
-        min-height: min(11rem, calc(100% - 2.75rem));
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
     .viewport {
         scroll-behavior: auto;

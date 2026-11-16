@@ -1,12 +1,31 @@
 .controls {
-    position: fixed;    
-    bottom: var(--space-lg);
-    right: var(--space-md);
+    position: fixed;
+    bottom: max(var(--space-lg, 1.5rem), env(safe-area-inset-bottom));
+    right: max(var(--space-md, 1rem), env(safe-area-inset-right));
     z-index: 60;
+
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
-    gap: var(--space-sm);
+    gap: var(--space-sm, 0.5rem);
+}
+
+.panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    width: var(--layout-control-width);
+    box-sizing: border-box;
+
+    padding: 0.45rem 0.55rem 0.65rem;
+    border: 1px solid transparent;
+    border-radius: 20px;
+
+    background: var(--color-surface);
+    box-shadow:
+        inset 0px -5px 0px rgba(0, 0, 0, 0.1),
+        inset 0px -2px 0px rgba(0, 0, 0, 0.14);
 }
 
 .panel.navigation {
@@ -15,9 +34,10 @@
         ". up ."
         "left center right"
         ". down .";
-    gap: 0;
-    padding: 0.35rem;
-    border-radius: var(--radius-md);
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.45rem 0.45rem 0.65rem;
+    border-radius: 20px;
 }
 
 .up { grid-area: up; }
@@ -26,90 +46,131 @@
 .right { grid-area: right; }
 .down { grid-area: down; }
 
-.panel {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: 0.3rem 0.45rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
-    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-    box-shadow: var(--shadow-floating-sm);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-
 .panel output {
     min-width: 2.75rem;
+    padding-bottom: 2px;
     text-align: center;
     color: var(--color-text-muted);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .panel button {
-    min-width: 1.75rem;
-    min-height: 1.75rem;
-    padding: 0.2rem 0.45rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.2rem;
+    height: 2.2rem;
+    min-width: 2.2rem;
+    padding: 0 0 4px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+
     color: var(--color-text);
     background: var(--color-surface);
-    font-size: 0.75rem;
+    line-height: 1;
+
+    box-shadow:
+        rgba(99, 99, 99, 0.2) 0 2px 8px 0,
+        inset 0px -4px 0px rgba(0, 0, 0, 0.12),
+        inset 0px -1.5px 0px rgba(0, 0, 0, 0.16);
+
     cursor: pointer;
-    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 150ms ease-in-out;
+}
+
+.panel button svg {
+    display: block;
+    flex-shrink: 0;
 }
 
 .navigation button {
-    width: 2rem;
-    height: 2rem;
-    min-width: 2rem;
-    min-height: 2rem;
-    padding: 0;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
 }
 
 .panel button:hover:not(:disabled) {
-    color: var(--color-surface);
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    transform: translateY(-1px);
+    filter: brightness(0.98);
 }
 
 .panel button:active:not(:disabled) {
-    transform: translateY(0);
+    filter: brightness(0.96);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    box-shadow:
+        rgba(99, 99, 99, 0.2) 0 2px 6px 0,
+        inset 0px -1px 0px rgba(0, 0, 0, 0.16);
 }
 
 .panel button:disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
 .panel button:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid color-mix(in srgb, var(--color-border) 60%, var(--color-text));
     outline-offset: 2px;
+}
+
+:global([data-theme="dark"]) .panel {
+    border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 94%, black);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0px -5px 0px rgba(0, 0, 0, 0.18),
+        inset 0px -2px 0px rgba(0, 0, 0, 0.24);
+}
+
+:global([data-theme="dark"]) .panel button {
+    border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 92%, white);
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0 2px 6px 0,
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0px -4px 0px rgba(0, 0, 0, 0.22),
+        inset 0px -1.5px 0px rgba(0, 0, 0, 0.3);
+}
+
+:global([data-theme="dark"]) .panel button:hover:not(:disabled) {
+    filter: none;
+    background: color-mix(in srgb, var(--color-surface) 88%, white);
+    border-color: color-mix(in srgb, var(--color-border) 95%, transparent);
+}
+
+:global([data-theme="dark"]) .panel button:active:not(:disabled) {
+    filter: none;
+    background: color-mix(in srgb, var(--color-surface) 95%, white);
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0 1px 4px 0,
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0px -1px 0px rgba(0, 0, 0, 0.28);
 }
 
 @media (max-width: 620px) {
     .controls {
-        right: max(var(--space-sm), env(safe-area-inset-right));
-        bottom: calc(4.5rem + env(safe-area-inset-bottom));
-        gap: var(--space-xs);
+        top: auto;
+        right: max(var(--space-sm, 0.5rem), env(safe-area-inset-right));
+        bottom: max(var(--space-sm, 0.5rem), env(safe-area-inset-bottom));
+        gap: var(--space-xs, 0.25rem);
     }
 
     .panel {
-        padding: .2rem .3rem;
+        padding: 0.45rem 0.55rem 0.65rem;
+    }
+
+    .panel.navigation {
+        gap: 0.25rem;
+        padding: 0.45rem 0.45rem 0.65rem;
     }
 
     .panel button {
-        min-width: 1.6rem;
-        min-height: 1.6rem;
-    }
-
-    .navigation button {
-        width: 1.75rem;
-        height: 1.75rem;
-        min-width: 1.75rem;
-        min-height: 1.75rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        min-width: 2.2rem;
     }
 }

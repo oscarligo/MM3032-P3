@@ -13,6 +13,9 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "@theme-toggles/react": "^5.0.5",
+    "country-flag-icons": "^1.6.20",
+    "lucide-react": "^1.73.0",
     "motion": "^14.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

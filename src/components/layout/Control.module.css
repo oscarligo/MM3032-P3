@@ -1,104 +1,157 @@
 .controls {
-    position: sticky;
-    bottom: var(--space-lg);
+    position: fixed;
+    bottom: max(var(--space-lg, 1.5rem), env(safe-area-inset-bottom));
+    left: max(var(--space-md, 1rem), env(safe-area-inset-left));
     z-index: 50;
-    margin-inline: auto;
+    margin: 0;
     width: max-content;
     max-width: calc(100vw - 2rem);
 
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-md);
-    
-    padding: var(--space-xs) var(--space-md);
+    box-sizing: border-box;
+    gap: var(--space-md, 1rem);
 
-    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
-    box-shadow: var(--shadow-floating);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    padding: 0.45rem 0.55rem 0.65rem 0.9rem;
+    border: 1px solid transparent;
+    border-radius: 20px;
+
+    background: var(--color-surface);
+    box-shadow:
+        inset 0px -5px 0px rgba(0, 0, 0, 0.1),
+        inset 0px -2px 0px rgba(0, 0, 0, 0.14);
 }
 
 .progress {
     min-width: max-content;
-    padding-left: var(--space-xs);
+    padding-bottom: 2px;
     color: var(--color-text-muted);
-    font-size: 0.875rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .actions {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: 0.4rem;
 }
 
 .actions button {
-    padding: 0.4rem 0.85rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0 0 4px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+
     color: var(--color-text);
     background: var(--color-surface);
-    font-size: 0.875rem;
+    line-height: 1;
+
+    box-shadow:
+        rgba(99, 99, 99, 0.2) 0 2px 8px 0,
+        inset 0px -4px 0px rgba(0, 0, 0, 0.12),
+        inset 0px -1.5px 0px rgba(0, 0, 0, 0.16);
+
     cursor: pointer;
-    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 150ms ease-in-out;
 }
 
 .actions button:hover:not(:disabled) {
-    color: var(--color-surface);
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    transform: translateY(-1px);
+    filter: brightness(0.98);
 }
 
 .actions button:active:not(:disabled) {
-    transform: translateY(0);
+    filter: brightness(0.96);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    box-shadow:
+        rgba(99, 99, 99, 0.2) 0 2px 6px 0,
+        inset 0px -1px 0px rgba(0, 0, 0, 0.16);
 }
 
 .actions button:disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
 .actions button:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid color-mix(in srgb, var(--color-border) 60%, var(--color-text));
     outline-offset: 2px;
+}
+
+:global([data-theme="dark"]) .controls {
+    border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 94%, black);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0px -5px 0px rgba(0, 0, 0, 0.18),
+        inset 0px -2px 0px rgba(0, 0, 0, 0.24);
+}
+
+:global([data-theme="dark"]) .actions button {
+    border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 92%, white);
+    box-shadow:
+        rgba(0, 0, 0, 0.22) 0 2px 6px 0,
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0px -4px 0px rgba(0, 0, 0, 0.22),
+        inset 0px -1.5px 0px rgba(0, 0, 0, 0.3);
+}
+
+:global([data-theme="dark"]) .actions button:hover:not(:disabled) {
+    filter: none;
+    background: color-mix(in srgb, var(--color-surface) 88%, white);
+    border-color: color-mix(in srgb, var(--color-border) 95%, transparent);
+}
+
+:global([data-theme="dark"]) .actions button:active:not(:disabled) {
+    filter: none;
+    background: color-mix(in srgb, var(--color-surface) 95%, white);
+    box-shadow:
+        rgba(0, 0, 0, 0.18) 0 1px 4px 0,
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0px -1px 0px rgba(0, 0, 0, 0.28);
 }
 
 @media (max-width: 560px) {
     .controls {
         position: fixed;
-        right: max(var(--space-sm), env(safe-area-inset-right));
-        bottom: max(var(--space-sm), env(safe-area-inset-bottom));
-        left: max(var(--space-sm), env(safe-area-inset-left));
-        width: auto;
-        max-width: none;
+        right: auto;
+        bottom: max(var(--space-sm, 0.5rem), env(safe-area-inset-bottom));
+        left: max(var(--space-sm, 0.5rem), env(safe-area-inset-left));
+        width: max-content;
+        max-width: calc(100vw - max(var(--space-sm, 0.5rem), env(safe-area-inset-left)) - max(var(--space-sm, 0.5rem), env(safe-area-inset-right)));
         margin: 0;
-        padding: 0.35rem;
-        gap: var(--space-xs);
-        border-radius: var(--radius-lg);
+        padding: 0.45rem 0.55rem 0.65rem;
+        gap: var(--space-xs, 0.25rem);
+        border-radius: 20px;
     }
 
     .progress {
-        display: none; 
+        display: none;
     }
 
     .actions {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        width: 100%;
+        display: flex;
+        width: auto;
         min-width: 0;
+        gap: 0.35rem;
     }
 
     .actions button {
-        width: 100%;
-        min-width: 0;
-        padding: .4rem .2rem;
-        overflow: hidden;
-        font-size: clamp(.65rem, 3vw, .75rem);
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        width: 2.2rem;
+        min-width: 2.2rem;
+        height: 2.2rem;
     }
 }

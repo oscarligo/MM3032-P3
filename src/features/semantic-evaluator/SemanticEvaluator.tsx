@@ -18,7 +18,7 @@ export default function SemanticEvaluator() {
         <div className={styles.canvasShell}>
             <TransformWrapper
                 initialScale={0.5}
-                minScale={0.5}
+                minScale={0.1}
                 maxScale={1.5}
                 centerOnInit
                 limitToBounds={false}

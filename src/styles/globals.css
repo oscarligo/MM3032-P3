@@ -5,9 +5,9 @@
 }
 
 .theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
+.theme-transition *:not([data-theme-toggle], [data-theme-toggle] *),
+.theme-transition *:not([data-theme-toggle], [data-theme-toggle] *)::before,
+.theme-transition *:not([data-theme-toggle], [data-theme-toggle] *)::after {
   transition-property: color, background-color, border-color, outline-color, box-shadow, fill, stroke, background-image !important;
   transition-duration: 300ms !important;
   transition-timing-function: ease !important;
@@ -19,7 +19,9 @@ html {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
   color: var(--color-text);
-  background: var(--color-background);
+  min-width: 100%;
+  min-height: 100%;
+  background: var(--wall-color);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -30,8 +32,16 @@ html {
 body {
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
-  background: var(--color-background);
+  background: var(--wall-color);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--wall-color);
 }
 
 button,

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react";
 import { useI18nContext } from "../../i18n/i18n-react";
 import { useProcedureStore } from "../../store/store_control";
 import styles from "./Control.module.css";
@@ -25,16 +26,53 @@ export default function Control() {
 
     if (totalSteps === 0) return null;
 
+    const playPauseLabel = isPlaying ? LL.procedure.pause() : LL.procedure.play();
+
     return (
         <footer className={styles.controls} aria-label={LL.procedure.controls()}>
             <span className={styles.progress}>
                 {LL.procedure.progress({ current: Math.min(stepIndex + 1, totalSteps), total: totalSteps })}
             </span>
             <div className={styles.actions}>
-                <button type="button" onClick={previous} disabled={stepIndex < 0}>{LL.procedure.previous()}</button>
-                <button type="button" onClick={restart} disabled={stepIndex < 0 && !isPlaying}>{LL.procedure.restart()}</button>
-                <button type="button" onClick={togglePlaying}>{isPlaying ? LL.procedure.pause() : LL.procedure.play()}</button>
-                <button type="button" onClick={next} disabled={stepIndex >= totalSteps - 1}>{LL.procedure.next()}</button>
+                <button
+                    type="button"
+                    onClick={previous}
+                    disabled={stepIndex < 0}
+                    aria-label={LL.procedure.previous()}
+                    title={LL.procedure.previous()}
+                >
+                    <ChevronLeft size={17} strokeWidth={2.2} aria-hidden="true" />
+                </button>
+                <button
+                    type="button"
+                    onClick={restart}
+                    disabled={stepIndex < 0 && !isPlaying}
+                    aria-label={LL.procedure.restart()}
+                    title={LL.procedure.restart()}
+                >
+                    <RotateCcw size={15} strokeWidth={2.2} aria-hidden="true" />
+                </button>
+                <button
+                    type="button"
+                    onClick={togglePlaying}
+                    aria-label={playPauseLabel}
+                    title={playPauseLabel}
+                >
+                    {isPlaying ? (
+                        <Pause size={15} strokeWidth={2.2} aria-hidden="true" />
+                    ) : (
+                        <Play size={15} strokeWidth={2.2} aria-hidden="true" />
+                    )}
+                </button>
+                <button
+                    type="button"
+                    onClick={next}
+                    disabled={stepIndex >= totalSteps - 1}
+                    aria-label={LL.procedure.next()}
+                    title={LL.procedure.next()}
+                >
+                    <ChevronRight size={17} strokeWidth={2.2} aria-hidden="true" />
+                </button>
             </div>
         </footer>
     );
