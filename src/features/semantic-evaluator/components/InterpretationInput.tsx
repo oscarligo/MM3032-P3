@@ -34,6 +34,12 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     const [predicateRows, setPredicateRows] = useState<Record<string, string[][]>>({});
     const [predicateTruth, setPredicateTruth] = useState<Record<string, boolean>>({});
     const [duplicatePredicates, setDuplicatePredicates] = useState<Record<string, boolean>>({});
+    // Elemento seleccionado para edición; sin selección explícita se edita el último agregado
+    const [activeDomain, setActiveDomain] = useState<number>();
+    const [activeTuples, setActiveTuples] = useState<Record<string, number | undefined>>({});
+    const activeDomainIndex = activeDomain !== undefined && activeDomain < domain.length
+        ? activeDomain
+        : domain.length - 1;
 
     const symbols = useMemo(() => analyzeFormula(formula), [formula]);
 
@@ -43,6 +49,8 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         setDomain(cleanDomain);
         setPredicateRows(cleanPredicateRows);
         setDuplicatePredicates({});
+        setActiveDomain(undefined);
+        setActiveTuples({});
     }, [isEditing]);
 
     const { options, hasDuplicates: duplicateDomain } = domainState(domain);
@@ -108,8 +116,14 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         );
     };
 
-    const addDomainItem = () => setDomain((values) => [...values, ""]);
-    const removeDomainItem = () => setDomain((values) => values.slice(0, -1));
+    const addDomainItem = () => {
+        setActiveDomain(undefined);
+        setDomain((values) => [...values, ""]);
+    };
+    const removeDomainItem = () => {
+        setActiveDomain(undefined);
+        setDomain((values) => values.slice(0, -1));
+    };
 
     const handleConstantChange = (constant: string, nextValue: string) => {
         setConstants((current) => ({ ...current, [constant]: nextValue }));
@@ -130,6 +144,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
 
     const addPredicateRow = (predicate: SymbolInfo) => {
         setDuplicatePredicates((current) => ({ ...current, [predicate.key]: false }));
+        setActiveTuples((current) => ({ ...current, [predicate.key]: undefined }));
         setPredicateRows((rows) => ({
             ...rows,
             [predicate.key]: [...(rows[predicate.key] ?? []), Array(predicate.arity).fill("")],
@@ -138,6 +153,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
 
     const removePredicateRow = (key: string) => {
         setDuplicatePredicates((current) => ({ ...current, [key]: false }));
+        setActiveTuples((current) => ({ ...current, [key]: undefined }));
         setPredicateRows((rows) => ({
             ...rows,
             [key]: (rows[key] ?? []).slice(0, -1),
@@ -187,10 +203,20 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         editable: boolean,
         value: string,
         onChange: (value: string) => void,
-        label: string
+        label: string,
+        onActivate?: () => void
     ) =>
         editable && isEditing ? (
             valueSelect(value, onChange, label)
+        ) : isEditing && onActivate ? (
+            <button
+                className={`${styles.plainValue} ${styles.activatable}`}
+                type="button"
+                onClick={onActivate}
+                aria-label={`${label}: ${LL.interpretation.edit()}`}
+            >
+                {value || "—"}
+            </button>
         ) : (
             <span className={styles.plainValue}>{value || "—"}</span>
         );
@@ -231,12 +257,22 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                     <span>{"{"}</span>
                     {domain.map((value, index) => (
                         <span key={index}>
-                            {isEditing && index === domain.length - 1 ? (
+                            {isEditing && index === activeDomainIndex ? (
                                 <input
                                     value={value}
+                                    autoFocus={activeDomain !== undefined}
                                     onChange={(event) => handleDomainChange(index, event.target.value)}
                                     aria-label={`${LL.interpretation.domain()} ${index + 1}`}
                                 />
+                            ) : isEditing ? (
+                                <button
+                                    className={`${styles.plainValue} ${styles.activatable}`}
+                                    type="button"
+                                    onClick={() => setActiveDomain(index)}
+                                    aria-label={`${LL.interpretation.domain()} ${index + 1}: ${LL.interpretation.edit()}`}
+                                >
+                                    {value || "—"}
+                                </button>
                             ) : (
                                 <span className={styles.plainValue}>{value || "—"}</span>
                             )}
@@ -298,7 +334,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                             {tuple.map((value, valueIndex) => (
                                                 <span key={valueIndex}>
                                                     {editableValue(
-                                                        rowIndex === rows.length - 1,
+                                                        rowIndex === (activeTuples[predicate.key] ?? rows.length - 1),
                                                         value,
                                                         (next) =>
                                                             updatePredicateArgument(
@@ -307,7 +343,8 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                                                 valueIndex,
                                                                 next
                                                             ),
-                                                        `${predicate.name} ${LL.interpretation.argument()} ${valueIndex + 1}`
+                                                        `${predicate.name} ${LL.interpretation.argument()} ${valueIndex + 1}`,
+                                                        () => setActiveTuples((current) => ({ ...current, [predicate.key]: rowIndex }))
                                                     )}
                                                     {valueIndex < tuple.length - 1 && ","}
                                                 </span>

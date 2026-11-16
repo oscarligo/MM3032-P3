@@ -142,6 +142,19 @@
     color: var(--color-presentation-text);
 }
 
+.activatable {
+    border: 1px dashed transparent;
+    border-radius: .3rem;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.activatable:hover,
+.activatable:focus-visible {
+    border-color: var(--color-presentation-text);
+}
+
 .card input:not([type]),
 .card select {
     width: 1.4rem;
