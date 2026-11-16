@@ -41,6 +41,10 @@ export default function NavBar() {
         };
     }, [theme]);
 
+    useEffect(() => {
+        document.title = LL.semanticEvaluator.title();
+    }, [LL, locale]);
+
     const isDark = theme === "dark";
     const themeLabel = isDark ? LL.navbar.lightTheme() : LL.navbar.darkTheme();
 
