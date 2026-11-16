@@ -137,7 +137,7 @@ type RootTranslation = {
 		 */
 		tree: string
 		/**
-		 * E​l​ ​p​a​r​s​e​r​ ​c​o​m​e​n​z​a​r​á​ ​d​e​s​p​u​é​s​ ​d​e​l​ ​l​e​x​e​r​.
+		 * C​o​n​t​i​n​ú​a​ ​c​o​n​ ​e​l​ ​s​i​g​u​i​e​n​t​e​ ​p​a​s​o​ ​p​a​r​a​ ​c​o​n​s​t​r​u​i​r​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​.
 		 */
 		waiting: string
 		/**
@@ -153,7 +153,7 @@ type RootTranslation = {
 		 */
 		free: string
 		/**
-		 * N​o​ ​s​e​ ​p​u​d​o​ ​c​o​n​s​t​r​u​i​r​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​.
+		 * N​o​ ​s​e​ ​p​u​d​o​ ​c​o​n​s​t​r​u​i​r​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o
 		 */
 		invalid: string
 		/**
@@ -201,57 +201,129 @@ type RootTranslation = {
 		 */
 		decision: string
 		/**
-		 * A​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​u​n​i​v​e​r​s​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
+		 * a​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​u​n​i​v​e​r​s​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
 		 */
 		openUniversal: string
 		/**
-		 * A​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​e​x​i​s​t​e​n​c​i​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
+		 * a​b​r​e​ ​u​n​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​e​x​i​s​t​e​n​c​i​a​l​ ​y​ ​e​s​p​e​r​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​q​u​e​ ​q​u​e​d​a​r​á​ ​l​i​g​a​d​a​.
 		 */
 		openExistential: string
 		/**
-		 * C​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​n​e​g​a​c​i​ó​n​ ​y​ ​a​n​a​l​i​z​a​ ​s​u​ ​o​p​e​r​a​n​d​o​.
+		 * c​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​n​e​g​a​c​i​ó​n​ ​y​ ​a​n​a​l​i​z​a​ ​s​u​ ​o​p​e​r​a​n​d​o​.
 		 */
 		buildNegation: string
 		/**
-		 * C​r​e​a​ ​u​n​a​ ​i​m​p​l​i​c​a​c​i​ó​n​;​ ​e​l​ ​á​r​b​o​l​ ​i​z​q​u​i​e​r​d​o​ ​s​e​r​á​ ​e​l​ ​a​n​t​e​c​e​d​e​n​t​e​ ​y​ ​e​l​ ​d​e​r​e​c​h​o​ ​e​l​ ​c​o​n​s​e​c​u​e​n​t​e​.
+		 * c​r​e​a​ ​u​n​a​ ​i​m​p​l​i​c​a​c​i​ó​n​;​ ​e​l​ ​á​r​b​o​l​ ​i​z​q​u​i​e​r​d​o​ ​s​e​r​á​ ​e​l​ ​a​n​t​e​c​e​d​e​n​t​e​ ​y​ ​e​l​ ​d​e​r​e​c​h​o​ ​e​l​ ​c​o​n​s​e​c​u​e​n​t​e​.
 		 */
 		buildImplication: string
 		/**
-		 * C​r​e​a​ ​u​n​a​ ​d​i​s​y​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
+		 * c​r​e​a​ ​u​n​a​ ​d​i​s​y​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
 		 */
 		buildDisjunction: string
 		/**
-		 * C​r​e​a​ ​u​n​a​ ​c​o​n​j​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
+		 * c​r​e​a​ ​u​n​a​ ​c​o​n​j​u​n​c​i​ó​n​ ​c​o​n​ ​l​a​s​ ​s​u​b​f​ó​r​m​u​l​a​s​ ​i​z​q​u​i​e​r​d​a​ ​y​ ​d​e​r​e​c​h​a​.
 		 */
 		buildConjunction: string
 		/**
-		 * A​b​r​e​ ​u​n​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​y​ ​c​o​m​i​e​n​z​a​ ​a​ ​a​n​a​l​i​z​a​r​l​a​.
+		 * a​b​r​e​ ​u​n​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​y​ ​c​o​m​i​e​n​z​a​ ​a​ ​a​n​a​l​i​z​a​r​l​a​.
 		 */
 		openGroup: string
 		/**
-		 * C​i​e​r​r​a​ ​l​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​a​c​t​u​a​l​.
+		 * c​i​e​r​r​a​ ​l​a​ ​s​u​b​f​ó​r​m​u​l​a​ ​a​g​r​u​p​a​d​a​ ​a​c​t​u​a​l​.
 		 */
 		closeGroup: string
 		/**
-		 * T​e​r​m​i​n​a​ ​e​l​ ​a​r​g​u​m​e​n​t​o​ ​a​c​t​u​a​l​ ​y​ ​c​o​m​i​e​n​z​a​ ​e​l​ ​s​i​g​u​i​e​n​t​e​.
+		 * t​e​r​m​i​n​a​ ​e​l​ ​a​r​g​u​m​e​n​t​o​ ​a​c​t​u​a​l​ ​y​ ​c​o​m​i​e​n​z​a​ ​e​l​ ​s​i​g​u​i​e​n​t​e​.
 		 */
 		nextArgument: string
 		/**
-		 * C​o​n​f​i​r​m​a​ ​E​O​F​:​ ​l​a​ ​f​ó​r​m​u​l​a​ ​y​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​ ​e​s​t​á​n​ ​c​o​m​p​l​e​t​o​s​.
+		 * c​o​n​f​i​r​m​a​ ​E​O​F​:​ ​l​a​ ​f​ó​r​m​u​l​a​ ​y​ ​e​l​ ​á​r​b​o​l​ ​s​i​n​t​á​c​t​i​c​o​ ​e​s​t​á​n​ ​c​o​m​p​l​e​t​o​s​.
 		 */
 		finishFormula: string
 		/**
-		 * R​e​g​i​s​t​r​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​v​a​r​i​a​b​l​e​ ​l​i​g​a​d​a​ ​d​e​l​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​a​c​t​i​v​o​.
+		 * r​e​g​i​s​t​r​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​v​a​r​i​a​b​l​e​ ​l​i​g​a​d​a​ ​d​e​l​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​a​c​t​i​v​o​.
 		 */
 		bindVariable: string
 		/**
-		 * I​n​t​e​r​p​r​e​t​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​t​é​r​m​i​n​o​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​o​ ​f​u​n​c​i​ó​n​.
+		 * i​n​t​e​r​p​r​e​t​a​ ​e​l​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​ ​c​o​m​o​ ​t​é​r​m​i​n​o​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​o​ ​f​u​n​c​i​ó​n​.
 		 */
 		readTerm: string
 		/**
-		 * C​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​p​r​e​d​i​c​a​d​o​ ​y​ ​p​r​e​p​a​r​a​ ​l​a​ ​l​e​c​t​u​r​a​ ​d​e​ ​s​u​s​ ​a​r​g​u​m​e​n​t​o​s​.
+		 * c​r​e​a​ ​u​n​ ​n​o​d​o​ ​d​e​ ​p​r​e​d​i​c​a​d​o​ ​y​ ​p​r​e​p​a​r​a​ ​l​a​ ​l​e​c​t​u​r​a​ ​d​e​ ​s​u​s​ ​a​r​g​u​m​e​n​t​o​s​.
 		 */
 		buildPredicate: string
+		/**
+		 * f​ó​r​m​u​l​a​ ​v​a​c​í​a​:​ ​l​a​ ​e​n​t​r​a​d​a​ ​n​o​ ​c​o​n​t​i​e​n​e​ ​n​i​n​g​u​n​a​ ​f​ó​r​m​u​l​a​.
+		 */
+		errorEmptyInput: string
+		/**
+		 * c​a​r​á​c​t​e​r​ ​i​n​e​s​p​e​r​a​d​o​:​ ​«​{​c​h​a​r​a​c​t​e​r​}​»​ ​e​n​ ​l​a​ ​p​o​s​i​c​i​ó​n​ ​{​p​o​s​i​t​i​o​n​}​.
+		 * @param {string} character
+		 * @param {number} position
+		 */
+		errorUnexpectedCharacter: RequiredParams<'character' | 'position'>
+		/**
+		 * p​a​r​é​n​t​e​s​i​s​ ​s​i​n​ ​c​e​r​r​a​r​:​ ​f​a​l​t​ó​ ​c​e​r​r​a​r​ ​«​(​»​ ​a​n​t​e​s​ ​d​e​l​ ​f​i​n​a​l​ ​d​e​ ​l​a​ ​f​ó​r​m​u​l​a​.
+		 */
+		errorUnclosedParenthesis: string
+		/**
+		 * p​a​r​é​n​t​e​s​i​s​ ​v​a​c​í​o​s​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​a​ ​f​ó​r​m​u​l​a​ ​d​e​n​t​r​o​ ​d​e​ ​«​(​)​»​.
+		 */
+		errorEmptyParentheses: string
+		/**
+		 * f​a​l​t​a​ ​s​e​p​a​r​a​d​o​r​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​«​,​»​ ​o​ ​«​)​»​ ​t​r​a​s​ ​e​l​ ​a​r​g​u​m​e​n​t​o​ ​e​n​ ​«​{​c​o​n​t​a​i​n​e​r​}​»​.
+		 * @param {string} container
+		 */
+		errorMissingArgumentComma: RequiredParams<'container'>
+		/**
+		 * a​r​g​u​m​e​n​t​o​ ​f​a​l​t​a​n​t​e​:​ ​c​o​m​a​ ​f​i​n​a​l​ ​i​n​n​e​c​e​s​a​r​i​a​ ​o​ ​f​a​l​t​a​ ​u​n​ ​t​é​r​m​i​n​o​ ​t​r​a​s​ ​«​,​»​.
+		 */
+		errorTrailingComma: string
+		/**
+		 * f​u​n​c​i​ó​n​ ​s​i​n​ ​a​r​g​u​m​e​n​t​o​s​:​ ​u​n​a​ ​f​u​n​c​i​ó​n​ ​r​e​q​u​i​e​r​e​ ​a​l​ ​m​e​n​o​s​ ​u​n​ ​t​é​r​m​i​n​o​ ​(​l​a​s​ ​c​o​n​s​t​a​n​t​e​s​ ​n​o​ ​l​l​e​v​a​n​ ​«​(​)​»​)​.
+		 */
+		errorZeroArityFunction: string
+		/**
+		 * o​p​e​r​a​n​d​o​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​a​ ​f​ó​r​m​u​l​a​ ​d​e​s​p​u​é​s​ ​d​e​l​ ​o​p​e​r​a​d​o​r​ ​«​{​o​p​e​r​a​t​o​r​}​»​.
+		 * @param {string} operator
+		 */
+		errorMissingOperand: RequiredParams<'operator'>
+		/**
+		 * f​a​l​t​a​ ​c​o​n​e​c​t​i​v​o​ ​l​ó​g​i​c​o​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​«​∧​»​,​ ​«​∨​»​ ​o​ ​«​→​»​ ​e​n​t​r​e​ ​f​ó​r​m​u​l​a​s​ ​a​n​t​e​s​ ​d​e​ ​«​{​f​o​u​n​d​}​»​.
+		 * @param {string} found
+		 */
+		errorMissingBinaryConnective: RequiredParams<'found'>
+		/**
+		 * v​a​r​i​a​b​l​e​ ​d​e​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​a​ ​v​a​r​i​a​b​l​e​ ​d​e​s​p​u​é​s​ ​d​e​ ​«​{​q​u​a​n​t​i​f​i​e​r​}​»​.
+		 * @param {string} quantifier
+		 */
+		errorExpectedQuantifierVariable: RequiredParams<'quantifier'>
+		/**
+		 * c​u​e​r​p​o​ ​d​e​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​a​ ​f​ó​r​m​u​l​a​ ​t​r​a​s​ ​«​{​q​u​a​n​t​i​f​i​e​r​}​{​v​a​r​i​a​b​l​e​}​»​.
+		 * @param {string} quantifier
+		 * @param {string} variable
+		 */
+		errorMissingQuantifierBody: RequiredParams<'quantifier' | 'variable'>
+		/**
+		 * f​ó​r​m​u​l​a​ ​e​n​ ​p​o​s​i​c​i​ó​n​ ​d​e​ ​t​é​r​m​i​n​o​:​ ​n​o​ ​s​e​ ​p​u​e​d​e​ ​p​a​s​a​r​ ​«​{​t​o​k​e​n​}​»​ ​c​o​m​o​ ​a​r​g​u​m​e​n​t​o​ ​d​e​ ​u​n​ ​p​r​e​d​i​c​a​d​o​.
+		 * @param {string} token
+		 */
+		errorFormulaInTermPosition: RequiredParams<'token'>
+		/**
+		 * t​é​r​m​i​n​o​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​,​ ​p​e​r​o​ ​s​e​ ​e​n​c​o​n​t​r​ó​ ​«​{​f​o​u​n​d​}​»​.
+		 * @param {string} found
+		 */
+		errorExpectedTermIdentifier: RequiredParams<'found'>
+		/**
+		 * t​o​k​e​n​ ​i​n​e​s​p​e​r​a​d​o​ ​a​l​ ​i​n​i​c​i​o​ ​d​e​ ​l​a​ ​e​x​p​r​e​s​i​ó​n​:​ ​«​{​v​a​l​u​e​}​»​ ​(​{​t​y​p​e​}​)
+		 * @param {string} type
+		 * @param {string} value
+		 */
+		errorUnexpectedToken: RequiredParams<'type' | 'value'>
+		/**
+		 * l​a​ ​e​n​t​r​a​d​a​ ​n​o​ ​e​s​ ​v​á​l​i​d​a
+		 */
+		errorUnknown: string
 	}
 	lexer: {
 		/**
@@ -620,7 +692,7 @@ export type TranslationFunctions = {
 		 */
 		tree: () => LocalizedString
 		/**
-		 * El parser comenzará después del lexer.
+		 * Continúa con el siguiente paso para construir el árbol sintáctico.
 		 */
 		waiting: () => LocalizedString
 		/**
@@ -636,7 +708,7 @@ export type TranslationFunctions = {
 		 */
 		free: () => LocalizedString
 		/**
-		 * No se pudo construir el árbol sintáctico.
+		 * No se pudo construir el árbol sintáctico
 		 */
 		invalid: () => LocalizedString
 		/**
@@ -684,57 +756,117 @@ export type TranslationFunctions = {
 		 */
 		decision: () => LocalizedString
 		/**
-		 * Abre un cuantificador universal y espera la variable que quedará ligada.
+		 * abre un cuantificador universal y espera la variable que quedará ligada.
 		 */
 		openUniversal: () => LocalizedString
 		/**
-		 * Abre un cuantificador existencial y espera la variable que quedará ligada.
+		 * abre un cuantificador existencial y espera la variable que quedará ligada.
 		 */
 		openExistential: () => LocalizedString
 		/**
-		 * Crea un nodo de negación y analiza su operando.
+		 * crea un nodo de negación y analiza su operando.
 		 */
 		buildNegation: () => LocalizedString
 		/**
-		 * Crea una implicación; el árbol izquierdo será el antecedente y el derecho el consecuente.
+		 * crea una implicación; el árbol izquierdo será el antecedente y el derecho el consecuente.
 		 */
 		buildImplication: () => LocalizedString
 		/**
-		 * Crea una disyunción con las subfórmulas izquierda y derecha.
+		 * crea una disyunción con las subfórmulas izquierda y derecha.
 		 */
 		buildDisjunction: () => LocalizedString
 		/**
-		 * Crea una conjunción con las subfórmulas izquierda y derecha.
+		 * crea una conjunción con las subfórmulas izquierda y derecha.
 		 */
 		buildConjunction: () => LocalizedString
 		/**
-		 * Abre una subfórmula agrupada y comienza a analizarla.
+		 * abre una subfórmula agrupada y comienza a analizarla.
 		 */
 		openGroup: () => LocalizedString
 		/**
-		 * Cierra la subfórmula agrupada actual.
+		 * cierra la subfórmula agrupada actual.
 		 */
 		closeGroup: () => LocalizedString
 		/**
-		 * Termina el argumento actual y comienza el siguiente.
+		 * termina el argumento actual y comienza el siguiente.
 		 */
 		nextArgument: () => LocalizedString
 		/**
-		 * Confirma EOF: la fórmula y el árbol sintáctico están completos.
+		 * confirma EOF: la fórmula y el árbol sintáctico están completos.
 		 */
 		finishFormula: () => LocalizedString
 		/**
-		 * Registra el identificador como variable ligada del cuantificador activo.
+		 * registra el identificador como variable ligada del cuantificador activo.
 		 */
 		bindVariable: () => LocalizedString
 		/**
-		 * Interpreta el identificador como término del predicado o función.
+		 * interpreta el identificador como término del predicado o función.
 		 */
 		readTerm: () => LocalizedString
 		/**
-		 * Crea un nodo de predicado y prepara la lectura de sus argumentos.
+		 * crea un nodo de predicado y prepara la lectura de sus argumentos.
 		 */
 		buildPredicate: () => LocalizedString
+		/**
+		 * fórmula vacía: la entrada no contiene ninguna fórmula.
+		 */
+		errorEmptyInput: () => LocalizedString
+		/**
+		 * carácter inesperado: «{character}» en la posición {position}.
+		 */
+		errorUnexpectedCharacter: (arg: { character: string, position: number }) => LocalizedString
+		/**
+		 * paréntesis sin cerrar: faltó cerrar «(» antes del final de la fórmula.
+		 */
+		errorUnclosedParenthesis: () => LocalizedString
+		/**
+		 * paréntesis vacíos: se esperaba una fórmula dentro de «()».
+		 */
+		errorEmptyParentheses: () => LocalizedString
+		/**
+		 * falta separador: se esperaba «,» o «)» tras el argumento en «{container}».
+		 */
+		errorMissingArgumentComma: (arg: { container: string }) => LocalizedString
+		/**
+		 * argumento faltante: coma final innecesaria o falta un término tras «,».
+		 */
+		errorTrailingComma: () => LocalizedString
+		/**
+		 * función sin argumentos: una función requiere al menos un término (las constantes no llevan «()»).
+		 */
+		errorZeroArityFunction: () => LocalizedString
+		/**
+		 * operando faltante: se esperaba una fórmula después del operador «{operator}».
+		 */
+		errorMissingOperand: (arg: { operator: string }) => LocalizedString
+		/**
+		 * falta conectivo lógico: se esperaba «∧», «∨» o «→» entre fórmulas antes de «{found}».
+		 */
+		errorMissingBinaryConnective: (arg: { found: string }) => LocalizedString
+		/**
+		 * variable de cuantificador faltante: se esperaba una variable después de «{quantifier}».
+		 */
+		errorExpectedQuantifierVariable: (arg: { quantifier: string }) => LocalizedString
+		/**
+		 * cuerpo de cuantificador faltante: se esperaba una fórmula tras «{quantifier}{variable}».
+		 */
+		errorMissingQuantifierBody: (arg: { quantifier: string, variable: string }) => LocalizedString
+		/**
+		 * fórmula en posición de término: no se puede pasar «{token}» como argumento de un predicado.
+		 */
+		errorFormulaInTermPosition: (arg: { token: string }) => LocalizedString
+		/**
+		 * término faltante: se esperaba un identificador, pero se encontró «{found}».
+		 */
+		errorExpectedTermIdentifier: (arg: { found: string }) => LocalizedString
+		/**
+		 * token inesperado al inicio de la expresión: «{value}» ({type})
+		 */
+		errorUnexpectedToken: (arg: { type: string, value: string }) => LocalizedString
+		/**
+		 * la entrada no es válida
+		 */
+		errorUnknown: () => LocalizedString
 	}
 	lexer: {
 		/**
