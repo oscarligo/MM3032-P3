@@ -57,6 +57,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         });
         const predicatesComplete = symbols.predicates.every((predicate) =>
             !duplicatePredicates[predicate.key]
+            && (predicate.arity === 0 || (predicateRows[predicate.key]?.length ?? 0) > 0)
             && (predicateRows[predicate.key] ?? []).every((tuple) =>
                 tuple.length === predicate.arity && tuple.every((value) => options.includes(value))
             )
@@ -327,6 +328,11 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         </>
                     )}
                 </div>
+                {predicate.arity > 0 && (predicateRows[predicate.key]?.length ?? 0) === 0 && (
+                    <p className={styles.error} role="alert">
+                        {LL.interpretation.emptyPredicate({ predicate: symbolLabel(predicate, symbols.predicates) })}
+                    </p>
+                )}
                 {duplicatePredicates[predicate.key] && (
                     <p className={styles.error}>{LL.interpretation.duplicatePredicate()}</p>
                 )}

@@ -1,5 +1,5 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
-import { evaluateFormulaInEnvironment } from "./evaluation";
+import { evaluateFormulaInEnvironment, formulaToText as originalFormulaToText } from "./evaluation";
 
 export type TruthStep = {
     expression: string;
@@ -11,25 +11,6 @@ export type TruthTrace = {
     originalExpression: string;
     assignment: Array<{ variable: string; value: string }>;
     steps: TruthStep[];
-};
-
-const originalTermToText = (term: Term): string =>
-    term.kind === "func"
-        ? `${term.name}(${term.args.map(originalTermToText).join(", ")})`
-        : term.name;
-
-const formulaWithoutQuantifiers = (formula: Formula): string => {
-    if (formula.kind === "atom") {
-        return formula.args.length > 0
-            ? `${formula.predicate}(${formula.args.map(originalTermToText).join(", ")})`
-            : formula.predicate;
-    }
-    if (formula.kind === "not") return `¬${formulaWithoutQuantifiers(formula.inner)}`;
-    if (formula.kind === "forall" || formula.kind === "exists") {
-        return formulaWithoutQuantifiers(formula.inner);
-    }
-    const operator = formula.kind === "and" ? "∧" : formula.kind === "or" ? "∨" : "→";
-    return `(${formulaWithoutQuantifiers(formula.left)} ${operator} ${formulaWithoutQuantifiers(formula.right)})`;
 };
 
 const termToText = (term: Term, environment: ReadonlyMap<string, string>): string => {
@@ -46,7 +27,9 @@ const formulaToText = (formula: Formula, environment: ReadonlyMap<string, string
     }
     if (formula.kind === "not") return `¬${formulaToText(formula.inner, environment)}`;
     if (formula.kind === "forall" || formula.kind === "exists") {
-        return formulaToText(formula.inner, environment);
+        const nested = new Map(environment);
+        nested.delete(formula.variable);
+        return `${formula.kind === "forall" ? "∀" : "∃"}${formula.variable} ${formulaToText(formula.inner, nested)}`;
     }
     const operator = formula.kind === "and" ? "∧" : formula.kind === "or" ? "∨" : "→";
     return `(${formulaToText(formula.left, environment)} ${operator} ${formulaToText(formula.right, environment)})`;
@@ -72,11 +55,8 @@ export const buildTruthTrace = (
     const valueLabel = (value: boolean | null) => value === null ? "-" : value ? trueLabel : "F";
 
     const visit = (current: Formula): boolean | null => {
-        if (current.kind === "forall" || current.kind === "exists") {
-            return visit(current.inner);
-        }
         let expression: string;
-        if (current.kind === "atom") {
+        if (current.kind === "atom" || current.kind === "forall" || current.kind === "exists") {
             expression = formulaToText(current, environment);
         } else if (current.kind === "not") {
             expression = `¬${valueLabel(visit(current.inner))}`;
@@ -96,5 +76,5 @@ export const buildTruthTrace = (
     };
 
     visit(formula);
-    return { originalExpression: formulaWithoutQuantifiers(formula), assignment, steps };
+    return { originalExpression: originalFormulaToText(formula), assignment, steps };
 };

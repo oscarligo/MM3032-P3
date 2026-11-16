@@ -56,10 +56,6 @@ const evaluateFormula = (formula: Formula, interpretation: InterpretationDefinit
         return left === false || right === true ? true : left === true && right === false ? false : null;
     }
 
-    if (environment.has(formula.variable)) {
-        return evaluateFormula(formula.inner, interpretation, environment);
-    }
-
     const results = interpretation.domain.map((value) => {
         const nested = new Map(environment);
         nested.set(formula.variable, value);

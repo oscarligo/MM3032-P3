@@ -77,6 +77,7 @@ const en = {
 		selectValue: '-', emptyDomain: 'Add at least one element to the domain.',
 		duplicateDomain: 'Domain elements cannot be repeated.',
 		duplicatePredicate: 'Predicate interpretation elements cannot be repeated.', trueValue: 'True',
+		emptyPredicate: 'The relation for {predicate} cannot be empty. Add at least one complete tuple.',
 	},
 	evaluation: {
 		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', result: 'Result', value: 'Value',

@@ -526,6 +526,11 @@ type RootTranslation = {
 		 * V​e​r​d​a​d​e​r​o
 		 */
 		trueValue: string
+		/**
+		 * L​a​ ​r​e​l​a​c​i​ó​n​ ​d​e​ ​{​p​r​e​d​i​c​a​t​e​}​ ​n​o​ ​p​u​e​d​e​ ​e​s​t​a​r​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​a​ ​t​u​p​l​a​ ​c​o​m​p​l​e​t​a​.
+		 * @param {string} predicate
+		 */
+		emptyPredicate: RequiredParams<'predicate'>
 	}
 	evaluation: {
 		/**
@@ -1171,6 +1176,10 @@ export type TranslationFunctions = {
 		 * Verdadero
 		 */
 		trueValue: () => LocalizedString
+		/**
+		 * La relación de {predicate} no puede estar vacía. Agrega al menos una tupla completa.
+		 */
+		emptyPredicate: (arg: { predicate: string }) => LocalizedString
 	}
 	evaluation: {
 		/**

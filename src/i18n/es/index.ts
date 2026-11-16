@@ -77,6 +77,7 @@ const es = {
 		selectValue: '-', emptyDomain: 'Agrega al menos un elemento al dominio.',
 		duplicateDomain: 'Los elementos del dominio no pueden repetirse.',
 		duplicatePredicate: 'Los elementos de la interpretación del predicado no pueden repetirse.', trueValue: 'Verdadero',
+		emptyPredicate: 'La relación de {predicate:string} no puede estar vacía. Agrega al menos una tupla completa.',
 	},
 	evaluation: {
 		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', result: 'Resultado', value: 'Valor',
