@@ -67,7 +67,7 @@
     display: grid;
     grid-template-rows: max-content minmax(0, 1fr);
     gap: var(--space-md);
-    overflow: hidden;
+    overflow: visible;
     z-index: 1;
 
     transform-origin: right center;
@@ -83,7 +83,7 @@
 
 
 .secondaryBoard {
-    overflow: hidden;
+    overflow: visible;
     z-index: 3;
 
     transform-origin: left center;

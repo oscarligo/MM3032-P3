@@ -231,6 +231,20 @@
     text-align: center;
 }
 
+.semanticRelation {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.semanticRelation sub {
+    margin-left: -.14em;
+    font-family: var(--font-family-handwritten);
+    font-size: .62em;
+    line-height: 0;
+    vertical-align: sub;
+}
+
 .satisfied {
     color: var(--color-success);
 }

@@ -398,13 +398,24 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             procedureOpen={Boolean(truthTrace)}
                         />
                         <p className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                            <span className={styles.semanticRelation}>
+                                <TegakiRenderer
+                                    key={`${finalEvaluation}-${usesEnvironment}`}
+                                    font={caveat}
+                                    reducedMotion="user"
+                                    timing={WRITING_TIMING}
+                                >
+                                    {`ℐ ${finalEvaluation === true ? "⊨" : "⊭"}`}
+                                </TegakiRenderer>
+                                {usesEnvironment && <sub>ℓ</sub>}
+                            </span>
                             <TegakiRenderer
-                                key={`${finalEvaluation}-${usesEnvironment}-${renderedFormula}`}
+                                key={renderedFormula}
                                 font={caveat}
                                 reducedMotion="user"
                                 timing={WRITING_TIMING}
                             >
-                                {`ℐ ${finalEvaluation === true ? "⊨" : "⊭"}${usesEnvironment ? "ₗ" : ""} ${renderedFormula}`}
+                                {renderedFormula}
                             </TegakiRenderer>
                         </p>
                         <TreeCanvasControls />

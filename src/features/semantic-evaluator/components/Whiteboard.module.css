@@ -1,4 +1,14 @@
 .whiteboard {
+  --frame-size: 16px;
+  --corner-size: 28px;
+  --rail-light: #d8dde6;
+  --rail-mid: #aeb5c0;
+  --rail-dark: #7a828e;
+  --rail-edge: #58606b;
+  --corner-bg: #58565b;
+  --corner-light: #76747a;
+  --corner-shadow: #38363a;
+
   width: 100%;
   max-width: 100%;
   min-height: var(--whiteboard-min-height);
@@ -8,25 +18,59 @@
   container-type: inline-size;
   container-name: whiteboard;
 
-  background-color: var(--color-whiteboard);
-  background-image: var(--whiteboard-surface);
-
-  border-style: solid;
-  border-width: var(--whiteboard-frame-width);
-  border-radius: 0;
-  border-image: var(--whiteboard-frame) 1;
-
-  outline: 1px solid var(--whiteboard-outer-edge);
-  outline-offset: 0;
-  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-shadow);
-
   color: var(--color-whiteboard-ink);
+  border: var(--frame-size) solid transparent;
+  border-radius: 0;
+
+  background:
+    linear-gradient(var(--color-whiteboard), var(--color-whiteboard)) padding-box,
+    linear-gradient(
+      180deg,
+      var(--rail-edge) 0%,
+      var(--rail-light) 32%,
+      var(--rail-mid) 68%,
+      var(--rail-dark) 100%
+    ) top / 100% var(--frame-size) no-repeat border-box,
+    linear-gradient(
+      180deg,
+      var(--rail-dark) 0%,
+      var(--rail-mid) 32%,
+      var(--rail-light) 68%,
+      var(--rail-edge) 100%
+    ) bottom / 100% var(--frame-size) no-repeat border-box,
+    linear-gradient(
+      90deg,
+      var(--rail-edge) 0%,
+      var(--rail-light) 32%,
+      var(--rail-mid) 68%,
+      var(--rail-dark) 100%
+    ) left / var(--frame-size) 100% no-repeat border-box,
+    linear-gradient(
+      90deg,
+      var(--rail-dark) 0%,
+      var(--rail-mid) 32%,
+      var(--rail-light) 68%,
+      var(--rail-edge) 100%
+    ) right / var(--frame-size) 100% no-repeat border-box;
+
+  /* Sombra interior pegada al marco (sin desplazamiento que deje franja blanca) */
+  box-shadow:
+    0 0 0 1px var(--rail-edge),
+    0 14px 28px -6px rgba(0, 0, 0, 0.24),
+    0 4px 10px -2px rgba(0, 0, 0, 0.14),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.28),
+    inset 0 2px 5px rgba(15, 23, 42, 0.22),
+    inset 0 0 8px rgba(15, 23, 42, 0.12);
 
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.4s ease;
 }
 
+.isCenter,
 .whiteboard--center {
   z-index: 2;
   transform: translateZ(var(--whiteboard-depth-center));
@@ -36,7 +80,6 @@
   z-index: 1;
   transform-origin: right center;
   transform: translateZ(var(--whiteboard-depth-side)) rotateY(var(--whiteboard-side-angle));
-  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
   user-select: none;
 }
 
@@ -44,17 +87,61 @@
   z-index: 1;
   transform-origin: left center;
   transform: translateZ(var(--whiteboard-depth-side)) rotateY(calc(var(--whiteboard-side-angle) * -1));
-  box-shadow: var(--whiteboard-frame-bevel), var(--whiteboard-side-shadow);
   user-select: none;
 }
 
-.whiteboard::after {
-  content: "";
+.corner {
   position: absolute;
-  inset: calc(var(--whiteboard-frame-width) * -1);
+  width: var(--corner-size);
+  height: var(--corner-size);
   pointer-events: none;
-  border: 1px solid var(--whiteboard-joint);
+  z-index: 5;
+
+  border-radius: 3px 0 100% 0;
+  border: 1px solid var(--corner-shadow);
+  background: linear-gradient(135deg, var(--corner-light) 0%, var(--corner-bg) 60%, var(--corner-shadow) 100%);
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    1px 1px 3px rgba(0, 0, 0, 0.28),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.cornerTL {
+  top: calc(var(--frame-size) * -1 - 1px);
+  left: calc(var(--frame-size) * -1 - 1px);
+}
+
+.cornerTR {
+  top: calc(var(--frame-size) * -1 - 1px);
+  right: calc(var(--frame-size) * -1 - 1px);
+  transform: rotate(90deg);
+}
+
+.cornerBR {
+  bottom: calc(var(--frame-size) * -1 - 1px);
+  right: calc(var(--frame-size) * -1 - 1px);
+  transform: rotate(180deg);
+}
+
+.cornerBL {
+  bottom: calc(var(--frame-size) * -1 - 1px);
+  left: calc(var(--frame-size) * -1 - 1px);
+  transform: rotate(270deg);
+}
+
+:global([data-theme="dark"]) .whiteboard {
+  --rail-light: #a2adbc;
+  --rail-mid: #748091;
+  --rail-dark: #4f5968;
+  --rail-edge: #353c47;
+  --corner-bg: #32353e;
+  --corner-light: #4d515e;
+  --corner-shadow: #191b20;
+
+  box-shadow:
+    0 0 0 1px var(--rail-edge),
+    0 18px 34px -6px rgba(0, 0, 0, 0.55),
+    0 6px 14px -2px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    inset 0 2px 6px rgba(0, 0, 0, 0.42),
+    inset 0 0 10px rgba(0, 0, 0, 0.24);
 }

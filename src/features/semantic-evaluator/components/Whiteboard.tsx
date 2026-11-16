@@ -11,6 +11,7 @@ export interface WhiteboardProps {
     padding?: CSSProperties["padding"];
     className?: string;
     ariaLabel?: string;
+    isCenter?: boolean;
 }
 
 export default function Whiteboard({
@@ -23,14 +24,22 @@ export default function Whiteboard({
     padding,
     className,
     ariaLabel,
+    isCenter,
 }: WhiteboardProps) {
+    const showCorners =
+        isCenter ?? (/center/i.test(className ?? "") || /center/i.test(id ?? ""));
+
     return (
         <section
             id={id}
-            className={`${styles.whiteboard}${className ? ` ${className}` : ""}`}
+            className={`${styles.whiteboard}${showCorners ? ` ${styles.isCenter}` : ""}${className ? ` ${className}` : ""}`}
             style={{ width, maxWidth, height, minHeight, padding }}
             aria-label={ariaLabel}
         >
+            <span className={`${styles.corner} ${styles.cornerTL}`} aria-hidden="true" />
+            <span className={`${styles.corner} ${styles.cornerTR}`} aria-hidden="true" />
+            <span className={`${styles.corner} ${styles.cornerBL}`} aria-hidden="true" />
+            <span className={`${styles.corner} ${styles.cornerBR}`} aria-hidden="true" />
             {children}
         </section>
     );
