@@ -19,19 +19,25 @@ import { FormulaSyntaxError, type ParseErrorPayload } from "./parse-errors";
     desde una cadena de entrada.
 */
 
+export type ParserCall = {
+    rule: string;
+    // Posición del primer token que consume esta llamada
+    start: number;
+};
+
 export type ParserTrace = {
     cursor: number;
     token: Token;
-    callStack: string[];
+    callStack: ParserCall[];
     activeScopeVars: string[];
 };
 
 export class FormulaParser {
     public readonly nodeTokens = new WeakMap<Formula | Term, number>();
-    private callStack: string[] = [];
+    private callStack: ParserCall[] = [];
 
     private inRule<T>(name: string, parse: () => T): T {
-        this.callStack.push(name);
+        this.callStack.push({ rule: name, start: this.cursor });
         try {
             return parse();
         } finally {
@@ -68,7 +74,7 @@ export class FormulaParser {
         this.onRead?.({
             cursor: this.cursor,
             token,
-            callStack: [...this.callStack],
+            callStack: this.callStack.map((call) => ({ ...call })),
             activeScopeVars: [...this.boundVarCounts.keys()],
         });
         if (token.type !== "EOF") {

@@ -6,6 +6,7 @@ import rough from "roughjs";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import type { ParserVisualization } from "../hooks/useParserVisualization";
 import type { RenderTreeNode } from "../algorithms/parser-tree";
+import type { CallStep } from "../algorithms/parser-steps";
 import FitContent from "./FitContent";
 import TreeCanvasControls from "./TreeCanvasControls";
 import styles from "./ParseTree.module.css";
@@ -284,6 +285,20 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
         "build-predicate": LL.parser.buildPredicate(),
     }[step.decision] ?? step.decision : "";
 
+    const callDescriptions: Record<CallStep["kind"], (token: string) => string> = {
+        formula: () => LL.parser.callFormula(),
+        implication: (token) => LL.parser.callImplication({ token }),
+        disjunction: (token) => LL.parser.callDisjunction({ token }),
+        conjunction: (token) => LL.parser.callConjunction({ token }),
+        negation: (token) => LL.parser.callNegation({ token }),
+        universal: (token) => LL.parser.callUniversal({ token }),
+        existential: (token) => LL.parser.callExistential({ token }),
+        unary: () => LL.parser.callUnary(),
+        group: (token) => LL.parser.callGroup({ token }),
+        predicate: (token) => LL.parser.callPredicate({ token }),
+        term: (token) => LL.parser.callTerm({ token }),
+    };
+
     return (
         <section className={styles.container}>
             <div className={styles.fitContent} data-fit-content>
@@ -311,7 +326,14 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                     tabIndex={0}
                                     aria-label={LL.parser.functionHistory()}
                                 >
-                                    <span className={styles.callPath}><Chalk>{step.callStack.join(" → ")}</Chalk></span>
+                                    <ol className={styles.callTree}>
+                                        {step.callStack.map((call, index) => (
+                                            <li className={styles.callNode} key={`${index}-${call.rule}`} tabIndex={0}>
+                                                <span className={styles.callName}><Chalk>{call.rule}</Chalk></span>
+                                                <span className={styles.callDescription} role="tooltip">{callDescriptions[call.kind](call.token)}</span>
+                                            </li>
+                                        ))}
+                                    </ol>
                                 </div>
                             </div>
 

@@ -193,6 +193,59 @@ type RootTranslation = {
 		 */
 		functionHistory: string
 		/**
+		 * p​u​n​t​o​ ​d​e​ ​e​n​t​r​a​d​a​:​ ​a​n​a​l​i​z​a​ ​l​a​ ​f​ó​r​m​u​l​a​ ​c​o​m​p​l​e​t​a​.
+		 */
+		callFormula: string
+		/**
+		 * r​e​s​u​e​l​v​e​ ​l​a​s​ ​i​m​p​l​i​c​a​c​i​o​n​e​s​ ​«​{​t​o​k​e​n​}​»​;​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​d​e​r​e​c​h​a​.
+		 * @param {string} token
+		 */
+		callImplication: RequiredParams<'token'>
+		/**
+		 * r​e​s​u​e​l​v​e​ ​l​a​s​ ​d​i​s​y​u​n​c​i​o​n​e​s​ ​«​{​t​o​k​e​n​}​»​;​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​i​z​q​u​i​e​r​d​a​.
+		 * @param {string} token
+		 */
+		callDisjunction: RequiredParams<'token'>
+		/**
+		 * r​e​s​u​e​l​v​e​ ​l​a​s​ ​c​o​n​j​u​n​c​i​o​n​e​s​ ​«​{​t​o​k​e​n​}​»​;​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​i​z​q​u​i​e​r​d​a​.
+		 * @param {string} token
+		 */
+		callConjunction: RequiredParams<'token'>
+		/**
+		 * a​p​l​i​c​a​ ​l​a​ ​n​e​g​a​c​i​ó​n​ ​«​{​t​o​k​e​n​}​»​ ​a​ ​s​u​ ​o​p​e​r​a​n​d​o​.
+		 * @param {string} token
+		 */
+		callNegation: RequiredParams<'token'>
+		/**
+		 * c​u​a​n​t​i​f​i​c​a​d​o​r​ ​u​n​i​v​e​r​s​a​l​ ​«​{​t​o​k​e​n​}​»​:​ ​l​i​g​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​e​n​ ​s​u​ ​c​u​e​r​p​o​.
+		 * @param {string} token
+		 */
+		callUniversal: RequiredParams<'token'>
+		/**
+		 * c​u​a​n​t​i​f​i​c​a​d​o​r​ ​e​x​i​s​t​e​n​c​i​a​l​ ​«​{​t​o​k​e​n​}​»​:​ ​l​i​g​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​e​n​ ​s​u​ ​c​u​e​r​p​o​.
+		 * @param {string} token
+		 */
+		callExistential: RequiredParams<'token'>
+		/**
+		 * s​i​n​ ​o​p​e​r​a​d​o​r​ ​p​r​e​f​i​j​o​:​ ​p​a​s​a​ ​d​i​r​e​c​t​o​ ​a​ ​l​a​ ​e​x​p​r​e​s​i​ó​n​ ​p​r​i​m​a​r​i​a​.
+		 */
+		callUnary: string
+		/**
+		 * s​u​b​f​ó​r​m​u​l​a​ ​e​n​t​r​e​ ​p​a​r​é​n​t​e​s​i​s​ ​«​{​t​o​k​e​n​}​»​:​ ​s​e​ ​a​n​a​l​i​z​a​ ​c​o​m​o​ ​f​ó​r​m​u​l​a​ ​c​o​m​p​l​e​t​a​.
+		 * @param {string} token
+		 */
+		callGroup: RequiredParams<'token'>
+		/**
+		 * p​r​e​d​i​c​a​d​o​ ​a​t​ó​m​i​c​o​ ​«​{​t​o​k​e​n​}​»​.
+		 * @param {string} token
+		 */
+		callPredicate: RequiredParams<'token'>
+		/**
+		 * t​é​r​m​i​n​o​ ​«​{​t​o​k​e​n​}​»​:​ ​v​a​r​i​a​b​l​e​,​ ​c​o​n​s​t​a​n​t​e​ ​o​ ​f​u​n​c​i​ó​n​.
+		 * @param {string} token
+		 */
+		callTerm: RequiredParams<'token'>
+		/**
 		 * T​o​k​e​n​s​ ​d​e​l​ ​l​e​x​e​r
 		 */
 		tokenStream: string
@@ -860,6 +913,50 @@ export type TranslationFunctions = {
 		 * Llamadas del token
 		 */
 		functionHistory: () => LocalizedString
+		/**
+		 * punto de entrada: analiza la fórmula completa.
+		 */
+		callFormula: () => LocalizedString
+		/**
+		 * resuelve las implicaciones «{token}»; asocia a la derecha.
+		 */
+		callImplication: (arg: { token: string }) => LocalizedString
+		/**
+		 * resuelve las disyunciones «{token}»; asocia a la izquierda.
+		 */
+		callDisjunction: (arg: { token: string }) => LocalizedString
+		/**
+		 * resuelve las conjunciones «{token}»; asocia a la izquierda.
+		 */
+		callConjunction: (arg: { token: string }) => LocalizedString
+		/**
+		 * aplica la negación «{token}» a su operando.
+		 */
+		callNegation: (arg: { token: string }) => LocalizedString
+		/**
+		 * cuantificador universal «{token}»: liga la variable en su cuerpo.
+		 */
+		callUniversal: (arg: { token: string }) => LocalizedString
+		/**
+		 * cuantificador existencial «{token}»: liga la variable en su cuerpo.
+		 */
+		callExistential: (arg: { token: string }) => LocalizedString
+		/**
+		 * sin operador prefijo: pasa directo a la expresión primaria.
+		 */
+		callUnary: () => LocalizedString
+		/**
+		 * subfórmula entre paréntesis «{token}»: se analiza como fórmula completa.
+		 */
+		callGroup: (arg: { token: string }) => LocalizedString
+		/**
+		 * predicado atómico «{token}».
+		 */
+		callPredicate: (arg: { token: string }) => LocalizedString
+		/**
+		 * término «{token}»: variable, constante o función.
+		 */
+		callTerm: (arg: { token: string }) => LocalizedString
 		/**
 		 * Tokens del lexer
 		 */
