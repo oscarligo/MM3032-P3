@@ -6,9 +6,13 @@ import { buildVisualTree, type RenderTreeNode } from "./parser-tree";
 
 export type CallStep = {
     rule: string;
-    kind: "formula" | "implication" | "disjunction" | "conjunction" | "negation"
+    kind: "formula" | "implicationRoot" | "implicationBody" | "implicationGroup" | "implicationRight"
+        | "disjunction" | "conjunction" | "negation"
         | "universal" | "existential" | "unary" | "group" | "predicate" | "term";
     token: string;
+    // Solo en niveles de operador binario: símbolo y si esta llamada lo consume
+    operator?: string;
+    consumes?: boolean;
 };
 
 export type ParserStep = {
@@ -60,8 +64,15 @@ const RULE_TRIGGERS: Record<string, TokenType[]> = {
 const OPERATOR_SYMBOL: Record<string, string> = { implication: "→", disjunction: "∨", conjunction: "∧" };
 
 // Describe cada llamada según el token con el que comienza, para que la explicación dependa de la cadena.
-const describeCall = ({ rule, start }: ParserCall, tokens: Token[]): CallStep => {
+const describeCall = (
+    callStack: ParserCall[],
+    index: number,
+    tokens: Token[],
+    operatorCalls: ReadonlySet<string>
+): CallStep => {
+    const { rule, start } = callStack[index];
     const first = tokens[start];
+    const quantifierText = (callStart: number) => `${tokens[callStart].value}${tokens[callStart + 1]?.value ?? ""}`;
     switch (rule) {
         case "unary":
             if (first.type === "NOT") return { rule, kind: "negation", token: first.value };
@@ -69,7 +80,7 @@ const describeCall = ({ rule, start }: ParserCall, tokens: Token[]): CallStep =>
                 return {
                     rule,
                     kind: first.type === "FORALL" ? "universal" : "existential",
-                    token: `${first.value}${tokens[start + 1]?.value ?? ""}`,
+                    token: quantifierText(start),
                 };
             }
             return { rule, kind: "unary", token: first.value || first.type };
@@ -79,22 +90,37 @@ const describeCall = ({ rule, start }: ParserCall, tokens: Token[]): CallStep =>
                 : { rule, kind: "predicate", token: first.value };
         case "term":
             return { rule, kind: "term", token: first.value };
-        case "implication":
+        case "implication": {
+            // El contexto lo da quien invocó esta llamada: raíz, cuerpo de cuantificador, paréntesis u operando derecho
+            const parent = callStack[index - 1];
+            const base = { rule, operator: OPERATOR_SYMBOL[rule], consumes: operatorCalls.has(`${rule}:${start}`) };
+            if (parent?.rule === "unary") return { ...base, kind: "implicationBody", token: quantifierText(parent.start) };
+            if (parent?.rule === "primary") return { ...base, kind: "implicationGroup", token: tokens[parent.start].value };
+            if (parent?.rule === "implication") return { ...base, kind: "implicationRight", token: OPERATOR_SYMBOL[rule] };
+            return { ...base, kind: "implicationRoot", token: "" };
+        }
         case "disjunction":
         case "conjunction":
-            return { rule, kind: rule, token: OPERATOR_SYMBOL[rule] };
+            return {
+                rule,
+                kind: rule,
+                token: OPERATOR_SYMBOL[rule],
+                operator: OPERATOR_SYMBOL[rule],
+                consumes: operatorCalls.has(`${rule}:${start}`),
+            };
         default:
             return { rule, kind: "formula", token: "" };
     }
 };
 
-const relevantCalls = (callStack: ParserCall[], tokens: Token[]): CallStep[] =>
+const relevantCalls = (callStack: ParserCall[], tokens: Token[], operatorCalls: ReadonlySet<string>): CallStep[] =>
     callStack
-        .filter(({ rule }) => {
-            const triggers = RULE_TRIGGERS[rule];
+        .map((call, index) => ({ call, index }))
+        .filter(({ call }) => {
+            const triggers = RULE_TRIGGERS[call.rule];
             return !triggers || tokens.some((token) => triggers.includes(token.type));
         })
-        .map((call) => describeCall(call, tokens));
+        .map(({ index }) => describeCall(callStack, index, tokens, operatorCalls));
 
 export function parseTokensWithSteps(tokens: Token[], constantSymbols: ReadonlySet<string> = new Set()): ParserStepsResult {
     const trace: ParserTrace[] = [];
@@ -105,7 +131,7 @@ export function parseTokensWithSteps(tokens: Token[], constantSymbols: ReadonlyS
         cursor,
         currentToken: token.value || token.type,
         tokenType: token.type,
-        callStack: relevantCalls(callStack, tokens),
+        callStack: relevantCalls(callStack, tokens, parser.operatorCalls),
         decision: decisionFor(token, callStack, tokens[cursor - 1]),
         activeScopeVars,
         // The circled token is next to read; only earlier tokens belong in the tree.

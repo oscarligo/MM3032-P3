@@ -197,10 +197,34 @@ type RootTranslation = {
 		 */
 		callFormula: string
 		/**
-		 * r​e​s​u​e​l​v​e​ ​l​a​s​ ​i​m​p​l​i​c​a​c​i​o​n​e​s​ ​«​{​t​o​k​e​n​}​»​;​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​d​e​r​e​c​h​a​.
+		 * f​ó​r​m​u​l​a​ ​c​o​m​p​l​e​t​a​:​ ​p​u​n​t​o​ ​d​e​ ​p​a​r​t​i​d​a​ ​d​e​l​ ​a​n​á​l​i​s​i​s​ ​d​e​ ​l​a​ ​c​a​d​e​n​a​.
+		 */
+		callImplicationRoot: string
+		/**
+		 * c​u​e​r​p​o​ ​d​e​ ​«​{​t​o​k​e​n​}​»​:​ ​l​a​ ​f​ó​r​m​u​l​a​ ​q​u​e​ ​s​i​g​u​e​ ​a​l​ ​c​u​a​n​t​i​f​i​c​a​d​o​r​.
 		 * @param {string} token
 		 */
-		callImplication: RequiredParams<'token'>
+		callImplicationBody: RequiredParams<'token'>
+		/**
+		 * f​ó​r​m​u​l​a​ ​d​e​n​t​r​o​ ​d​e​ ​«​{​t​o​k​e​n​}​»​:​ ​e​l​ ​c​o​n​t​e​n​i​d​o​ ​d​e​l​ ​p​a​r​é​n​t​e​s​i​s​.
+		 * @param {string} token
+		 */
+		callImplicationGroup: RequiredParams<'token'>
+		/**
+		 * o​p​e​r​a​n​d​o​ ​d​e​r​e​c​h​o​ ​d​e​ ​«​{​t​o​k​e​n​}​»​:​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​d​e​r​e​c​h​a​.
+		 * @param {string} token
+		 */
+		callImplicationRight: RequiredParams<'token'>
+		/**
+		 * A​q​u​í​ ​s​e​ ​c​o​n​s​u​m​e​ ​e​l​ ​«​{​t​o​k​e​n​}​»​.
+		 * @param {string} token
+		 */
+		callConsumes: RequiredParams<'token'>
+		/**
+		 * A​q​u​í​ ​n​o​ ​h​a​y​ ​«​{​t​o​k​e​n​}​»​:​ ​s​o​l​o​ ​p​a​s​a​ ​a​l​ ​n​i​v​e​l​ ​s​i​g​u​i​e​n​t​e​.
+		 * @param {string} token
+		 */
+		callSkips: RequiredParams<'token'>
 		/**
 		 * r​e​s​u​e​l​v​e​ ​l​a​s​ ​d​i​s​y​u​n​c​i​o​n​e​s​ ​«​{​t​o​k​e​n​}​»​;​ ​a​s​o​c​i​a​ ​a​ ​l​a​ ​i​z​q​u​i​e​r​d​a​.
 		 * @param {string} token
@@ -227,7 +251,7 @@ type RootTranslation = {
 		 */
 		callExistential: RequiredParams<'token'>
 		/**
-		 * s​i​n​ ​o​p​e​r​a​d​o​r​ ​p​r​e​f​i​j​o​:​ ​p​a​s​a​ ​d​i​r​e​c​t​o​ ​a​ ​l​a​ ​e​x​p​r​e​s​i​ó​n​ ​p​r​i​m​a​r​i​a​.
+		 * n​o​ ​h​a​y​ ​¬​,​ ​∀​ ​n​i​ ​∃​ ​a​q​u​í​:​ ​p​a​s​a​ ​a​ ​l​a​ ​e​x​p​r​e​s​i​ó​n​ ​p​r​i​m​a​r​i​a​.
 		 */
 		callUnary: string
 		/**
@@ -918,9 +942,29 @@ export type TranslationFunctions = {
 		 */
 		callFormula: () => LocalizedString
 		/**
-		 * resuelve las implicaciones «{token}»; asocia a la derecha.
+		 * fórmula completa: punto de partida del análisis de la cadena.
 		 */
-		callImplication: (arg: { token: string }) => LocalizedString
+		callImplicationRoot: () => LocalizedString
+		/**
+		 * cuerpo de «{token}»: la fórmula que sigue al cuantificador.
+		 */
+		callImplicationBody: (arg: { token: string }) => LocalizedString
+		/**
+		 * fórmula dentro de «{token}»: el contenido del paréntesis.
+		 */
+		callImplicationGroup: (arg: { token: string }) => LocalizedString
+		/**
+		 * operando derecho de «{token}»: asocia a la derecha.
+		 */
+		callImplicationRight: (arg: { token: string }) => LocalizedString
+		/**
+		 * Aquí se consume el «{token}».
+		 */
+		callConsumes: (arg: { token: string }) => LocalizedString
+		/**
+		 * Aquí no hay «{token}»: solo pasa al nivel siguiente.
+		 */
+		callSkips: (arg: { token: string }) => LocalizedString
 		/**
 		 * resuelve las disyunciones «{token}»; asocia a la izquierda.
 		 */
@@ -942,7 +986,7 @@ export type TranslationFunctions = {
 		 */
 		callExistential: (arg: { token: string }) => LocalizedString
 		/**
-		 * sin operador prefijo: pasa directo a la expresión primaria.
+		 * no hay ¬, ∀ ni ∃ aquí: pasa a la expresión primaria.
 		 */
 		callUnary: () => LocalizedString
 		/**

@@ -287,7 +287,10 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
 
     const callDescriptions: Record<CallStep["kind"], (token: string) => string> = {
         formula: () => LL.parser.callFormula(),
-        implication: (token) => LL.parser.callImplication({ token }),
+        implicationRoot: () => LL.parser.callImplicationRoot(),
+        implicationBody: (token) => LL.parser.callImplicationBody({ token }),
+        implicationGroup: (token) => LL.parser.callImplicationGroup({ token }),
+        implicationRight: (token) => LL.parser.callImplicationRight({ token }),
         disjunction: (token) => LL.parser.callDisjunction({ token }),
         conjunction: (token) => LL.parser.callConjunction({ token }),
         negation: (token) => LL.parser.callNegation({ token }),
@@ -330,7 +333,12 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                         {step.callStack.map((call, index) => (
                                             <li className={styles.callNode} key={`${index}-${call.rule}`} tabIndex={0}>
                                                 <span className={styles.callName}><Chalk>{call.rule}</Chalk></span>
-                                                <span className={styles.callDescription} role="tooltip">{callDescriptions[call.kind](call.token)}</span>
+                                                <span className={styles.callDescription} role="tooltip">
+                                                    {callDescriptions[call.kind](call.token)}
+                                                    {call.operator && call.consumes !== undefined && ` ${call.consumes
+                                                        ? LL.parser.callConsumes({ token: call.operator })
+                                                        : LL.parser.callSkips({ token: call.operator })}`}
+                                                </span>
                                             </li>
                                         ))}
                                     </ol>

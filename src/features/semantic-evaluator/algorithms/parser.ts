@@ -34,6 +34,8 @@ export type ParserTrace = {
 
 export class FormulaParser {
     public readonly nodeTokens = new WeakMap<Formula | Term, number>();
+    // Llamadas ("regla:inicio") que consumieron su operador binario; se completa durante el parseo
+    public readonly operatorCalls = new Set<string>();
     private callStack: ParserCall[] = [];
 
     private inRule<T>(name: string, parse: () => T): T {
@@ -48,6 +50,11 @@ export class FormulaParser {
     private atToken<T extends Formula | Term>(node: T, cursor: number): T {
         this.nodeTokens.set(node, cursor);
         return node;
+    }
+
+    private markOperator(): void {
+        const { rule, start } = this.callStack[this.callStack.length - 1];
+        this.operatorCalls.add(`${rule}:${start}`);
     }
 
     private tokens: Token[];
@@ -270,6 +277,7 @@ export class FormulaParser {
 
             const operator = this.cursor;
             if (this.peek().type === "IMPLIES") {
+                this.markOperator();
                 const operatorToken = this.advance();
                 if (["EOF", "RPAREN"].includes(this.peek().type)) {
                     throw new FormulaSyntaxError({ code: "MISSING_OPERAND", operator: operatorToken.value, position: operatorToken.position });
@@ -290,6 +298,7 @@ export class FormulaParser {
 
             while (this.peek().type === "OR") {
                 const operator = this.cursor;
+                this.markOperator();
                 const operatorToken = this.advance();
                 if (["EOF", "RPAREN"].includes(this.peek().type)) {
                     throw new FormulaSyntaxError({ code: "MISSING_OPERAND", operator: operatorToken.value, position: operatorToken.position });
@@ -310,6 +319,7 @@ export class FormulaParser {
 
             while (this.peek().type === "AND") {
                 const operator = this.cursor;
+                this.markOperator();
                 const operatorToken = this.advance();
                 if (["EOF", "RPAREN"].includes(this.peek().type)) {
                     throw new FormulaSyntaxError({ code: "MISSING_OPERAND", operator: operatorToken.value, position: operatorToken.position });
