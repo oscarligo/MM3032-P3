@@ -4,7 +4,7 @@ const en = {
 	HI: 'Hello',
 	navbar: {
 		navigation: 'Main navigation', title: 'Semantic evaluator', language: 'Language',
-		spanish: 'Spanish', english: 'English', lightTheme: 'Light theme', darkTheme: 'Dark theme',
+		spanish: 'Spanish', english: 'English', lightTheme: 'Light theme', darkTheme: 'Dark theme', qrCode: 'QR code',
 	},
 	semanticEvaluator: {
 		title: 'Semantic evaluator', example: 'Example',

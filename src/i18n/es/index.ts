@@ -4,7 +4,7 @@ const es = {
 	HI: 'HOLA',
 	navbar: {
 		navigation: 'Navegación principal', title: 'Evaluador semántico', language: 'Idioma',
-		spanish: 'Español', english: 'Inglés', lightTheme: 'Tema claro', darkTheme: 'Tema oscuro',
+		spanish: 'Español', english: 'Inglés', lightTheme: 'Tema claro', darkTheme: 'Tema oscuro', qrCode: 'Código QR',
 	},
 	semanticEvaluator: {
 		title: 'Evaluador semántico', example: 'Ejemplo',

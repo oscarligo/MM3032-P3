@@ -47,6 +47,10 @@ type RootTranslation = {
 		 * T​e​m​a​ ​o​s​c​u​r​o
 		 */
 		darkTheme: string
+		/**
+		 * C​ó​d​i​g​o​ ​Q​R
+		 */
+		qrCode: string
 	}
 	semanticEvaluator: {
 		/**
@@ -605,6 +609,10 @@ export type TranslationFunctions = {
 		 * Tema oscuro
 		 */
 		darkTheme: () => LocalizedString
+		/**
+		 * Código QR
+		 */
+		qrCode: () => LocalizedString
 	}
 	semanticEvaluator: {
 		/**

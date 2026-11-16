@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, CircleExclamationPoint } from "lucide-react";
 import { GT, US } from "country-flag-icons/react/3x2";
 import { Spin } from "@theme-toggles/react";
 import "@theme-toggles/react/styles/spin.css";
@@ -9,7 +9,12 @@ import { useLocaleStore } from "../../store/store_local";
 import { useUIStore } from "../../store/store_ui";
 import styles from "./NavBar.module.css";
 
-export default function NavBar() {
+type NavBarProps = {
+    showQr: boolean;
+    onToggleQr: () => void;
+};
+
+export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
     const { LL } = useI18nContext();
     const locale = useLocaleStore((state) => state.locale);
     const setLocale = useLocaleStore((state) => state.setLocale);
@@ -49,8 +54,9 @@ export default function NavBar() {
     const themeLabel = isDark ? LL.navbar.lightTheme() : LL.navbar.darkTheme();
 
     return (
-        <nav className={styles.navbar} aria-label={LL.navbar.navigation()}>
-            <div className={styles.controls}>
+        <div className={styles.navGroup}>
+            <nav className={styles.navbar} aria-label={LL.navbar.navigation()}>
+                <div className={styles.controls}>
                 <div className={styles.selectWrapper} title={LL.navbar.language()}>
                     <span className={styles.flagBadge} aria-hidden="true">
                         {locale === "es" ? (
@@ -86,7 +92,21 @@ export default function NavBar() {
                     aria-label={themeLabel}
                     title={themeLabel}
                 />
-            </div>
-        </nav>
+
+                <span className={styles.divider} aria-hidden="true" />
+
+                <button
+                    className={styles.helpButton}
+                    type="button"
+                    onClick={onToggleQr}
+                    aria-label={LL.navbar.qrCode()}
+                    title={LL.navbar.qrCode()}
+                    aria-expanded={showQr}
+                >
+                    <CircleExclamationPoint size={20} strokeWidth={2.1} aria-hidden="true" />
+                </button>
+                </div>
+            </nav>
+        </div>
     );
 }

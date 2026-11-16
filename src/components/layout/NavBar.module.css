@@ -1,13 +1,19 @@
-.navbar {
+.navGroup {
     position: fixed;
     top: max(var(--space-md, 1rem), env(safe-area-inset-top));
     right: max(var(--space-md, 1rem), env(safe-area-inset-right));
-    left: auto;
     z-index: 50;
-
-    margin: 0;
-    width: var(--layout-control-width);
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
     max-width: calc(100vw - 2rem);
+}
+
+.navbar {
+    margin: 0;
+    width: max-content;
+    min-width: var(--layout-control-width);
+    max-width: 100%;
 
     display: flex;
     align-items: center;
@@ -44,7 +50,8 @@
 
 /* Estética button-36 original en modo claro */
 .selectWrapper,
-.themeToggle {
+.themeToggle,
+.helpButton {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -89,13 +96,25 @@
         padding 150ms ease-in-out;
 }
 
+.helpButton {
+    width: 2.2rem;
+    padding-inline: 0;
+    color: var(--color-text-muted);
+}
+
 .selectWrapper:hover,
-.themeToggle:hover {
+.themeToggle:hover,
+.helpButton:hover {
     filter: brightness(0.98);
 }
 
+.helpButton:hover {
+    color: var(--color-text);
+}
+
 .selectWrapper:active,
-.themeToggle:active {
+.themeToggle:active,
+.helpButton:active {
     filter: brightness(0.96);
     padding-top: 2px;
     padding-bottom: 2px;
@@ -115,7 +134,8 @@
 }
 
 :global([data-theme="dark"]) .selectWrapper,
-:global([data-theme="dark"]) .themeToggle {
+:global([data-theme="dark"]) .themeToggle,
+:global([data-theme="dark"]) .helpButton {
     border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
     background: color-mix(in srgb, var(--color-surface) 92%, white);
     box-shadow:
@@ -126,14 +146,16 @@
 }
 
 :global([data-theme="dark"]) .selectWrapper:hover,
-:global([data-theme="dark"]) .themeToggle:hover {
+:global([data-theme="dark"]) .themeToggle:hover,
+:global([data-theme="dark"]) .helpButton:hover {
     filter: none;
     background: color-mix(in srgb, var(--color-surface) 88%, white);
     border-color: color-mix(in srgb, var(--color-border) 95%, transparent);
 }
 
 :global([data-theme="dark"]) .selectWrapper:active,
-:global([data-theme="dark"]) .themeToggle:active {
+:global([data-theme="dark"]) .themeToggle:active,
+:global([data-theme="dark"]) .helpButton:active {
     filter: none;
     background: color-mix(in srgb, var(--color-surface) 95%, white);
     box-shadow:
@@ -147,7 +169,8 @@
     outline: none;
 }
 
-.themeToggle:focus-visible {
+.themeToggle:focus-visible,
+.helpButton:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--color-border) 60%, var(--color-text));
     outline-offset: 2px;
 }
@@ -205,8 +228,9 @@
 }
 
 @media (max-width: 560px) {
-    .navbar {
+    .navGroup {
         top: max(var(--space-sm, 0.5rem), env(safe-area-inset-top));
         right: max(var(--space-sm, 0.5rem), env(safe-area-inset-right));
+        max-width: calc(100vw - 1rem);
     }
 }
