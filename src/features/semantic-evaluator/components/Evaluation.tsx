@@ -8,13 +8,14 @@ import { useLocaleStore } from "../../../store/store_local";
 import { useInterpretationStore } from "../../../store/store_interpretation";
 import {
     buildEvaluationMap,
-    evaluateUnderInterpretation,
     fitEvaluationScale,
     formulaToText,
 } from "../algorithms/evaluation";
+import { explainFormula } from "../algorithms/explanation";
 import { buildTruthTrace, type TruthTrace } from "../algorithms/truth";
 import type { Formula } from "../types";
 import TreeCanvasControls from "./TreeCanvasControls";
+import Justification from "./Justification";
 import Truth from "./Truth";
 import styles from "./Evaluation.module.css";
 
@@ -84,10 +85,15 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
         () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
         [formula, interpretation]
     );
-    const finalEvaluation = useMemo(
-        () => formula && interpretation ? evaluateUnderInterpretation(formula, interpretation) : null,
-        [formula, interpretation]
-    );
+    const explanation = useMemo(() => {
+        if (!formula || !interpretation) return undefined;
+        try {
+            return explainFormula(formula, interpretation);
+        } catch {
+            return undefined;
+        }
+    }, [formula, interpretation]);
+    const finalEvaluation = explanation ? explanation.value : null;
     const renderedFormula = useMemo(() => formula ? formulaToText(formula) : "", [formula]);
     const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
     const [truthTrace, setTruthTrace] = useState<TruthTrace>();
@@ -418,6 +424,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                 {renderedFormula}
                             </TegakiRenderer>
                         </p>
+                        {explanation && <Justification explanation={explanation} />}
                         <TreeCanvasControls />
                     </TransformWrapper>
                 </div>

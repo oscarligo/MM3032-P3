@@ -65,6 +65,18 @@ const en = {
 	},
 	evaluation: {
 		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', result: 'Result', value: 'Value',
+				justification: 'Justification', trueVerdict: 'True', falseVerdict: 'False',
+				left: 'left', right: 'right',
+				atomMember: '{tuple} belongs to {symbol}ᴵ', atomNotMember: '{tuple} does not belong to {symbol}ᴵ',
+				atomTrue: '{symbol}ᴵ is true', atomFalse: '{symbol}ᴵ is false',
+				notTrue: 'Its argument is false', notFalse: 'Its argument is true',
+				andTrue: 'Both sides are true', andFalse: 'The {side} side is false',
+				orTrue: 'The {side} side is true', orFalse: 'Both sides are false',
+				impliesTrueLeft: 'The antecedent is false', impliesTrueRight: 'The consequent is true',
+				impliesFalse: 'The antecedent is true and the consequent is false',
+				witness: 'Witness: {variable} = {element}', counterexample: 'Counterexample: {variable} = {element}',
+				completeForall: 'Full check: it holds for all {count} elements of 𝒟 = {elements}',
+				completeExists: 'Full check: it fails for all {count} elements of 𝒟 = {elements}',
 	},
 	truth: {
 		title: 'Truth-value decision', close: 'Close', atoms: 'Evaluation history',

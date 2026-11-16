@@ -65,6 +65,18 @@ const es = {
 	},
 	evaluation: {
 		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', result: 'Resultado', value: 'Valor',
+				justification: 'Justificación', trueVerdict: 'Verdadero', falseVerdict: 'Falso',
+				left: 'izquierdo', right: 'derecho',
+				atomMember: '{tuple} pertenece a {symbol}ᴵ', atomNotMember: '{tuple} no pertenece a {symbol}ᴵ',
+				atomTrue: '{symbol}ᴵ es verdadero', atomFalse: '{symbol}ᴵ es falso',
+				notTrue: 'Su argumento es falso', notFalse: 'Su argumento es verdadero',
+				andTrue: 'Ambos lados son verdaderos', andFalse: 'El lado {side} es falso',
+				orTrue: 'El lado {side} es verdadero', orFalse: 'Ambos lados son falsos',
+				impliesTrueLeft: 'El antecedente es falso', impliesTrueRight: 'El consecuente es verdadero',
+				impliesFalse: 'El antecedente es verdadero y el consecuente es falso',
+				witness: 'Testigo: {variable} = {element}', counterexample: 'Contraejemplo: {variable} = {element}',
+				completeForall: 'Comprobación completa: se cumple para los {count:number} elementos de 𝒟 = {elements}',
+				completeExists: 'Comprobación completa: no se cumple para ninguno de los {count:number} elementos de 𝒟 = {elements}',
 	},
 	truth: {
 		title: 'Decisión del valor de verdad', close: 'Cerrar', atoms: 'Historial de evaluación',

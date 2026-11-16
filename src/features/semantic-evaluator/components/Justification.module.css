@@ -1,0 +1,78 @@
+.justification {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: var(--space-xs);
+    width: 100%;
+    min-width: 0;
+    margin-top: var(--space-xs);
+    padding-top: var(--space-xs);
+    border-top: 2px dashed color-mix(in srgb, var(--color-whiteboard-ink) 25%, transparent);
+    color: var(--color-whiteboard-ink);
+    font-family: var(--font-family-handwritten);
+}
+
+.verdict {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.body {
+    max-height: 7.5rem;
+    overflow-y: auto;
+    padding-right: var(--space-xs);
+    cursor: auto;
+    user-select: text;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    gap: .1rem;
+}
+
+.step > .steps {
+    margin-top: .15rem;
+    padding-left: var(--space-md);
+    border-left: 2px solid color-mix(in srgb, var(--color-whiteboard-ink) 25%, transparent);
+}
+
+.stepLine {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .4rem;
+    font-size: .9rem;
+}
+
+.formula {
+    font-family: var(--font-family-math);
+    overflow-wrap: anywhere;
+}
+
+.reason {
+    font-size: .85rem;
+    line-height: 1.2;
+    opacity: .85;
+    overflow-wrap: anywhere;
+}
+
+.true {
+    color: var(--color-success);
+}
+
+.false {
+    color: var(--color-annotation);
+}

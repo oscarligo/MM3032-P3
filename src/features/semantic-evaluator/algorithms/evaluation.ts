@@ -26,7 +26,7 @@ const collectVariables = (formula: Formula, variables = new Set<string>()): Set<
     return variables;
 };
 
-const evaluateTerm = (term: Term, interpretation: InterpretationDefinition, environment: ReadonlyMap<string, string>): string | null => {
+export const evaluateTerm = (term: Term, interpretation: InterpretationDefinition, environment: ReadonlyMap<string, string>): string | null => {
     if (term.kind === "var") return environment.get(term.name) ?? null;
     if (term.kind === "const") return interpretation.constants[term.name] ?? null;
     const args = term.args.map((argument) => evaluateTerm(argument, interpretation, environment));

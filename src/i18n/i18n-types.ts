@@ -468,6 +468,110 @@ type RootTranslation = {
 		 * V​a​l​o​r
 		 */
 		value: string
+		/**
+		 * J​u​s​t​i​f​i​c​a​c​i​ó​n
+		 */
+		justification: string
+		/**
+		 * V​e​r​d​a​d​e​r​o
+		 */
+		trueVerdict: string
+		/**
+		 * F​a​l​s​o
+		 */
+		falseVerdict: string
+		/**
+		 * i​z​q​u​i​e​r​d​o
+		 */
+		left: string
+		/**
+		 * d​e​r​e​c​h​o
+		 */
+		right: string
+		/**
+		 * {​t​u​p​l​e​}​ ​p​e​r​t​e​n​e​c​e​ ​a​ ​{​s​y​m​b​o​l​}​ᴵ
+		 * @param {unknown} symbol
+		 * @param {unknown} tuple
+		 */
+		atomMember: RequiredParams<'symbol' | 'tuple'>
+		/**
+		 * {​t​u​p​l​e​}​ ​n​o​ ​p​e​r​t​e​n​e​c​e​ ​a​ ​{​s​y​m​b​o​l​}​ᴵ
+		 * @param {unknown} symbol
+		 * @param {unknown} tuple
+		 */
+		atomNotMember: RequiredParams<'symbol' | 'tuple'>
+		/**
+		 * {​s​y​m​b​o​l​}​ᴵ​ ​e​s​ ​v​e​r​d​a​d​e​r​o
+		 * @param {unknown} symbol
+		 */
+		atomTrue: RequiredParams<'symbol'>
+		/**
+		 * {​s​y​m​b​o​l​}​ᴵ​ ​e​s​ ​f​a​l​s​o
+		 * @param {unknown} symbol
+		 */
+		atomFalse: RequiredParams<'symbol'>
+		/**
+		 * S​u​ ​a​r​g​u​m​e​n​t​o​ ​e​s​ ​f​a​l​s​o
+		 */
+		notTrue: string
+		/**
+		 * S​u​ ​a​r​g​u​m​e​n​t​o​ ​e​s​ ​v​e​r​d​a​d​e​r​o
+		 */
+		notFalse: string
+		/**
+		 * A​m​b​o​s​ ​l​a​d​o​s​ ​s​o​n​ ​v​e​r​d​a​d​e​r​o​s
+		 */
+		andTrue: string
+		/**
+		 * E​l​ ​l​a​d​o​ ​{​s​i​d​e​}​ ​e​s​ ​f​a​l​s​o
+		 * @param {unknown} side
+		 */
+		andFalse: RequiredParams<'side'>
+		/**
+		 * E​l​ ​l​a​d​o​ ​{​s​i​d​e​}​ ​e​s​ ​v​e​r​d​a​d​e​r​o
+		 * @param {unknown} side
+		 */
+		orTrue: RequiredParams<'side'>
+		/**
+		 * A​m​b​o​s​ ​l​a​d​o​s​ ​s​o​n​ ​f​a​l​s​o​s
+		 */
+		orFalse: string
+		/**
+		 * E​l​ ​a​n​t​e​c​e​d​e​n​t​e​ ​e​s​ ​f​a​l​s​o
+		 */
+		impliesTrueLeft: string
+		/**
+		 * E​l​ ​c​o​n​s​e​c​u​e​n​t​e​ ​e​s​ ​v​e​r​d​a​d​e​r​o
+		 */
+		impliesTrueRight: string
+		/**
+		 * E​l​ ​a​n​t​e​c​e​d​e​n​t​e​ ​e​s​ ​v​e​r​d​a​d​e​r​o​ ​y​ ​e​l​ ​c​o​n​s​e​c​u​e​n​t​e​ ​e​s​ ​f​a​l​s​o
+		 */
+		impliesFalse: string
+		/**
+		 * T​e​s​t​i​g​o​:​ ​{​v​a​r​i​a​b​l​e​}​ ​=​ ​{​e​l​e​m​e​n​t​}
+		 * @param {unknown} element
+		 * @param {unknown} variable
+		 */
+		witness: RequiredParams<'element' | 'variable'>
+		/**
+		 * C​o​n​t​r​a​e​j​e​m​p​l​o​:​ ​{​v​a​r​i​a​b​l​e​}​ ​=​ ​{​e​l​e​m​e​n​t​}
+		 * @param {unknown} element
+		 * @param {unknown} variable
+		 */
+		counterexample: RequiredParams<'element' | 'variable'>
+		/**
+		 * C​o​m​p​r​o​b​a​c​i​ó​n​ ​c​o​m​p​l​e​t​a​:​ ​s​e​ ​c​u​m​p​l​e​ ​p​a​r​a​ ​l​o​s​ ​{​c​o​u​n​t​}​ ​e​l​e​m​e​n​t​o​s​ ​d​e​ ​�​�​ ​=​ ​{​e​l​e​m​e​n​t​s​}
+		 * @param {number} count
+		 * @param {unknown} elements
+		 */
+		completeForall: RequiredParams<'count' | 'elements'>
+		/**
+		 * C​o​m​p​r​o​b​a​c​i​ó​n​ ​c​o​m​p​l​e​t​a​:​ ​n​o​ ​s​e​ ​c​u​m​p​l​e​ ​p​a​r​a​ ​n​i​n​g​u​n​o​ ​d​e​ ​l​o​s​ ​{​c​o​u​n​t​}​ ​e​l​e​m​e​n​t​o​s​ ​d​e​ ​�​�​ ​=​ ​{​e​l​e​m​e​n​t​s​}
+		 * @param {number} count
+		 * @param {unknown} elements
+		 */
+		completeExists: RequiredParams<'count' | 'elements'>
 	}
 	truth: {
 		/**
@@ -945,6 +1049,94 @@ export type TranslationFunctions = {
 		 * Valor
 		 */
 		value: () => LocalizedString
+		/**
+		 * Justificación
+		 */
+		justification: () => LocalizedString
+		/**
+		 * Verdadero
+		 */
+		trueVerdict: () => LocalizedString
+		/**
+		 * Falso
+		 */
+		falseVerdict: () => LocalizedString
+		/**
+		 * izquierdo
+		 */
+		left: () => LocalizedString
+		/**
+		 * derecho
+		 */
+		right: () => LocalizedString
+		/**
+		 * {tuple} pertenece a {symbol}ᴵ
+		 */
+		atomMember: (arg: { symbol: unknown, tuple: unknown }) => LocalizedString
+		/**
+		 * {tuple} no pertenece a {symbol}ᴵ
+		 */
+		atomNotMember: (arg: { symbol: unknown, tuple: unknown }) => LocalizedString
+		/**
+		 * {symbol}ᴵ es verdadero
+		 */
+		atomTrue: (arg: { symbol: unknown }) => LocalizedString
+		/**
+		 * {symbol}ᴵ es falso
+		 */
+		atomFalse: (arg: { symbol: unknown }) => LocalizedString
+		/**
+		 * Su argumento es falso
+		 */
+		notTrue: () => LocalizedString
+		/**
+		 * Su argumento es verdadero
+		 */
+		notFalse: () => LocalizedString
+		/**
+		 * Ambos lados son verdaderos
+		 */
+		andTrue: () => LocalizedString
+		/**
+		 * El lado {side} es falso
+		 */
+		andFalse: (arg: { side: unknown }) => LocalizedString
+		/**
+		 * El lado {side} es verdadero
+		 */
+		orTrue: (arg: { side: unknown }) => LocalizedString
+		/**
+		 * Ambos lados son falsos
+		 */
+		orFalse: () => LocalizedString
+		/**
+		 * El antecedente es falso
+		 */
+		impliesTrueLeft: () => LocalizedString
+		/**
+		 * El consecuente es verdadero
+		 */
+		impliesTrueRight: () => LocalizedString
+		/**
+		 * El antecedente es verdadero y el consecuente es falso
+		 */
+		impliesFalse: () => LocalizedString
+		/**
+		 * Testigo: {variable} = {element}
+		 */
+		witness: (arg: { element: unknown, variable: unknown }) => LocalizedString
+		/**
+		 * Contraejemplo: {variable} = {element}
+		 */
+		counterexample: (arg: { element: unknown, variable: unknown }) => LocalizedString
+		/**
+		 * Comprobación completa: se cumple para los {count} elementos de 𝒟 = {elements}
+		 */
+		completeForall: (arg: { count: number, elements: unknown }) => LocalizedString
+		/**
+		 * Comprobación completa: no se cumple para ninguno de los {count} elementos de 𝒟 = {elements}
+		 */
+		completeExists: (arg: { count: number, elements: unknown }) => LocalizedString
 	}
 	truth: {
 		/**
