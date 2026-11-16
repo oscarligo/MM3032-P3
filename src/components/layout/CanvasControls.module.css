@@ -70,7 +70,7 @@
     border: 1px solid transparent;
     border-radius: 14px;
 
-    color: var(--color-text);
+    color: var(--color-text-muted);
     background: var(--color-surface);
     line-height: 1;
 
@@ -98,10 +98,11 @@
 }
 
 .navigation button {
-    border-radius: 12px;
+    border-radius: 14px;
 }
 
 .panel button:hover:not(:disabled) {
+    color: var(--color-text);
     filter: brightness(0.98);
 }
 
@@ -163,7 +164,7 @@
         top: auto;
         right: max(var(--space-sm, 0.5rem), env(safe-area-inset-right));
         bottom: max(var(--space-sm, 0.5rem), env(safe-area-inset-bottom));
-        gap: var(--space-xs, 0.25rem);
+        gap: 0.45rem;
     }
 
     .panel {
@@ -172,7 +173,7 @@
 
     .panel.navigation {
         gap: 0.25rem;
-        padding: 0.45rem 0.45rem 0.65rem;
+        padding: 0.45rem 0.55rem 0.65rem;
     }
 
     .panel button {
