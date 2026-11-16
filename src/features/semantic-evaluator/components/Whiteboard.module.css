@@ -62,7 +62,8 @@
     inset 0 2px 5px rgba(15, 23, 42, 0.22),
     inset 0 0 8px rgba(15, 23, 42, 0.12);
 
-  transform-style: preserve-3d;
+  /* preserve-3d impide que los clics lleguen a los botones dentro de contenedores con transform (p. ej. FitContent). */
+  transform-style: flat;
   backface-visibility: hidden;
   transition:
     transform 0.3s ease,
