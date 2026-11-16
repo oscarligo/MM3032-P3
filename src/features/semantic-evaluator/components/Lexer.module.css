@@ -73,11 +73,12 @@
 
 .error,
 .empty {
-    margin-top: clamp(var(--space-xs), 2.5cqi, var(--space-md));
+    margin-block: clamp(var(--space-xs), 2.5cqi, var(--space-md)) 1em;
     font-size: clamp(0.9rem, 3.5cqi, 1.4rem);
 }
 
 .error {
+    margin-block: 1em;
     color: var(--color-annotation);
 }
 

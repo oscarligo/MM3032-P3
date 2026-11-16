@@ -19,13 +19,13 @@ type ParseTreeProps = {
 const FAST_TEGAKI = { glyphGap: 0, stagger: { advance: 0.02, duration: 0.1 } } as const;
 
 const Chalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI}>
+    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 2 }}>
         {String(children)}
     </TegakiRenderer>
 );
 
 const StaticChalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="always">
+    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 2 }}>
         {String(children)}
     </TegakiRenderer>
 );
@@ -252,18 +252,18 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
     if (visualization.error) {
         return (
             <div className={styles.notesViewport}>
-                <p className={styles.error} role="alert">
+                <div className={styles.error} role="alert">
                     <Chalk>{`${LL.parser.invalid()}: ${visualization.error}`}</Chalk>
-                </p>
+                </div>
             </div>
         );
     }
     if (!visualization.hasStarted) {
         return (
             <div className={styles.notesViewport}>
-                <p className={styles.waiting}>
+                <div className={styles.waiting}>
                     <Chalk>{LL.parser.waiting()}</Chalk>
-                </p>
+                </div>
             </div>
         );
     }

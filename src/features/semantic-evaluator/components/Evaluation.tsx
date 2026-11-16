@@ -300,16 +300,16 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     return (
         <section className={styles.container}>
             <h2>
-                <TegakiRenderer font={caveat} reducedMotion="always">
+                <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 2 }}>
                     {LL.evaluation.title()}
                 </TegakiRenderer>
             </h2>
             {!evaluationMap ? (
-                <p className={styles.waiting}>
-                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
+                <div className={styles.waiting}>
+                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }} quality={{ pixelRatio: 2 }}>
                         {LL.evaluation.waiting()}
                     </TegakiRenderer>
-                </p>
+                </div>
             ) : (
                 <div className={styles.canvasPanel}>
                     <TransformWrapper
@@ -407,13 +407,15 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             columnCount={evaluationMap.columnAssignments.length}
                             procedureOpen={Boolean(truthTrace)}
                         />
-                        <p className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                        <TreeCanvasControls />
+                        <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
                             <span className={styles.semanticRelation}>
                                 <TegakiRenderer
                                     key={`${finalEvaluation}-${usesEnvironment}`}
                                     font={caveat}
                                     reducedMotion="user"
                                     timing={WRITING_TIMING}
+                                    quality={{ pixelRatio: 3 }}
                                 >
                                     {`ℐ ${finalEvaluation === true ? "⊨" : "⊭"}`}
                                 </TegakiRenderer>
@@ -424,12 +426,12 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                 font={caveat}
                                 reducedMotion="user"
                                 timing={WRITING_TIMING}
+                                quality={{ pixelRatio: 3 }}
                             >
                                 {renderedFormula}
                             </TegakiRenderer>
-                        </p>
+                        </div>
                         {explanation && <Justification explanation={explanation} />}
-                        <TreeCanvasControls />
                     </TransformWrapper>
                 </div>
             )}
