@@ -82,7 +82,14 @@
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    transition: all 150ms ease-in-out;
+    transition:
+        color 300ms ease,
+        background-color 300ms ease,
+        border-color 300ms ease,
+        box-shadow 300ms ease,
+        transform 150ms ease-in-out,
+        filter 150ms ease-in-out,
+        padding 150ms ease-in-out;
 }
 
 .panel button svg {

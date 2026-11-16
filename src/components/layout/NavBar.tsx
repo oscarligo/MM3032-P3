@@ -78,7 +78,7 @@ export default function NavBar() {
                     className={`${styles.themeToggle} ${isDark ? styles.moonState : styles.sunState}`}
                     toggled={isDark}
                     onClick={toggleTheme}
-                    duration={250}
+                    duration={300}
                     aria-label={themeLabel}
                     title={themeLabel}
                 />
