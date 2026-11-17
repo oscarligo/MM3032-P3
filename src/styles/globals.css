@@ -51,6 +51,14 @@ select {
   font: inherit;
 }
 
+button,
+[role="button"],
+summary,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
