@@ -39,12 +39,13 @@ test("nested quantifiers shadow and restore assignments for sibling subformulas"
     assert.equal(evaluation.evaluateUnderInterpretation(formula, { ...interpretation, environment: { x: "1" } }), false);
 });
 
-test("table cells and their traces evaluate the quantified formula rather than its body", () => {
-    for (const [source, expected] of [["∀x P(x)", false], ["∃x P(x)", true], ["∀x ∃x P(x)", true]]) {
+test("table cells and their traces evaluate concrete cases without quantifiers", () => {
+    for (const source of ["∀x P(x)", "∃x P(x)", "∀x ∃x P(x)"]) {
         const formula = parseFormula(source);
         const map = evaluation.buildEvaluationMap(formula, interpretation);
         for (const [rowIndex, row] of map.results.entries()) {
             for (const [columnIndex, result] of row.entries()) {
+                const expected = map.rowAssignments[rowIndex][0] === "0";
                 assert.equal(result, expected, source);
                 const trace = buildTruthTrace(
                     formula, interpretation,
@@ -52,11 +53,24 @@ test("table cells and their traces evaluate the quantified formula rather than i
                     map.columnVariables, map.columnAssignments[columnIndex], "V"
                 );
                 assert.equal(trace.steps.at(-1).result, result, source);
-                assert.equal(trace.originalExpression, evaluation.formulaToText(formula));
-                assert.equal(trace.steps.at(-1).expression, evaluation.formulaToText(formula));
+                assert.equal(trace.originalExpression, `P(${map.rowAssignments[rowIndex][0]})`);
+                assert.equal(trace.steps.at(-1).expression, `P(${map.rowAssignments[rowIndex][0]})`);
+                assert.doesNotMatch(trace.originalExpression, /[∀∃]/);
             }
         }
     }
+});
+
+test("truth traces break down constants and function applications", () => {
+    const formula = parseFormula("P(f(a))", new Set(["a"]));
+    const detailedInterpretation = {
+        ...interpretation,
+        constants: { a: "0" },
+        functions: { "f/1": { arity: 1, rows: [{ args: ["0"], result: "1" }, { args: ["1"], result: "0" }] } },
+    };
+    const trace = buildTruthTrace(formula, detailedInterpretation, [], [], [], [], "V");
+
+    assert.deepEqual(trace.steps.map(({ expression }) => expression), ["a = 0", "f(0) = 1", "P(1)"]);
 });
 
 test("unquantified traces still show atomic and connective steps", () => {

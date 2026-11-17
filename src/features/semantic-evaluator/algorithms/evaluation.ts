@@ -35,7 +35,12 @@ export const evaluateTerm = (term: Term, interpretation: InterpretationDefinitio
         .find((row) => row.args.every((value, index) => value === args[index]))?.result ?? null;
 };
 
-const evaluateFormula = (formula: Formula, interpretation: InterpretationDefinition, environment: ReadonlyMap<string, string>): boolean | null => {
+const evaluateFormula = (
+    formula: Formula,
+    interpretation: InterpretationDefinition,
+    environment: ReadonlyMap<string, string>,
+    instantiateQuantifiers = false
+): boolean | null => {
     if (formula.kind === "atom") {
         const predicate = interpretation.predicates[`${formula.predicate}/${formula.args.length}`];
         if (!predicate) return null;
@@ -45,21 +50,25 @@ const evaluateFormula = (formula: Formula, interpretation: InterpretationDefinit
         return predicate.rows.some((tuple) => tuple.every((value, index) => value === args[index]));
     }
     if (formula.kind === "not") {
-        const value = evaluateFormula(formula.inner, interpretation, environment);
+        const value = evaluateFormula(formula.inner, interpretation, environment, instantiateQuantifiers);
         return value === null ? null : !value;
     }
     if (formula.kind === "and" || formula.kind === "or" || formula.kind === "implies") {
-        const left = evaluateFormula(formula.left, interpretation, environment);
-        const right = evaluateFormula(formula.right, interpretation, environment);
+        const left = evaluateFormula(formula.left, interpretation, environment, instantiateQuantifiers);
+        const right = evaluateFormula(formula.right, interpretation, environment, instantiateQuantifiers);
         if (formula.kind === "and") return left === false || right === false ? false : left === true && right === true ? true : null;
         if (formula.kind === "or") return left === true || right === true ? true : left === false && right === false ? false : null;
         return left === false || right === true ? true : left === true && right === false ? false : null;
     }
 
+    if (instantiateQuantifiers && environment.has(formula.variable)) {
+        return evaluateFormula(formula.inner, interpretation, environment, true);
+    }
+
     const results = interpretation.domain.map((value) => {
         const nested = new Map(environment);
         nested.set(formula.variable, value);
-        return evaluateFormula(formula.inner, interpretation, nested);
+        return evaluateFormula(formula.inner, interpretation, nested, instantiateQuantifiers);
     });
     if (formula.kind === "forall") return results.includes(false) ? false : results.every((value) => value === true) ? true : null;
     return results.includes(true) ? true : results.every((value) => value === false) ? false : null;
@@ -84,7 +93,7 @@ export const buildEvaluationMap = (formula: Formula, interpretation: Interpretat
         const environment = new Map(Object.entries(interpretation.environment));
         rowVariables.forEach((variable, index) => environment.set(variable, rowValues[index]));
         columnVariables.forEach((variable, index) => environment.set(variable, columnValues[index]));
-        return evaluateFormula(formula, interpretation, environment);
+        return evaluateFormula(formula, interpretation, environment, true);
     }));
     return { variables, rowVariables, columnVariables, rowAssignments, columnAssignments, results };
 };
@@ -118,6 +127,12 @@ export const evaluateFormulaInEnvironment = (
     interpretation: InterpretationDefinition,
     environment: ReadonlyMap<string, string>
 ) => evaluateFormula(formula, interpretation, environment);
+
+export const evaluateFormulaForCase = (
+    formula: Formula,
+    interpretation: InterpretationDefinition,
+    environment: ReadonlyMap<string, string>
+) => evaluateFormula(formula, interpretation, environment, true);
 
 export const fitEvaluationScale = (
     viewportWidth: number,

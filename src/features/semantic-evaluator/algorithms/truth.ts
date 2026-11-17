@@ -1,10 +1,10 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
-import { evaluateFormulaInEnvironment, formulaToText as originalFormulaToText } from "./evaluation";
+import { evaluateFormulaForCase } from "./evaluation";
 
 export type TruthStep = {
     expression: string;
     result: boolean | null;
-    isAtom: boolean;
+    showTruthValue: boolean;
 };
 
 export type TruthTrace = {
@@ -26,11 +26,7 @@ const formulaToText = (formula: Formula, environment: ReadonlyMap<string, string
             : formula.predicate;
     }
     if (formula.kind === "not") return `¬${formulaToText(formula.inner, environment)}`;
-    if (formula.kind === "forall" || formula.kind === "exists") {
-        const nested = new Map(environment);
-        nested.delete(formula.variable);
-        return `${formula.kind === "forall" ? "∀" : "∃"}${formula.variable} ${formulaToText(formula.inner, nested)}`;
-    }
+    if (formula.kind === "forall" || formula.kind === "exists") return formulaToText(formula.inner, environment);
     const operator = formula.kind === "and" ? "∧" : formula.kind === "or" ? "∨" : "→";
     return `(${formulaToText(formula.left, environment)} ${operator} ${formulaToText(formula.right, environment)})`;
 };
@@ -54,10 +50,40 @@ export const buildTruthTrace = (
 
     const valueLabel = (value: boolean | null) => value === null ? "-" : value ? trueLabel : "F";
 
+    const resolveTerm = (term: Term): string | null => {
+        if (term.kind === "var") return environment.get(term.name) ?? null;
+        if (term.kind === "const") {
+            const value = interpretation.constants[term.name] ?? null;
+            steps.push({
+                expression: `${term.name} = ${value ?? "-"}`,
+                result: null,
+                showTruthValue: false,
+            });
+            return value;
+        }
+
+        const args = term.args.map(resolveTerm);
+        const value = args.some((argument) => argument === null)
+            ? null
+            : interpretation.functions[`${term.name}/${term.args.length}`]?.rows
+                .find((row) => row.args.every((argument, index) => argument === args[index]))?.result ?? null;
+        steps.push({
+            expression: `${term.name}(${args.map((argument) => argument ?? "-").join(", ")}) = ${value ?? "-"}`,
+            result: null,
+            showTruthValue: false,
+        });
+        return value;
+    };
+
     const visit = (current: Formula): boolean | null => {
+        if (current.kind === "forall" || current.kind === "exists") return visit(current.inner);
+
         let expression: string;
-        if (current.kind === "atom" || current.kind === "forall" || current.kind === "exists") {
-            expression = formulaToText(current, environment);
+        if (current.kind === "atom") {
+            const args = current.args.map(resolveTerm);
+            expression = args.length > 0
+                ? `${current.predicate}(${args.map((argument) => argument ?? "-").join(", ")})`
+                : current.predicate;
         } else if (current.kind === "not") {
             expression = `¬${valueLabel(visit(current.inner))}`;
         } else {
@@ -66,15 +92,15 @@ export const buildTruthTrace = (
             const operator = current.kind === "and" ? "∧" : current.kind === "or" ? "∨" : "→";
             expression = `(${valueLabel(left)} ${operator} ${valueLabel(right)})`;
         }
-        const result = evaluateFormulaInEnvironment(current, interpretation, environment);
+        const result = evaluateFormulaForCase(current, interpretation, environment);
         steps.push({
             expression,
             result,
-            isAtom: current.kind === "atom",
+            showTruthValue: true,
         });
         return result;
     };
 
     visit(formula);
-    return { originalExpression: originalFormulaToText(formula), assignment, steps };
+    return { originalExpression: formulaToText(formula, environment), assignment, steps };
 };
