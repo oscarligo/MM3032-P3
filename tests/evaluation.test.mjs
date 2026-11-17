@@ -66,3 +66,32 @@ test("unquantified traces still show atomic and connective steps", () => {
     );
     assert.deepEqual(trace.steps.map(({ result }) => result), [true, false, true, true]);
 });
+
+test("a parenthesized quantifier body does not absorb a following implication", () => {
+    const formula = parseFormula("∀x (∃y (P(f(x,y))) → Q(a,y,b))", new Set(["a", "b"]));
+
+    assert.equal(formula.kind, "forall");
+    assert.equal(formula.inner.kind, "implies");
+    assert.equal(formula.inner.left.kind, "exists");
+    assert.equal(formula.inner.left.inner.kind, "atom");
+    assert.equal(formula.inner.right.kind, "atom");
+    assert.equal(formula.inner.right.predicate, "Q");
+});
+
+test("an unparenthesized quantifier binds only the following unary formula", () => {
+    const formula = parseFormula("∀x (∃y P(f(x,y)) → ∃y Q(a,y,b))", new Set(["a", "b"]));
+
+    assert.equal(formula.kind, "forall");
+    assert.equal(formula.inner.kind, "implies");
+    assert.equal(formula.inner.left.kind, "exists");
+    assert.equal(formula.inner.left.inner.kind, "atom");
+    assert.equal(formula.inner.right.kind, "exists");
+    assert.equal(formula.inner.right.inner.kind, "atom");
+});
+
+test("a predicate symbol cannot be reused as a term", () => {
+    assert.throws(
+        () => parseFormula("P(f(P,y))"),
+        (error) => error?.payload?.code === "FORMULA_IN_TERM_POSITION" && error.payload.token === "P"
+    );
+});

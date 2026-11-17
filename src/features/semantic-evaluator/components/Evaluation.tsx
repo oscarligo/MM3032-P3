@@ -299,11 +299,11 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 </TegakiRenderer>
             </h2>
             {!evaluationMap ? (
-                <p className={styles.waiting}>
+                <div className={styles.waiting}>
                     <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
                         {LL.evaluation.waiting()}
                     </TegakiRenderer>
-                </p>
+                </div>
             ) : (
                 <div className={styles.canvasPanel}>
                     <TransformWrapper
@@ -401,7 +401,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             columnCount={evaluationMap.columnAssignments.length}
                             procedureOpen={Boolean(truthTrace)}
                         />
-                        <p className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                        <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
                             <span className={styles.semanticRelation}>
                                 <TegakiRenderer
                                     key={`${finalEvaluation}-${usesEnvironment}`}
@@ -421,7 +421,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             >
                                 {renderedFormula}
                             </TegakiRenderer>
-                        </p>
+                        </div>
                         <TreeCanvasControls />
                     </TransformWrapper>
                 </div>

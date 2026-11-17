@@ -253,18 +253,18 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
     if (visualization.error) {
         return (
             <div className={styles.notesViewport}>
-                <p className={styles.error} role="alert">
+                <div className={styles.error} role="alert">
                     <Chalk>{`${LL.parser.invalid()}: ${visualization.error}`}</Chalk>
-                </p>
+                </div>
             </div>
         );
     }
     if (!visualization.hasStarted) {
         return (
             <div className={styles.notesViewport}>
-                <p className={styles.waiting}>
+                <div className={styles.waiting}>
                     <Chalk>{LL.parser.waiting()}</Chalk>
-                </p>
+                </div>
             </div>
         );
     }

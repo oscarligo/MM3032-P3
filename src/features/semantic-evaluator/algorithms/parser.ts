@@ -37,6 +37,7 @@ export class FormulaParser {
     // Llamadas ("regla:inicio") que consumieron su operador binario; se completa durante el parseo
     public readonly operatorCalls = new Set<string>();
     private callStack: ParserCall[] = [];
+    private predicateSymbols = new Set<string>();
 
     private inRule<T>(name: string, parse: () => T): T {
         this.callStack.push({ rule: name, start: this.cursor });
@@ -221,6 +222,14 @@ export class FormulaParser {
             const identToken = this.advance();
             const ident = identToken.value;
 
+            if (this.predicateSymbols.has(ident)) {
+                throw new FormulaSyntaxError({
+                    code: "FORMULA_IN_TERM_POSITION",
+                    token: ident,
+                    position: identToken.position,
+                });
+            }
+
             // Si viene seguido de '(', es una función: f(t1, t2)
             if (this.peek().type === "LPAREN") {
                 if (/^[A-Z]/.test(ident)) {
@@ -361,7 +370,7 @@ export class FormulaParser {
                 }
 
                 this.pushBoundVar(variable);
-                const inner = this.parseImplication();
+                const inner = this.parseUnary();
                 this.popBoundVar(variable);
 
                 return this.atToken({ kind: "forall", variable, inner }, start);
@@ -382,7 +391,7 @@ export class FormulaParser {
                 }
 
                 this.pushBoundVar(variable);
-                const inner = this.parseImplication();
+                const inner = this.parseUnary();
                 this.popBoundVar(variable);
 
                 return this.atToken({ kind: "exists", variable, inner }, start);
@@ -417,6 +426,7 @@ export class FormulaParser {
                 this.advance();
                 const predicate = token.value;
                 const args: Term[] = [];
+                this.predicateSymbols.add(predicate);
 
                 if (this.peek().type === "LPAREN") {
                     const open = this.advance();

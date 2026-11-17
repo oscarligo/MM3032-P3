@@ -33,9 +33,9 @@ export default function Lexer() {
             </header>
 
             {result.error ? (
-                <p className={styles.error} role="alert">
+                <div className={styles.error} role="alert">
                     <Chalk>{LL.lexer.invalid()}</Chalk>
-                </p>
+                </div>
             ) : input ? (
                 <div className={styles.stage} ref={boardRef}>
                     <canvas ref={canvasRef} className={styles.canvas} />
@@ -64,7 +64,7 @@ export default function Lexer() {
 
                 </div>
             ) : (
-                <p className={styles.empty}><Chalk>{LL.lexer.empty()}</Chalk></p>
+                <div className={styles.empty}><Chalk>{LL.lexer.empty()}</Chalk></div>
             )}
         </div>
     );
