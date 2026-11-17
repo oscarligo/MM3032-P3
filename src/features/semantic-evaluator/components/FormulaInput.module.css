@@ -311,3 +311,74 @@
     box-shadow: var(--shadow-presentation-focus);
 }
 
+
+.objectiveHeader {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 0;
+    padding-right: 2rem;
+}
+
+.examplesDropdown {
+    position: relative;
+    flex: none;
+    z-index: 11;
+}
+
+.examplesDropdown summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+.examplesDropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.examplesList {
+    position: absolute;
+    top: calc(100% + .5rem);
+    right: 0;
+    width: max-content;
+    max-width: min(39rem, 75cqi);
+    max-height: 18rem;
+    overflow: auto;
+    margin: 0;
+    padding: .4rem;
+    list-style: none;
+    border: 1px solid var(--color-presentation-border);
+    border-radius: var(--radius-md);
+    background: var(--color-presentation-surface);
+    box-shadow: var(--shadow-presentation);
+}
+
+.examplesList button {
+    display: block;
+    width: 100%;
+    padding: .65rem .8rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-presentation-text);
+    font-family: var(--font-family-monospace);
+    font-size: 1rem;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.examplesList button:hover,
+.examplesList button:focus-visible {
+    background: var(--color-presentation-control-hover);
+}
+
+.examplesDropdown summary:focus-visible,
+.examplesList button:focus-visible {
+    outline: 2px solid var(--color-presentation-focus);
+    outline-offset: 2px;
+}

@@ -1,0 +1,7 @@
+
+∀x (P(x) → ∃y Q(x, y))
+∃x (P(x) ∧  R(m,x))
+∃x P(x) → ∀x Q(x)
+∀x (P(x) → Q(x))
+∃x (Q(x) ∧ ¬P(x))
+∀x ∀y (R(x,y) → P(y))
