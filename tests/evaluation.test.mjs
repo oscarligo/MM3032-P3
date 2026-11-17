@@ -7,8 +7,10 @@ const server = await createServer({ server: { middlewareMode: true, watch: null 
 let evaluation;
 let parseFormula;
 let buildTruthTrace;
+let interpretationAlgorithms;
 try {
     evaluation = await server.ssrLoadModule(resolve("src", "features", "semantic-evaluator", "algorithms", "evaluation.ts"));
+    interpretationAlgorithms = await server.ssrLoadModule(resolve("src", "features", "semantic-evaluator", "algorithms", "interpretation.ts"));
     ({ parseFormula } = await server.ssrLoadModule(resolve("src", "features", "semantic-evaluator", "algorithms", "parser.ts")));
     ({ buildTruthTrace } = await server.ssrLoadModule(resolve("src", "features", "semantic-evaluator", "algorithms", "truth.ts")));
 } finally {
@@ -100,6 +102,16 @@ test("table keeps shadowed and free variable bindings independent", () => {
         [...evaluation.selectConclusionCells(mixedMap, mixedInterpretation, false)],
         ["0:1"]
     );
+});
+
+test("cartesian generators reject oversized matrices before materializing them", () => {
+    const formula = parseFormula("P(a,b,c,d,e,f)");
+    const domain = ["0", "1", "2", "3", "4"];
+    const oversizedInterpretation = { ...interpretation, domain };
+
+    assert.equal(evaluation.evaluationCellCount(formula, domain.length), 15625);
+    assert.throws(() => evaluation.buildEvaluationMap(formula, oversizedInterpretation), RangeError);
+    assert.throws(() => interpretationAlgorithms.functionRowsForDomain(domain, 6), RangeError);
 });
 
 test("truth traces break down constants and function applications", () => {

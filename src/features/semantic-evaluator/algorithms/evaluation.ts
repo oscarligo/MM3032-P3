@@ -1,4 +1,5 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
+import { cartesianSize, MAX_CARTESIAN_ENTRIES } from "./interpretation";
 
 export type EvaluationMap = {
     caseFormula: Formula;
@@ -84,6 +85,11 @@ const collectVariables = (formula: Formula, variables = new Set<string>()): Set<
     return variables;
 };
 
+export const evaluationCellCount = (formula: Formula, domainSize: number) => {
+    const { formula: caseFormula } = scopeFormulaForCases(formula);
+    return cartesianSize(domainSize, collectVariables(caseFormula).size);
+};
+
 export const evaluateTerm = (term: Term, interpretation: InterpretationDefinition, environment: ReadonlyMap<string, string>): string | null => {
     if (term.kind === "var") return environment.get(term.name) ?? null;
     if (term.kind === "const") return interpretation.constants[term.name] ?? null;
@@ -143,6 +149,9 @@ const assignments = (domain: string[], size: number): string[][] => {
 export const buildEvaluationMap = (formula: Formula, interpretation: InterpretationDefinition): EvaluationMap => {
     const { formula: caseFormula, rawLabels } = scopeFormulaForCases(formula);
     const variables = [...collectVariables(caseFormula)];
+    if (cartesianSize(interpretation.domain.length, variables.length) > MAX_CARTESIAN_ENTRIES) {
+        throw new RangeError(`Evaluation map exceeds ${MAX_CARTESIAN_ENTRIES} cells`);
+    }
     const variableLabels = buildVariableLabels(variables, rawLabels);
     const rowVariableCount = variables.length === 1 ? 1 : Math.floor(variables.length / 2);
     const rowVariables = variables.slice(0, rowVariableCount);

@@ -619,6 +619,17 @@ type RootTranslation = {
 		 */
 		emptyFunction: RequiredParams<'symbol'>
 		/**
+		 * L​a​ ​f​u​n​c​i​ó​n​ ​{​s​y​m​b​o​l​}​ ​r​e​q​u​i​e​r​e​ ​m​á​s​ ​d​e​ ​{​l​i​m​i​t​}​ ​f​i​l​a​s​.​ ​R​e​d​u​c​e​ ​e​l​ ​d​o​m​i​n​i​o​ ​o​ ​l​a​ ​a​r​i​d​a​d​.
+		 * @param {number} limit
+		 * @param {string} symbol
+		 */
+		functionTooLarge: RequiredParams<'limit' | 'symbol'>
+		/**
+		 * L​a​ ​m​a​t​r​i​z​ ​r​e​q​u​i​e​r​e​ ​m​á​s​ ​d​e​ ​{​l​i​m​i​t​}​ ​c​e​l​d​a​s​.​ ​R​e​d​u​c​e​ ​e​l​ ​d​o​m​i​n​i​o​ ​o​ ​l​a​ ​c​a​n​t​i​d​a​d​ ​d​e​ ​v​a​r​i​a​b​l​e​s​.
+		 * @param {number} limit
+		 */
+		evaluationTooLarge: RequiredParams<'limit'>
+		/**
 		 * A​s​i​g​n​a​ ​u​n​ ​v​a​l​o​r​ ​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​{​v​a​r​i​a​b​l​e​}​ ​e​n​ ​e​l​ ​e​n​t​o​r​n​o​ ​ℓ​.
 		 * @param {string} variable
 		 */
@@ -1372,6 +1383,14 @@ export type TranslationFunctions = {
 		 * Completa todos los resultados de la función {symbol}.
 		 */
 		emptyFunction: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * La función {symbol} requiere más de {limit} filas. Reduce el dominio o la aridad.
+		 */
+		functionTooLarge: (arg: { limit: number, symbol: string }) => LocalizedString
+		/**
+		 * La matriz requiere más de {limit} celdas. Reduce el dominio o la cantidad de variables.
+		 */
+		evaluationTooLarge: (arg: { limit: number }) => LocalizedString
 		/**
 		 * Asigna un valor a la variable {variable} en el entorno ℓ.
 		 */

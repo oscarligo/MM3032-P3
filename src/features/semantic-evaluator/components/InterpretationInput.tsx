@@ -9,11 +9,14 @@ import {
     cleanPredicateRows,
     domainState,
     functionRowsForDomain,
+    cartesianSize,
+    MAX_CARTESIAN_ENTRIES,
     symbolLabel,
     updatePredicateTuple,
     type FunctionRow,
     type SymbolInfo,
 } from "../algorithms/interpretation";
+import { evaluationCellCount } from "../algorithms/evaluation";
 import type { Formula, InterpretationDefinition } from "../types";
 import InterpretationCarousel from "./InterpretationCarousel";
 import styles from "./InterpretationInput.module.css";
@@ -72,10 +75,20 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     const { options, hasDuplicates: duplicateDomain } = domainState(domain);
     const domainHasEmpty = domain.some((value) => value.trim() === "");
     const domainSignature = options.join("\u0000");
+    const oversizedFunctions = useMemo(() => new Set(
+        symbols.functions
+            .filter((fn) => cartesianSize(options.length, fn.arity) > MAX_CARTESIAN_ENTRIES)
+            .map((fn) => fn.key)
+    ), [options.length, symbols.functions]);
+    const evaluationTooLarge = useMemo(
+        () => evaluationCellCount(formula, options.length) > MAX_CARTESIAN_ENTRIES,
+        [formula, options.length]
+    );
 
     const interpretationDefinition = useMemo<InterpretationDefinition | undefined>(() => {
         const constantsComplete = symbols.constants.every((symbol) => options.includes(constants[symbol]));
         const functionsComplete = symbols.functions.every((fn) => {
+            if (oversizedFunctions.has(fn.key)) return false;
             const rows = functionRows[fn.key] ?? [];
             return rows.length === options.length ** fn.arity
                 && rows.every((row) => row.args.every((value) => options.includes(value)) && options.includes(row.result));
@@ -89,7 +102,8 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         );
         const environmentComplete = symbols.freeVariables.every((variable) => options.includes(environment[variable]));
 
-        if (options.length === 0 || domainHasEmpty || duplicateDomain || !constantsComplete || !functionsComplete
+        if (options.length === 0 || domainHasEmpty || duplicateDomain || evaluationTooLarge
+            || !constantsComplete || !functionsComplete
             || !predicatesComplete || !environmentComplete) return undefined;
 
         return {
@@ -106,7 +120,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
             }])),
             environment: Object.fromEntries(symbols.freeVariables.map((variable) => [variable, environment[variable]])),
         };
-    }, [constants, domainHasEmpty, domainSignature, duplicateDomain, duplicatePredicates, environment, functionRows, predicateRows, predicateTruth, symbols]);
+    }, [constants, domainHasEmpty, domainSignature, duplicateDomain, duplicatePredicates, environment, evaluationTooLarge, functionRows, oversizedFunctions, predicateRows, predicateTruth, symbols]);
 
     const validationWarnings = useMemo(() => {
         const warnings: string[] = [];
@@ -114,6 +128,9 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         if (options.length === 0) warnings.push(LL.interpretation.emptyDomain());
         else if (domainHasEmpty) warnings.push(LL.interpretation.emptyDomainElement());
         if (duplicateDomain) warnings.push(LL.interpretation.duplicateDomain());
+        if (evaluationTooLarge) {
+            warnings.push(LL.interpretation.evaluationTooLarge({ limit: MAX_CARTESIAN_ENTRIES }));
+        }
 
         symbols.constants.forEach((symbol) => {
             if (!options.includes(constants[symbol])) {
@@ -121,10 +138,15 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
             }
         });
         symbols.functions.forEach((fn) => {
+            const label = symbolLabel(fn, symbols.functions);
+            if (oversizedFunctions.has(fn.key)) {
+                warnings.push(LL.interpretation.functionTooLarge({ symbol: label, limit: MAX_CARTESIAN_ENTRIES }));
+                return;
+            }
             const rows = functionRows[fn.key] ?? [];
             if (rows.length !== options.length ** fn.arity
                 || rows.some((row) => !options.includes(row.result))) {
-                warnings.push(LL.interpretation.emptyFunction({ symbol: symbolLabel(fn, symbols.functions) }));
+                warnings.push(LL.interpretation.emptyFunction({ symbol: label }));
             }
         });
         symbols.predicates.forEach((predicate) => {
@@ -151,7 +173,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         });
 
         return warnings;
-    }, [LL.interpretation, constants, domainHasEmpty, duplicateDomain, duplicatePredicates, environment, functionRows, options, predicateRows, symbols]);
+    }, [LL.interpretation, constants, domainHasEmpty, duplicateDomain, duplicatePredicates, environment, evaluationTooLarge, functionRows, options, oversizedFunctions, predicateRows, symbols]);
 
     useEffect(
         () => setInterpretationDefinition(isConfirmed ? interpretationDefinition : undefined),
@@ -178,6 +200,9 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
             ])
         ));
         setFunctionRows((current) => Object.fromEntries(symbols.functions.map((fn) => {
+            if (cartesianSize(options.length, fn.arity) > MAX_CARTESIAN_ENTRIES) {
+                return [fn.key, []];
+            }
             const previousResults = new Map(
                 (current[fn.key] ?? []).map((row) => [row.args.join("\u0000"), row.result])
             );
@@ -373,7 +398,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         </span>
                     ))}
                     <span>{"}"}</span>
-                    {warningMark(domainHasEmpty || duplicateDomain)}
+                    {warningMark(domainHasEmpty || duplicateDomain || evaluationTooLarge)}
                 </span>
                 {actionButtons(addDomainItem, removeDomainItem, !domainHasEmpty && !duplicateDomain, domain.length > 1)}
             </div>
@@ -473,6 +498,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         {symbolLabel(fn, symbols.functions)}
                         <sup>ℐ</sup>
                     </strong>
+                    {warningMark(oversizedFunctions.has(fn.key))}
                     <span>:</span>
                     <strong>𝒟<sup>{fn.arity}</sup></strong>
                     <span>→</span>

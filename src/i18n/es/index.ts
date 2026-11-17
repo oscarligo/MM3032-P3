@@ -96,6 +96,8 @@ const es = {
 		duplicateDomain: 'Los elementos del dominio no pueden repetirse.',
 		emptyConstant: 'Asigna un valor a la constante {symbol:string}.',
 		emptyFunction: 'Completa todos los resultados de la función {symbol:string}.',
+		functionTooLarge: 'La función {symbol:string} requiere más de {limit:number} filas. Reduce el dominio o la aridad.',
+		evaluationTooLarge: 'La matriz requiere más de {limit:number} celdas. Reduce el dominio o la cantidad de variables.',
 		emptyEnvironment: 'Asigna un valor a la variable {variable:string} en el entorno ℓ.',
 		duplicatePredicate: 'Los elementos de la interpretación del predicado no pueden repetirse.', trueValue: 'Verdadero',
 		emptyUnaryPredicate: 'La interpretación de {predicate:string} está vacía. Agrega al menos un elemento del dominio.',

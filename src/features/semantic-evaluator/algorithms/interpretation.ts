@@ -11,6 +11,11 @@ export type FunctionRow = {
     result: string;
 };
 
+export const MAX_CARTESIAN_ENTRIES = 4096;
+
+export const cartesianSize = (domainSize: number, dimensions: number) =>
+    domainSize ** dimensions;
+
 const subscript = (value: number) =>
     String(value).replace(/\d/g, (digit) => "₀₁₂₃₄₅₆₇₈₉"[Number(digit)]);
 
@@ -84,6 +89,9 @@ export const cleanFunctionRows = (rows: Record<string, FunctionRow[]>) =>
     );
 
 export const functionRowsForDomain = (domain: string[], arity: number): FunctionRow[] => {
+    if (cartesianSize(domain.length, arity) > MAX_CARTESIAN_ENTRIES) {
+        throw new RangeError(`Function table exceeds ${MAX_CARTESIAN_ENTRIES} rows`);
+    }
     let tuples: string[][] = [[]];
     for (let index = 0; index < arity; index += 1) {
         tuples = tuples.flatMap((tuple) => domain.map((value) => [...tuple, value]));

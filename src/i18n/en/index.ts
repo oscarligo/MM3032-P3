@@ -96,6 +96,8 @@ const en = {
 		duplicateDomain: 'Domain elements cannot be repeated.',
 		emptyConstant: 'Assign a value to constant {symbol}.',
 		emptyFunction: 'Complete every result for function {symbol}.',
+		functionTooLarge: 'Function {symbol} requires more than {limit} rows. Reduce the domain or arity.',
+		evaluationTooLarge: 'The matrix requires more than {limit} cells. Reduce the domain or number of variables.',
 		emptyEnvironment: 'Assign a value to variable {variable} in environment ℓ.',
 		duplicatePredicate: 'Predicate interpretation elements cannot be repeated.', trueValue: 'True',
 		emptyUnaryPredicate: 'The interpretation of {predicate} is empty. Add at least one domain element.',
