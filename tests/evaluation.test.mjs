@@ -162,6 +162,27 @@ test("a true implication marks its false antecedent with the correct polarity", 
     assert.equal(map.results[1][0], true);
 });
 
+test("every marked counterexample cell agrees with a false disjunction", () => {
+    const formula = parseFormula("(∀x P(x)) ∨ ∀y Q(y)");
+    const disjunctionInterpretation = {
+        ...interpretation,
+        predicates: {
+            "P/1": { arity: 1, rows: [["0"]], truth: false },
+            "Q/1": { arity: 1, rows: [["0"]], truth: false },
+        },
+    };
+    const map = evaluation.buildEvaluationMap(formula, disjunctionInterpretation);
+    const target = evaluation.evaluateUnderInterpretation(formula, disjunctionInterpretation);
+    const selected = [...evaluation.selectConclusionCells(map, disjunctionInterpretation, target)];
+
+    assert.equal(target, false);
+    assert.deepEqual(selected, ["1:1"]);
+    assert.ok(selected.every((id) => {
+        const [rowIndex, columnIndex] = id.split(":").map(Number);
+        return map.results[rowIndex][columnIndex] === target;
+    }));
+});
+
 test("conclusion evidence can mark complete stripes or one witness per stripe", () => {
     const formula = parseFormula("∀x ∃y P(x,y)");
     const falseInterpretation = {
