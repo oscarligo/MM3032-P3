@@ -274,19 +274,30 @@
 .functionsPanel {
     grid-area: functions;
     padding-left: var(--space-md);
-    border-left: 1px solid var(--color-presentation-border-subtle);
 }
 
 .environmentPanel {
+    position: relative;
     grid-area: environment;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: .55rem;
     min-width: 0;
-    padding-left: var(--space-md);
-    border-left: 1px solid var(--color-presentation-border-subtle);
+    padding: 0 0 2.75rem var(--space-md);
+    box-sizing: border-box;
     font-family: var(--font-family-math);
+}
+
+.functionsPanel::before,
+.environmentPanel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 2.75rem;
+    left: 0;
+    width: 1px;
+    background: var(--color-presentation-border-subtle);
 }
 
 .environmentSymbol {
