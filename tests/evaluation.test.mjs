@@ -126,6 +126,25 @@ test("truth traces break down constants and function applications", () => {
     assert.deepEqual(trace.steps.map(({ expression }) => expression), ["a = 0", "f(0) = 1", "P(1)"]);
 });
 
+test("conclusion evidence combines witnesses required by different branches", () => {
+    const formula = parseFormula("(∃x P(x)) ∧ ∃y Q(y)");
+    const branchInterpretation = {
+        ...interpretation,
+        predicates: {
+            "P/1": { arity: 1, rows: [["1"]], truth: false },
+            "Q/1": { arity: 1, rows: [["1"]], truth: false },
+        },
+    };
+    const map = evaluation.buildEvaluationMap(formula, branchInterpretation);
+    const selected = [...evaluation.selectConclusionCells(map, branchInterpretation, true)];
+
+    assert.deepEqual(selected, ["1:1"]);
+    assert.ok(selected.every((id) => {
+        const [rowIndex, columnIndex] = id.split(":").map(Number);
+        return map.results[rowIndex][columnIndex] === true;
+    }));
+});
+
 test("conclusion evidence can mark complete stripes or one witness per stripe", () => {
     const formula = parseFormula("∀x ∃y P(x,y)");
     const falseInterpretation = {

@@ -213,8 +213,25 @@ export const selectConclusionCells = (
         if (current.kind === "or") return left === true || right === true ? true : left === false && right === false ? false : null;
         return left === false || right === true ? true : left === true && right === false ? false : null;
     };
-    const merge = (...groups: CaseCell[][]) =>
-        [...new Map(groups.flat().map((cell) => [cell.id, cell])).values()];
+    const combineEvidence = (
+        leftFormula: Formula,
+        leftCells: CaseCell[],
+        rightFormula: Formula,
+        rightCells: CaseCell[],
+        candidates: CaseCell[]
+    ) => {
+        const leftVariables = [...collectVariables(leftFormula)];
+        const rightVariables = [...collectVariables(rightFormula)];
+        const matches = (candidate: CaseCell, evidence: CaseCell, variables: string[]) =>
+            variables.every((variable) => candidate.assignment.get(variable) === evidence.assignment.get(variable));
+        return [...new Map(leftCells.flatMap((leftCell) => rightCells.flatMap((rightCell) => {
+            const combined = candidates.find((candidate) =>
+                matches(candidate, leftCell, leftVariables)
+                && matches(candidate, rightCell, rightVariables)
+            );
+            return combined ? [[combined.id, combined] as const] : [];
+        }))).values()];
+    };
     const selectEvidence = (current: Formula, candidates: CaseCell[], expected: boolean): CaseCell[] => {
         if (current.kind === "atom") {
             const selected = candidates.find((cell) => atomOutcome(current, cell) === expected) ?? candidates[0];
@@ -233,17 +250,29 @@ export const selectConclusionCells = (
         const left = outcome(current.left, candidates);
         if (current.kind === "and") {
             return expected
-                ? merge(selectEvidence(current.left, candidates, true), selectEvidence(current.right, candidates, true))
+                ? combineEvidence(
+                    current.left, selectEvidence(current.left, candidates, true),
+                    current.right, selectEvidence(current.right, candidates, true),
+                    candidates
+                )
                 : selectEvidence(left === false ? current.left : current.right, candidates, false);
         }
         if (current.kind === "or") {
             return expected
                 ? selectEvidence(left === true ? current.left : current.right, candidates, true)
-                : merge(selectEvidence(current.left, candidates, false), selectEvidence(current.right, candidates, false));
+                : combineEvidence(
+                    current.left, selectEvidence(current.left, candidates, false),
+                    current.right, selectEvidence(current.right, candidates, false),
+                    candidates
+                );
         }
         return expected
             ? selectEvidence(left === false ? current.left : current.right, candidates, true)
-            : merge(selectEvidence(current.left, candidates, true), selectEvidence(current.right, candidates, false));
+            : combineEvidence(
+                current.left, selectEvidence(current.left, candidates, true),
+                current.right, selectEvidence(current.right, candidates, false),
+                candidates
+            );
     };
 
     return new Set(selectEvidence(evaluationMap.caseFormula, cells, target).map((cell) => cell.id));
