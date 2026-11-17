@@ -97,7 +97,8 @@ test("table keeps shadowed and free variable bindings independent", () => {
     const mixedMap = evaluation.buildEvaluationMap(mixedFormula, mixedInterpretation);
 
     assert.deepEqual(mixedMap.variables.map((variable) => mixedMap.variableLabels.get(variable)), ["x₁", "x₂"]);
-    assert.deepEqual(mixedMap.results, [[true, false], [false, false]]);
+    assert.deepEqual(mixedMap.rowAssignments, [["0"]]);
+    assert.deepEqual(mixedMap.results, [[true, false]]);
     assert.deepEqual(
         [...evaluation.selectConclusionCells(mixedMap, mixedInterpretation, false)],
         ["0:1"]
@@ -246,6 +247,9 @@ test("conclusion evidence never leaves the free-variable environment", () => {
     const selected = evaluation.selectConclusionCells(map, constrainedInterpretation, true);
 
     assert.equal(evaluation.evaluateUnderInterpretation(formula, constrainedInterpretation), true);
+    assert.equal(map.rowAssignments.length * map.columnAssignments.length, domain.length ** 2);
+    assert.ok(map.rowAssignments.every((assignment) => assignment[map.rowVariables.indexOf("a")] === "1"));
+    assert.ok(map.columnAssignments.every((assignment) => assignment[map.columnVariables.indexOf("z")] === "1"));
     assert.equal(selected.size, domain.length);
     for (const id of selected) {
         const [rowIndex, columnIndex] = id.split(":").map(Number);

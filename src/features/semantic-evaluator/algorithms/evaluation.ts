@@ -1,5 +1,5 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
-import { cartesianSize, MAX_CARTESIAN_ENTRIES } from "./interpretation";
+import { MAX_CARTESIAN_ENTRIES } from "./interpretation";
 
 export type EvaluationMap = {
     caseFormula: Formula;
@@ -85,9 +85,16 @@ const collectVariables = (formula: Formula, variables = new Set<string>()): Set<
     return variables;
 };
 
-export const evaluationCellCount = (formula: Formula, domainSize: number) => {
+export const evaluationCellCount = (
+    formula: Formula,
+    domainSize: number,
+    environment: Readonly<Record<string, string>> = {}
+) => {
     const { formula: caseFormula } = scopeFormulaForCases(formula);
-    return cartesianSize(domainSize, collectVariables(caseFormula).size);
+    return [...collectVariables(caseFormula)].reduce(
+        (size, variable) => size * (environment[variable] ? 1 : domainSize),
+        1
+    );
 };
 
 export const evaluateTerm = (term: Term, interpretation: InterpretationDefinition, environment: ReadonlyMap<string, string>): string | null => {
@@ -138,10 +145,15 @@ const evaluateFormula = (
     return results.includes(true) ? true : results.every((value) => value === false) ? false : null;
 };
 
-const assignments = (domain: string[], size: number): string[][] => {
+const assignments = (
+    domain: string[],
+    variables: string[],
+    environment: Readonly<Record<string, string>>
+): string[][] => {
     let values: string[][] = [[]];
-    for (let index = 0; index < size; index += 1) {
-        values = values.flatMap((assignment) => domain.map((value) => [...assignment, value]));
+    for (const variable of variables) {
+        const choices = environment[variable] === undefined ? domain : [environment[variable]];
+        values = values.flatMap((assignment) => choices.map((value) => [...assignment, value]));
     }
     return values;
 };
@@ -149,15 +161,15 @@ const assignments = (domain: string[], size: number): string[][] => {
 export const buildEvaluationMap = (formula: Formula, interpretation: InterpretationDefinition): EvaluationMap => {
     const { formula: caseFormula, rawLabels } = scopeFormulaForCases(formula);
     const variables = [...collectVariables(caseFormula)];
-    if (cartesianSize(interpretation.domain.length, variables.length) > MAX_CARTESIAN_ENTRIES) {
+    if (evaluationCellCount(formula, interpretation.domain.length, interpretation.environment) > MAX_CARTESIAN_ENTRIES) {
         throw new RangeError(`Evaluation map exceeds ${MAX_CARTESIAN_ENTRIES} cells`);
     }
     const variableLabels = buildVariableLabels(variables, rawLabels);
     const rowVariableCount = variables.length === 1 ? 1 : Math.floor(variables.length / 2);
     const rowVariables = variables.slice(0, rowVariableCount);
     const columnVariables = variables.slice(rowVariables.length);
-    const rowAssignments = assignments(interpretation.domain, rowVariables.length);
-    const columnAssignments = assignments(interpretation.domain, columnVariables.length);
+    const rowAssignments = assignments(interpretation.domain, rowVariables, interpretation.environment);
+    const columnAssignments = assignments(interpretation.domain, columnVariables, interpretation.environment);
     const results = rowAssignments.map((rowValues) => columnAssignments.map((columnValues) => {
         const environment = new Map(Object.entries(interpretation.environment));
         rowVariables.forEach((variable, index) => environment.set(variable, rowValues[index]));

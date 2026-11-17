@@ -81,8 +81,8 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
             .map((fn) => fn.key)
     ), [options.length, symbols.functions]);
     const evaluationTooLarge = useMemo(
-        () => evaluationCellCount(formula, options.length) > MAX_CARTESIAN_ENTRIES,
-        [formula, options.length]
+        () => evaluationCellCount(formula, options.length, environment) > MAX_CARTESIAN_ENTRIES,
+        [environment, formula, options.length]
     );
 
     const interpretationDefinition = useMemo<InterpretationDefinition | undefined>(() => {
