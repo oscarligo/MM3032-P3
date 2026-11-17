@@ -1,12 +1,70 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
 
 export type EvaluationMap = {
+    caseFormula: Formula;
     variables: string[];
+    variableLabels: ReadonlyMap<string, string>;
     rowVariables: string[];
     columnVariables: string[];
     rowAssignments: string[][];
     columnAssignments: string[][];
     results: Array<Array<boolean | null>>;
+};
+
+const scopeFormulaForCases = (formula: Formula) => {
+    let bindingIndex = 0;
+    const rawLabels = new Map<string, string>();
+
+    const visitTerm = (term: Term, bindings: ReadonlyMap<string, string>): Term => {
+        if (term.kind === "var") {
+            const name = bindings.get(term.name) ?? term.name;
+            rawLabels.set(name, term.name);
+            return { ...term, name };
+        }
+        if (term.kind === "func") {
+            return { ...term, args: term.args.map((argument) => visitTerm(argument, bindings)) };
+        }
+        return term;
+    };
+
+    const visit = (current: Formula, bindings: ReadonlyMap<string, string>): Formula => {
+        if (current.kind === "atom") {
+            return { ...current, args: current.args.map((term) => visitTerm(term, bindings)) };
+        }
+        if (current.kind === "not") return { ...current, inner: visit(current.inner, bindings) };
+        if (current.kind === "forall" || current.kind === "exists") {
+            const variable = `@bound:${bindingIndex++}:${current.variable}`;
+            const nestedBindings = new Map(bindings);
+            nestedBindings.set(current.variable, variable);
+            rawLabels.set(variable, current.variable);
+            return { ...current, variable, inner: visit(current.inner, nestedBindings) };
+        }
+        return {
+            ...current,
+            left: visit(current.left, bindings),
+            right: visit(current.right, bindings),
+        };
+    };
+
+    return { formula: visit(formula, new Map()), rawLabels };
+};
+
+const subscript = (value: number) =>
+    String(value).replace(/\d/g, (digit) => "₀₁₂₃₄₅₆₇₈₉"[Number(digit)]);
+
+const buildVariableLabels = (variables: string[], rawLabels: ReadonlyMap<string, string>) => {
+    const counts = new Map<string, number>();
+    variables.forEach((variable) => {
+        const label = rawLabels.get(variable) ?? variable;
+        counts.set(label, (counts.get(label) ?? 0) + 1);
+    });
+    const indexes = new Map<string, number>();
+    return new Map(variables.map((variable) => {
+        const label = rawLabels.get(variable) ?? variable;
+        const index = (indexes.get(label) ?? 0) + 1;
+        indexes.set(label, index);
+        return [variable, counts.get(label) === 1 ? label : `${label}${subscript(index)}`];
+    }));
 };
 
 const collectVariables = (formula: Formula, variables = new Set<string>()): Set<string> => {
@@ -83,7 +141,9 @@ const assignments = (domain: string[], size: number): string[][] => {
 };
 
 export const buildEvaluationMap = (formula: Formula, interpretation: InterpretationDefinition): EvaluationMap => {
-    const variables = [...collectVariables(formula)];
+    const { formula: caseFormula, rawLabels } = scopeFormulaForCases(formula);
+    const variables = [...collectVariables(caseFormula)];
+    const variableLabels = buildVariableLabels(variables, rawLabels);
     const rowVariableCount = variables.length === 1 ? 1 : Math.floor(variables.length / 2);
     const rowVariables = variables.slice(0, rowVariableCount);
     const columnVariables = variables.slice(rowVariables.length);
@@ -93,13 +153,12 @@ export const buildEvaluationMap = (formula: Formula, interpretation: Interpretat
         const environment = new Map(Object.entries(interpretation.environment));
         rowVariables.forEach((variable, index) => environment.set(variable, rowValues[index]));
         columnVariables.forEach((variable, index) => environment.set(variable, columnValues[index]));
-        return evaluateFormula(formula, interpretation, environment, true);
+        return evaluateFormula(caseFormula, interpretation, environment, true);
     }));
-    return { variables, rowVariables, columnVariables, rowAssignments, columnAssignments, results };
+    return { caseFormula, variables, variableLabels, rowVariables, columnVariables, rowAssignments, columnAssignments, results };
 };
 
 export const selectConclusionCells = (
-    formula: Formula,
     evaluationMap: EvaluationMap,
     interpretation: InterpretationDefinition,
     target: boolean
@@ -178,7 +237,7 @@ export const selectConclusionCells = (
             : merge(selectEvidence(current.left, candidates, true), selectEvidence(current.right, candidates, false));
     };
 
-    return new Set(selectEvidence(formula, cells, target).map((cell) => cell.id));
+    return new Set(selectEvidence(evaluationMap.caseFormula, cells, target).map((cell) => cell.id));
 };
 
 const termToText = (term: Term): string =>

@@ -107,7 +107,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const [activeTruthCell, setActiveTruthCell] = useState<string>();
     const conclusionCellIds = useMemo(
         () => formula && evaluationMap && interpretation && finalEvaluation !== null
-            ? selectConclusionCells(formula, evaluationMap, interpretation, finalEvaluation)
+            ? selectConclusionCells(evaluationMap, interpretation, finalEvaluation)
             : new Set<string>(),
         [evaluationMap, finalEvaluation, formula, interpretation]
     );
@@ -137,13 +137,14 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             return;
         }
         setTruthTrace(buildTruthTrace(
-            formula,
+            evaluationMap.caseFormula,
             interpretation,
             evaluationMap.rowVariables,
             evaluationMap.rowAssignments[rowIndex],
             evaluationMap.columnVariables,
             evaluationMap.columnAssignments[columnIndex],
-            trueLabel
+            trueLabel,
+            evaluationMap.variableLabels
         ));
         setActiveTruthCell(cellId);
     };
@@ -457,7 +458,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                         <>
                                             <thead>
                                                 <tr>
-                                                    <th data-axis-corner>{evaluationMap.variables[0]}</th>
+                                                    <th data-axis-corner>{evaluationMap.variableLabels.get(evaluationMap.variables[0])}</th>
                                                     <th>{LL.evaluation.value()}</th>
                                                 </tr>
                                             </thead>
@@ -478,7 +479,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                         {evaluationMap.rowVariables.map((rowVariable) => (
                                                             <th className={styles.rowAxisHeader} data-empty-cell key={rowVariable} />
                                                         ))}
-                                                        <th className={styles.axisCorner} data-axis-corner>{variable}</th>
+                                                        <th className={styles.axisCorner} data-axis-corner>{evaluationMap.variableLabels.get(variable)}</th>
                                                         {evaluationMap.columnAssignments.map((assignment, columnIndex) => (
                                                             <th className={styles.columnValue} key={columnIndex}>{assignment[variableIndex]}</th>
                                                         ))}
@@ -488,7 +489,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                             <tbody>
                                                 <tr className={styles.axisSpacerRow}>
                                                     {evaluationMap.rowVariables.map((variable) => (
-                                                        <th className={styles.rowAxisHeader} key={variable}>{variable}</th>
+                                                        <th className={styles.rowAxisHeader} key={variable}>{evaluationMap.variableLabels.get(variable)}</th>
                                                     ))}
                                                     <th className={styles.axisCorner} data-empty-cell />
                                                     {evaluationMap.columnAssignments.map((_, columnIndex) => <td data-empty-cell key={columnIndex} />)}

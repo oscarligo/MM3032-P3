@@ -38,14 +38,19 @@ export const buildTruthTrace = (
     rowAssignment: string[],
     columnVariables: string[],
     columnAssignment: string[],
-    trueLabel: string
+    trueLabel: string,
+    variableLabels: ReadonlyMap<string, string> = new Map()
 ): TruthTrace => {
-    const assignment = [
+    const cases = [
         ...rowVariables.map((variable, index) => ({ variable, value: rowAssignment[index] })),
         ...columnVariables.map((variable, index) => ({ variable, value: columnAssignment[index] })),
     ];
+    const assignment = cases.map(({ variable, value }) => ({
+        variable: variableLabels.get(variable) ?? variable,
+        value,
+    }));
     const environment = new Map(Object.entries(interpretation.environment));
-    assignment.forEach(({ variable, value }) => environment.set(variable, value));
+    cases.forEach(({ variable, value }) => environment.set(variable, value));
     const steps: TruthStep[] = [];
 
     const valueLabel = (value: boolean | null) => value === null ? "-" : value ? trueLabel : "F";

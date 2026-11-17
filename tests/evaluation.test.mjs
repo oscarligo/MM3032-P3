@@ -40,7 +40,7 @@ test("nested quantifiers shadow and restore assignments for sibling subformulas"
 });
 
 test("table cells and their traces evaluate concrete cases without quantifiers", () => {
-    for (const source of ["∀x P(x)", "∃x P(x)", "∀x ∃x P(x)"]) {
+    for (const source of ["∀x P(x)", "∃x P(x)"]) {
         const formula = parseFormula(source);
         const map = evaluation.buildEvaluationMap(formula, interpretation);
         for (const [rowIndex, row] of map.results.entries()) {
@@ -48,9 +48,9 @@ test("table cells and their traces evaluate concrete cases without quantifiers",
                 const expected = map.rowAssignments[rowIndex][0] === "0";
                 assert.equal(result, expected, source);
                 const trace = buildTruthTrace(
-                    formula, interpretation,
+                    map.caseFormula, interpretation,
                     map.rowVariables, map.rowAssignments[rowIndex],
-                    map.columnVariables, map.columnAssignments[columnIndex], "V"
+                    map.columnVariables, map.columnAssignments[columnIndex], "V", map.variableLabels
                 );
                 assert.equal(trace.steps.at(-1).result, result, source);
                 assert.equal(trace.originalExpression, `P(${map.rowAssignments[rowIndex][0]})`);
@@ -59,6 +59,47 @@ test("table cells and their traces evaluate concrete cases without quantifiers",
             }
         }
     }
+});
+
+test("table keeps shadowed and free variable bindings independent", () => {
+    const shadowedFormula = parseFormula("∀x ∃x P(x)");
+    const shadowedMap = evaluation.buildEvaluationMap(shadowedFormula, interpretation);
+
+    assert.deepEqual(shadowedMap.variables.map((variable) => shadowedMap.variableLabels.get(variable)), ["x₁", "x₂"]);
+    assert.deepEqual(shadowedMap.results, [[true, false], [true, false]]);
+    assert.deepEqual(
+        [...evaluation.selectConclusionCells(shadowedMap, interpretation, true)],
+        ["0:0", "1:0"]
+    );
+    const shadowedTrace = buildTruthTrace(
+        shadowedMap.caseFormula, interpretation,
+        shadowedMap.rowVariables, shadowedMap.rowAssignments[1],
+        shadowedMap.columnVariables, shadowedMap.columnAssignments[0],
+        "V", shadowedMap.variableLabels
+    );
+    assert.deepEqual(shadowedTrace.assignment, [
+        { variable: "x₁", value: "1" },
+        { variable: "x₂", value: "0" },
+    ]);
+    assert.equal(shadowedTrace.originalExpression, "P(0)");
+
+    const mixedFormula = parseFormula("P(x) ∧ ∀x Q(x)");
+    const mixedInterpretation = {
+        ...interpretation,
+        predicates: {
+            "P/1": { arity: 1, rows: [["0"]], truth: false },
+            "Q/1": { arity: 1, rows: [["0"]], truth: false },
+        },
+        environment: { x: "0" },
+    };
+    const mixedMap = evaluation.buildEvaluationMap(mixedFormula, mixedInterpretation);
+
+    assert.deepEqual(mixedMap.variables.map((variable) => mixedMap.variableLabels.get(variable)), ["x₁", "x₂"]);
+    assert.deepEqual(mixedMap.results, [[true, false], [false, false]]);
+    assert.deepEqual(
+        [...evaluation.selectConclusionCells(mixedMap, mixedInterpretation, false)],
+        ["0:1"]
+    );
 });
 
 test("truth traces break down constants and function applications", () => {
@@ -81,7 +122,7 @@ test("conclusion evidence can mark complete stripes or one witness per stripe", 
     };
     const falseMap = evaluation.buildEvaluationMap(formula, falseInterpretation);
     assert.deepEqual(
-        [...evaluation.selectConclusionCells(formula, falseMap, falseInterpretation, false)],
+        [...evaluation.selectConclusionCells(falseMap, falseInterpretation, false)],
         ["0:0", "0:1"]
     );
 
@@ -91,7 +132,7 @@ test("conclusion evidence can mark complete stripes or one witness per stripe", 
     };
     const trueMap = evaluation.buildEvaluationMap(formula, trueInterpretation);
     assert.deepEqual(
-        [...evaluation.selectConclusionCells(formula, trueMap, trueInterpretation, true)],
+        [...evaluation.selectConclusionCells(trueMap, trueInterpretation, true)],
         ["0:0", "1:1"]
     );
 
@@ -108,7 +149,7 @@ test("conclusion evidence can mark complete stripes or one witness per stripe", 
     };
     const implicationMap = evaluation.buildEvaluationMap(implication, implicationInterpretation);
     assert.deepEqual(
-        [...evaluation.selectConclusionCells(implication, implicationMap, implicationInterpretation, false)],
+        [...evaluation.selectConclusionCells(implicationMap, implicationInterpretation, false)],
         ["1:0", "1:1", "1:2"]
     );
 });
@@ -132,15 +173,15 @@ test("conclusion evidence never leaves the free-variable environment", () => {
         environment: { a: "1", z: "1" },
     };
     const map = evaluation.buildEvaluationMap(formula, constrainedInterpretation);
-    const selected = evaluation.selectConclusionCells(formula, map, constrainedInterpretation, true);
+    const selected = evaluation.selectConclusionCells(map, constrainedInterpretation, true);
 
     assert.equal(evaluation.evaluateUnderInterpretation(formula, constrainedInterpretation), true);
     assert.equal(selected.size, domain.length);
     for (const id of selected) {
         const [rowIndex, columnIndex] = id.split(":").map(Number);
         const assignment = Object.fromEntries([
-            ...map.rowVariables.map((variable, index) => [variable, map.rowAssignments[rowIndex][index]]),
-            ...map.columnVariables.map((variable, index) => [variable, map.columnAssignments[columnIndex][index]]),
+            ...map.rowVariables.map((variable, index) => [map.variableLabels.get(variable), map.rowAssignments[rowIndex][index]]),
+            ...map.columnVariables.map((variable, index) => [map.variableLabels.get(variable), map.columnAssignments[columnIndex][index]]),
         ]);
         assert.equal(assignment.a, "1");
         assert.equal(assignment.y, "1");
