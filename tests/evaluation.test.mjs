@@ -73,6 +73,81 @@ test("truth traces break down constants and function applications", () => {
     assert.deepEqual(trace.steps.map(({ expression }) => expression), ["a = 0", "f(0) = 1", "P(1)"]);
 });
 
+test("conclusion evidence can mark complete stripes or one witness per stripe", () => {
+    const formula = parseFormula("∀x ∃y P(x,y)");
+    const falseInterpretation = {
+        ...interpretation,
+        predicates: { "P/2": { arity: 2, rows: [["1", "0"]], truth: false } },
+    };
+    const falseMap = evaluation.buildEvaluationMap(formula, falseInterpretation);
+    assert.deepEqual(
+        [...evaluation.selectConclusionCells(formula, falseMap, falseInterpretation, false)],
+        ["0:0", "0:1"]
+    );
+
+    const trueInterpretation = {
+        ...falseInterpretation,
+        predicates: { "P/2": { arity: 2, rows: [["0", "0"], ["1", "1"]], truth: false } },
+    };
+    const trueMap = evaluation.buildEvaluationMap(formula, trueInterpretation);
+    assert.deepEqual(
+        [...evaluation.selectConclusionCells(formula, trueMap, trueInterpretation, true)],
+        ["0:0", "1:1"]
+    );
+
+    const implication = parseFormula("∀x (P(x) → ∃y Q(x,y))");
+    const implicationInterpretation = {
+        domain: ["1", "0", "2"],
+        constants: {},
+        functions: {},
+        predicates: {
+            "P/1": { arity: 1, rows: [["0"]], truth: false },
+            "Q/2": { arity: 2, rows: [["1", "1"]], truth: false },
+        },
+        environment: {},
+    };
+    const implicationMap = evaluation.buildEvaluationMap(implication, implicationInterpretation);
+    assert.deepEqual(
+        [...evaluation.selectConclusionCells(implication, implicationMap, implicationInterpretation, false)],
+        ["1:0", "1:1", "1:2"]
+    );
+});
+
+test("conclusion evidence never leaves the free-variable environment", () => {
+    const formula = parseFormula("∀x (P(x, f(a, b)) → ∃y Q(x, y, z))", new Set(["b"]));
+    const domain = ["2", "1", "3"];
+    const constrainedInterpretation = {
+        domain,
+        constants: { b: "1" },
+        functions: {
+            "f/2": {
+                arity: 2,
+                rows: domain.flatMap((left) => domain.map((right) => ({ args: [left, right], result: "1" }))),
+            },
+        },
+        predicates: {
+            "P/2": { arity: 2, rows: domain.map((x) => [x, "1"]), truth: false },
+            "Q/3": { arity: 3, rows: domain.map((x) => [x, "1", "1"]), truth: false },
+        },
+        environment: { a: "1", z: "1" },
+    };
+    const map = evaluation.buildEvaluationMap(formula, constrainedInterpretation);
+    const selected = evaluation.selectConclusionCells(formula, map, constrainedInterpretation, true);
+
+    assert.equal(evaluation.evaluateUnderInterpretation(formula, constrainedInterpretation), true);
+    assert.equal(selected.size, domain.length);
+    for (const id of selected) {
+        const [rowIndex, columnIndex] = id.split(":").map(Number);
+        const assignment = Object.fromEntries([
+            ...map.rowVariables.map((variable, index) => [variable, map.rowAssignments[rowIndex][index]]),
+            ...map.columnVariables.map((variable, index) => [variable, map.columnAssignments[columnIndex][index]]),
+        ]);
+        assert.equal(assignment.a, "1");
+        assert.equal(assignment.y, "1");
+        assert.equal(assignment.z, "1");
+    }
+});
+
 test("unquantified traces still show atomic and connective steps", () => {
     const trace = buildTruthTrace(
         parseFormula("P(x) ∧ ¬P(y)"), interpretation,

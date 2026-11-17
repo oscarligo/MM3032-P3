@@ -12,6 +12,7 @@ import {
     evaluateUnderInterpretation,
     fitEvaluationScale,
     formulaToText,
+    selectConclusionCells,
 } from "../algorithms/evaluation";
 import { buildTruthTrace, type TruthTrace } from "../algorithms/truth";
 import type { Formula } from "../types";
@@ -60,15 +61,16 @@ function AutoCenter({ rowCount, columnCount, procedureOpen }: {
     return null;
 }
 
-function TruthCell({ value, trueLabel, active, onClick }: {
+function TruthCell({ value, trueLabel, active, onClick, conclusionMark }: {
     value: boolean | null;
     trueLabel: string;
     active: boolean;
     onClick: () => void;
+    conclusionMark?: "witness" | "counterexample";
 }) {
     const valueClass = value === null ? styles.pendingCell : value ? styles.trueCell : styles.falseCell;
     return (
-        <td className={`${valueClass} ${active ? styles.activeCell : ""}`}>
+        <td className={`${valueClass} ${active ? styles.activeCell : ""}`} data-conclusion-mark={conclusionMark}>
             <button className={styles.truthButton} data-truth-cell type="button" onClick={onClick}>
                 {value === null ? "-" : value ? trueLabel : "F"}
             </button>
@@ -103,6 +105,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
     const [truthTrace, setTruthTrace] = useState<TruthTrace>();
     const [activeTruthCell, setActiveTruthCell] = useState<string>();
+    const conclusionCellIds = useMemo(
+        () => formula && evaluationMap && interpretation && finalEvaluation !== null
+            ? selectConclusionCells(formula, evaluationMap, interpretation, finalEvaluation)
+            : new Set<string>(),
+        [evaluationMap, finalEvaluation, formula, interpretation]
+    );
+    const conclusionMark = finalEvaluation === true ? "witness" : "counterexample";
 
     useEffect(() => {
         registerProcedure("evaluation", interpretation ? 2 : 0, 1, false);
@@ -141,6 +150,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
 
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const conclusionCanvasRef = useRef<HTMLCanvasElement>(null);
     const tableRef = useRef<HTMLTableElement>(null);
 
         useLayoutEffect(() => {
@@ -306,6 +316,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 }
                 ctx.restore();
             });
+
         };
 
         drawHandDrawnTable();
@@ -316,6 +327,74 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
 
         return () => observer.disconnect();
     }, [evaluationMap, formula, locale]);
+
+    useEffect(() => {
+        const wrap = wrapRef.current;
+        const tableEl = tableRef.current;
+        const canvas = conclusionCanvasRef.current;
+        if (!wrap || !tableEl || !canvas) return;
+
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        canvas.width = wrap.offsetWidth * dpr;
+        canvas.height = wrap.offsetHeight * dpr;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, wrap.offsetWidth, wrap.offsetHeight);
+        if (!showConclusion) return;
+
+        const getBox = (element: HTMLElement) => {
+            let x = 0;
+            let y = 0;
+            let current: HTMLElement | null = element;
+            while (current && current !== wrap) {
+                x += current.offsetLeft;
+                y += current.offsetTop;
+                current = current.offsetParent as HTMLElement | null;
+            }
+            return { x, y, width: element.offsetWidth, height: element.offsetHeight };
+        };
+        const style = getComputedStyle(wrap);
+        const successColor = style.getPropertyValue("--color-success").trim() || "#15803d";
+        const annotationColor = style.getPropertyValue("--color-annotation").trim() || "#e11d48";
+        const lines = Array.from(tableEl.querySelectorAll<HTMLElement>("[data-conclusion-mark]")).flatMap((cell, cellIndex) => {
+            const box = getBox(cell);
+            const color = cell.dataset.conclusionMark === "witness" ? successColor : annotationColor;
+            const cellLines = [];
+            let hatchIndex = 0;
+            for (let start = box.x - box.height; start < box.x + box.width; start += 8) {
+                const x1 = Math.max(start, box.x);
+                const x2 = Math.min(start + box.height, box.x + box.width);
+                cellLines.push({
+                    x1,
+                    y1: box.y + box.height - (x1 - start),
+                    x2,
+                    y2: box.y + box.height - (x2 - start),
+                    color,
+                    seed: 800 + cellIndex * 100 + hatchIndex,
+                });
+                hatchIndex += 1;
+            }
+            return cellLines;
+        });
+        const rc = rough.canvas(canvas);
+        const timers: number[] = [];
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        lines.forEach((line, index) => {
+            const draw = () => rc.line(line.x1, line.y1, line.x2, line.y2, {
+                stroke: line.color,
+                strokeWidth: 1.2,
+                roughness: 1.1,
+                bowing: .6,
+                seed: line.seed,
+                disableMultiStroke: true,
+            });
+            if (reducedMotion) draw();
+            else timers.push(window.setTimeout(draw, index * 35));
+        });
+
+        return () => timers.forEach(window.clearTimeout);
+    }, [conclusionCellIds, showConclusion]);
 
 
     return (
@@ -365,10 +444,14 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                 </div>
                                 <div ref={wrapRef} className={styles.tableCanvasWrap}>
                                 <canvas ref={canvasRef} className={styles.roughCanvas} />
+                                <canvas
+                                    ref={conclusionCanvasRef}
+                                    className={`${styles.conclusionCanvas} ${showConclusion ? styles.conclusionCanvasVisible : ""}`}
+                                />
                                 <table ref={tableRef} className={styles.table}>
                                     {evaluationMap.variables.length === 0 ? (
                                         <tbody>
-                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} active={activeTruthCell === "0:0"} onClick={() => openTruth(0, 0)} /></tr>
+                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} active={activeTruthCell === "0:0"} onClick={() => openTruth(0, 0)} conclusionMark={showConclusion && conclusionCellIds.has("0:0") ? conclusionMark : undefined} /></tr>
                                         </tbody>
                                     ) : evaluationMap.variables.length === 1 ? (
                                         <>
@@ -382,7 +465,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                 {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
                                                     <tr key={rowIndex}>
                                                         <th className={styles.rowValue}>{assignment[0]}</th>
-                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} active={activeTruthCell === `${rowIndex}:0`} onClick={() => openTruth(rowIndex, 0)} />
+                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} active={activeTruthCell === `${rowIndex}:0`} onClick={() => openTruth(rowIndex, 0)} conclusionMark={showConclusion && conclusionCellIds.has(`${rowIndex}:0`) ? conclusionMark : undefined} />
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -422,6 +505,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                                 trueLabel={trueLabel}
                                                                 active={activeTruthCell === `${rowIndex}:${columnIndex}`}
                                                                 onClick={() => openTruth(rowIndex, columnIndex)}
+                                                                conclusionMark={showConclusion && conclusionCellIds.has(`${rowIndex}:${columnIndex}`) ? conclusionMark : undefined}
                                                                 key={columnIndex}
                                                             />
                                                         ))}
