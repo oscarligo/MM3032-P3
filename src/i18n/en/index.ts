@@ -67,6 +67,7 @@ const en = {
 		errorExpectedQuantifierVariable: 'missing quantifier variable: expected a variable after “{quantifier}”.',
 		errorMissingQuantifierBody: 'missing quantifier body: expected a formula after “{quantifier}{variable}”.',
 		errorFormulaInTermPosition: 'formula in term position: “{token}” cannot be passed as a predicate argument.',
+		errorSymbolRoleConflict: 'ambiguous symbol: “{symbol}” cannot be used with more than one syntactic role.',
 		errorExpectedTermIdentifier: 'missing term: expected an identifier, but found “{found}”.',
 		errorUnexpectedToken: "unexpected token at the start of the expression: “{value}” ({type})",
 		errorUnknown: 'the input is invalid',

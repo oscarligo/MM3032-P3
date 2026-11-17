@@ -181,6 +181,24 @@ test("an unparenthesized quantifier binds only the following unary formula", () 
 test("a predicate symbol cannot be reused as a term", () => {
     assert.throws(
         () => parseFormula("P(f(P,y))"),
-        (error) => error?.payload?.code === "FORMULA_IN_TERM_POSITION" && error.payload.token === "P"
+        (error) => error?.payload?.code === "SYMBOL_ROLE_CONFLICT" && error.payload.symbol === "P"
     );
+});
+
+test("a symbol cannot change syntactic role regardless of occurrence order", () => {
+    for (const [source, constants = []] of [
+        ["R(P) ∧ P(x)"],
+        ["P(f(x)) ∧ f(x)"],
+        ["f(x) ∧ P(f(x))"],
+        ["P(x) ∧ ∀P Q(x)"],
+        ["P(a) ∧ ∀a Q(a)", ["a"]],
+    ]) {
+        assert.throws(
+            () => parseFormula(source, new Set(constants)),
+            (error) => error?.payload?.code === "SYMBOL_ROLE_CONFLICT",
+            source
+        );
+    }
+
+    assert.doesNotThrow(() => parseFormula("P(x) ∧ P(x,y)"));
 });

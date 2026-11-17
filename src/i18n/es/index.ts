@@ -67,6 +67,7 @@ const es = {
 		errorExpectedQuantifierVariable: 'variable de cuantificador faltante: se esperaba una variable después de «{quantifier:string}».',
 		errorMissingQuantifierBody: 'cuerpo de cuantificador faltante: se esperaba una fórmula tras «{quantifier:string}{variable:string}».',
 		errorFormulaInTermPosition: 'fórmula en posición de término: no se puede pasar «{token:string}» como argumento de un predicado.',
+		errorSymbolRoleConflict: 'símbolo ambiguo: «{symbol:string}» no puede utilizarse con más de un rol sintáctico.',
 		errorExpectedTermIdentifier: 'término faltante: se esperaba un identificador, pero se encontró «{found:string}».',
 		errorUnexpectedToken: "token inesperado al inicio de la expresión: «{value:string}» ({type:string})",
 		errorUnknown: 'la entrada no es válida',

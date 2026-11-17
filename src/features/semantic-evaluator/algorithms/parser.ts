@@ -32,12 +32,14 @@ export type ParserTrace = {
     activeScopeVars: string[];
 };
 
+type SymbolRole = "predicate" | "function" | "constant" | "variable";
+
 export class FormulaParser {
     public readonly nodeTokens = new WeakMap<Formula | Term, number>();
     // Llamadas ("regla:inicio") que consumieron su operador binario; se completa durante el parseo
     public readonly operatorCalls = new Set<string>();
     private callStack: ParserCall[] = [];
-    private predicateSymbols = new Set<string>();
+    private symbolRoles = new Map<string, SymbolRole>();
 
     private inRule<T>(name: string, parse: () => T): T {
         this.callStack.push({ rule: name, start: this.cursor });
@@ -199,6 +201,18 @@ export class FormulaParser {
         return this.boundVarCounts.has(name);
     }
 
+    private registerSymbol(token: Token, role: SymbolRole): void {
+        const previousRole = this.symbolRoles.get(token.value);
+        if (previousRole && previousRole !== role) {
+            throw new FormulaSyntaxError({
+                code: "SYMBOL_ROLE_CONFLICT",
+                symbol: token.value,
+                position: token.position,
+            });
+        }
+        this.symbolRoles.set(token.value, role);
+    }
+
     // Parsear un término (variable, constante o función)
     // Función recursiva que maneja la gramática de términos:
     private parseTerm(): Term {
@@ -222,14 +236,6 @@ export class FormulaParser {
             const identToken = this.advance();
             const ident = identToken.value;
 
-            if (this.predicateSymbols.has(ident)) {
-                throw new FormulaSyntaxError({
-                    code: "FORMULA_IN_TERM_POSITION",
-                    token: ident,
-                    position: identToken.position,
-                });
-            }
-
             // Si viene seguido de '(', es una función: f(t1, t2)
             if (this.peek().type === "LPAREN") {
                 if (/^[A-Z]/.test(ident)) {
@@ -239,12 +245,15 @@ export class FormulaParser {
                         position: identToken.position,
                     });
                 }
+                this.registerSymbol(identToken, "function");
                 const open = this.advance();
                 const args = this.parseArguments(ident, open.position, false);
                 return this.atToken({ kind: "func", name: ident, args }, start);
             }
 
-            if (this.isBound(ident) || !this.constantSymbols.has(ident)) {
+            const isVariable = this.isBound(ident) || !this.constantSymbols.has(ident);
+            this.registerSymbol(identToken, isVariable ? "variable" : "constant");
+            if (isVariable) {
                 return this.atToken({ kind: "var", name: ident }, start);
             }
             return this.atToken({ kind: "const", name: ident }, start);
@@ -369,6 +378,7 @@ export class FormulaParser {
                     throw new FormulaSyntaxError({ code: "MISSING_QUANTIFIER_BODY", quantifier: quantifier.value, variable, position: varToken.position });
                 }
 
+                this.registerSymbol(varToken, "variable");
                 this.pushBoundVar(variable);
                 const inner = this.parseUnary();
                 this.popBoundVar(variable);
@@ -390,6 +400,7 @@ export class FormulaParser {
                     throw new FormulaSyntaxError({ code: "MISSING_QUANTIFIER_BODY", quantifier: quantifier.value, variable, position: varToken.position });
                 }
 
+                this.registerSymbol(varToken, "variable");
                 this.pushBoundVar(variable);
                 const inner = this.parseUnary();
                 this.popBoundVar(variable);
@@ -426,7 +437,7 @@ export class FormulaParser {
                 this.advance();
                 const predicate = token.value;
                 const args: Term[] = [];
-                this.predicateSymbols.add(predicate);
+                this.registerSymbol(token, "predicate");
 
                 if (this.peek().type === "LPAREN") {
                     const open = this.advance();

@@ -11,6 +11,7 @@ export type ParseErrorPayload =
     | { code: "EXPECTED_QUANTIFIER_VARIABLE"; quantifier: string; position: number }
     | { code: "MISSING_QUANTIFIER_BODY"; quantifier: string; variable: string; position: number }
     | { code: "FORMULA_IN_TERM_POSITION"; token: string; position: number }
+    | { code: "SYMBOL_ROLE_CONFLICT"; symbol: string; position: number }
     | { code: "EXPECTED_TERM_IDENTIFIER"; found: string; position: number }
     | { code: "UNEXPECTED_TOKEN"; value: string; type: string; position: number };
 

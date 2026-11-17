@@ -391,6 +391,11 @@ type RootTranslation = {
 		 */
 		errorFormulaInTermPosition: RequiredParams<'token'>
 		/**
+		 * s​í​m​b​o​l​o​ ​a​m​b​i​g​u​o​:​ ​«​{​s​y​m​b​o​l​}​»​ ​n​o​ ​p​u​e​d​e​ ​u​t​i​l​i​z​a​r​s​e​ ​c​o​n​ ​m​á​s​ ​d​e​ ​u​n​ ​r​o​l​ ​s​i​n​t​á​c​t​i​c​o​.
+		 * @param {string} symbol
+		 */
+		errorSymbolRoleConflict: RequiredParams<'symbol'>
+		/**
 		 * t​é​r​m​i​n​o​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​,​ ​p​e​r​o​ ​s​e​ ​e​n​c​o​n​t​r​ó​ ​«​{​f​o​u​n​d​}​»​.
 		 * @param {string} found
 		 */
@@ -1151,6 +1156,10 @@ export type TranslationFunctions = {
 		 * fórmula en posición de término: no se puede pasar «{token}» como argumento de un predicado.
 		 */
 		errorFormulaInTermPosition: (arg: { token: string }) => LocalizedString
+		/**
+		 * símbolo ambiguo: «{symbol}» no puede utilizarse con más de un rol sintáctico.
+		 */
+		errorSymbolRoleConflict: (arg: { symbol: string }) => LocalizedString
 		/**
 		 * término faltante: se esperaba un identificador, pero se encontró «{found}».
 		 */
