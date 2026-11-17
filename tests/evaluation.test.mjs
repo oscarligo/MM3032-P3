@@ -52,10 +52,10 @@ test("table cells and their traces evaluate concrete cases without quantifiers",
                 const trace = buildTruthTrace(
                     map.caseFormula, interpretation,
                     map.rowVariables, map.rowAssignments[rowIndex],
-                    map.columnVariables, map.columnAssignments[columnIndex], "V", map.variableLabels
+                    map.columnVariables, map.columnAssignments[columnIndex], "V", map.variableLabels, formula
                 );
                 assert.equal(trace.steps.at(-1).result, result, source);
-                assert.equal(trace.originalExpression, `P(${map.rowAssignments[rowIndex][0]})`);
+                assert.equal(trace.originalExpression, "P(x)");
                 assert.equal(trace.steps.at(-1).expression, `P(${map.rowAssignments[rowIndex][0]})`);
                 assert.doesNotMatch(trace.originalExpression, /[∀∃]/);
             }
@@ -77,13 +77,13 @@ test("table keeps shadowed and free variable bindings independent", () => {
         shadowedMap.caseFormula, interpretation,
         shadowedMap.rowVariables, shadowedMap.rowAssignments[1],
         shadowedMap.columnVariables, shadowedMap.columnAssignments[0],
-        "V", shadowedMap.variableLabels
+        "V", shadowedMap.variableLabels, shadowedFormula
     );
     assert.deepEqual(shadowedTrace.assignment, [
         { variable: "x₁", value: "1" },
         { variable: "x₂", value: "0" },
     ]);
-    assert.equal(shadowedTrace.originalExpression, "P(0)");
+    assert.equal(shadowedTrace.originalExpression, "P(x)");
 
     const mixedFormula = parseFormula("P(x) ∧ ∀x Q(x)");
     const mixedInterpretation = {
@@ -123,6 +123,7 @@ test("truth traces break down constants and function applications", () => {
     };
     const trace = buildTruthTrace(formula, detailedInterpretation, [], [], [], [], "V");
 
+    assert.equal(trace.originalExpression, "P(f(a))");
     assert.deepEqual(trace.steps.map(({ expression }) => expression), ["a = 0", "f(0) = 1", "P(1)"]);
 });
 

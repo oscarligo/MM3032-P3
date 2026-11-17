@@ -39,7 +39,8 @@ export const buildTruthTrace = (
     columnVariables: string[],
     columnAssignment: string[],
     trueLabel: string,
-    variableLabels: ReadonlyMap<string, string> = new Map()
+    variableLabels: ReadonlyMap<string, string> = new Map(),
+    displayFormula: Formula = formula
 ): TruthTrace => {
     const cases = [
         ...rowVariables.map((variable, index) => ({ variable, value: rowAssignment[index] })),
@@ -107,5 +108,5 @@ export const buildTruthTrace = (
     };
 
     visit(formula);
-    return { originalExpression: formulaToText(formula, environment), assignment, steps };
+    return { originalExpression: formulaToText(displayFormula, new Map()), assignment, steps };
 };

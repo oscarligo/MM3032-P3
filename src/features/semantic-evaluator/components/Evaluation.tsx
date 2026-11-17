@@ -144,7 +144,8 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             evaluationMap.columnVariables,
             evaluationMap.columnAssignments[columnIndex],
             trueLabel,
-            evaluationMap.variableLabels
+            evaluationMap.variableLabels,
+            formula
         ));
         setActiveTruthCell(cellId);
     };
