@@ -379,10 +379,9 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             return cellLines;
         });
         const rc = rough.canvas(canvas);
-        const timers: number[] = [];
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        lines.forEach((line, index) => {
-            const draw = () => rc.line(line.x1, line.y1, line.x2, line.y2, {
+        const drawLine = (line: typeof lines[number]) =>
+            rc.line(line.x1, line.y1, line.x2, line.y2, {
                 stroke: line.color,
                 strokeWidth: 1.2,
                 roughness: 1.1,
@@ -390,11 +389,24 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 seed: line.seed,
                 disableMultiStroke: true,
             });
-            if (reducedMotion) draw();
-            else timers.push(window.setTimeout(draw, index * 35));
-        });
+        if (reducedMotion || lines.length <= 1) {
+            lines.forEach(drawLine);
+            return;
+        }
 
-        return () => timers.forEach(window.clearTimeout);
+        const duration = Math.min(1200, Math.max(300, lines.length * 8));
+        const startedAt = performance.now();
+        let drawnCount = 0;
+        let animationFrame = 0;
+        const drawFrame = (now: number) => {
+            const progress = Math.min(1, (now - startedAt) / duration);
+            const targetCount = Math.ceil(lines.length * progress);
+            while (drawnCount < targetCount) drawLine(lines[drawnCount++]);
+            if (drawnCount < lines.length) animationFrame = window.requestAnimationFrame(drawFrame);
+        };
+        animationFrame = window.requestAnimationFrame(drawFrame);
+
+        return () => window.cancelAnimationFrame(animationFrame);
     }, [conclusionCellIds, showConclusion]);
 
 
