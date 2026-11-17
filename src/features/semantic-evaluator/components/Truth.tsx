@@ -28,7 +28,7 @@ export default function Truth({ trace, trueLabel, onClose }: {
 
             <section className={styles.summary}>
                 <span className={styles.originalFormula}>
-                    <TegakiRenderer font={caveat} reducedMotion="user" timing={WRITING_TIMING} quality={{ pixelRatio: 3 }}>
+                    <TegakiRenderer font={caveat} reducedMotion="user" timing={WRITING_TIMING}>
                         {trace.originalExpression}
                     </TegakiRenderer>
                 </span>

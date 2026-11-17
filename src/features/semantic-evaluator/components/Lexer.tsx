@@ -7,13 +7,13 @@ import styles from "./Lexer.module.css";
 const FAST_TEGAKI = { glyphGap: 0, stagger: { advance: 0.025, duration: 0.12 } } as const;
 
 const Chalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI}>
         {String(children)}
     </TegakiRenderer>
 );
 
 const StaticChalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="always">
         {String(children)}
     </TegakiRenderer>
 );
@@ -33,9 +33,9 @@ export default function Lexer() {
             </header>
 
             {result.error ? (
-                <div className={styles.error} role="alert">
+                <p className={styles.error} role="alert">
                     <Chalk>{LL.lexer.invalid()}</Chalk>
-                </div>
+                </p>
             ) : input ? (
                 <div className={styles.stage} ref={boardRef}>
                     <canvas ref={canvasRef} className={styles.canvas} />
@@ -64,7 +64,7 @@ export default function Lexer() {
 
                 </div>
             ) : (
-                <div className={styles.empty}><Chalk>{LL.lexer.empty()}</Chalk></div>
+                <p className={styles.empty}><Chalk>{LL.lexer.empty()}</Chalk></p>
             )}
         </div>
     );

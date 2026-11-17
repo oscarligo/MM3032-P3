@@ -18,6 +18,9 @@ import type { Formula, InterpretationDefinition } from "../types";
 import InterpretationCarousel from "./InterpretationCarousel";
 import styles from "./InterpretationInput.module.css";
 
+const ENABLE_QUICK_EDIT = false;
+const REQUIRE_NONEMPTY_PREDICATES = false;
+
 export default function InterpretationInput({ formula, isEditing, isConfirmed }: {
     formula: Formula;
     isEditing: boolean;
@@ -65,7 +68,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         });
         const predicatesComplete = symbols.predicates.every((predicate) =>
             !duplicatePredicates[predicate.key]
-            && (predicate.arity === 0 || (predicateRows[predicate.key]?.length ?? 0) > 0)
+            && (!REQUIRE_NONEMPTY_PREDICATES || predicate.arity === 0 || (predicateRows[predicate.key]?.length ?? 0) > 0)
             && (predicateRows[predicate.key] ?? []).every((tuple) =>
                 tuple.length === predicate.arity && tuple.every((value) => options.includes(value))
             )
@@ -208,7 +211,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     ) =>
         editable && isEditing ? (
             valueSelect(value, onChange, label)
-        ) : isEditing && onActivate ? (
+        ) : ENABLE_QUICK_EDIT && isEditing && onActivate ? (
             <button
                 className={`${styles.plainValue} ${styles.activatable}`}
                 type="button"
@@ -257,14 +260,14 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                     <span>{"{"}</span>
                     {domain.map((value, index) => (
                         <span key={index}>
-                            {isEditing && index === activeDomainIndex ? (
+                            {isEditing && index === (ENABLE_QUICK_EDIT ? activeDomainIndex : domain.length - 1) ? (
                                 <input
                                     value={value}
-                                    autoFocus={activeDomain !== undefined}
+                                    autoFocus={ENABLE_QUICK_EDIT && activeDomain !== undefined}
                                     onChange={(event) => handleDomainChange(index, event.target.value)}
                                     aria-label={`${LL.interpretation.domain()} ${index + 1}`}
                                 />
-                            ) : isEditing ? (
+                            ) : ENABLE_QUICK_EDIT && isEditing ? (
                                 <button
                                     className={`${styles.plainValue} ${styles.activatable}`}
                                     type="button"
@@ -334,7 +337,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                             {tuple.map((value, valueIndex) => (
                                                 <span key={valueIndex}>
                                                     {editableValue(
-                                                        rowIndex === (activeTuples[predicate.key] ?? rows.length - 1),
+                                                        rowIndex === (ENABLE_QUICK_EDIT ? activeTuples[predicate.key] ?? rows.length - 1 : rows.length - 1),
                                                         value,
                                                         (next) =>
                                                             updatePredicateArgument(
@@ -365,7 +368,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         </>
                     )}
                 </div>
-                {predicate.arity > 0 && (predicateRows[predicate.key]?.length ?? 0) === 0 && (
+                {REQUIRE_NONEMPTY_PREDICATES && predicate.arity > 0 && (predicateRows[predicate.key]?.length ?? 0) === 0 && (
                     <p className={styles.error} role="alert">
                         {LL.interpretation.emptyPredicate({ predicate: symbolLabel(predicate, symbols.predicates) })}
                     </p>

@@ -102,8 +102,7 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --transition-fast: 150ms ease;
-  --layout-control-width: 12rem;
-  --control-size: 3.5rem;
+  --layout-control-width: 9rem;
 
   --scrollbar-size: 10px;
   --scrollbar-track: transparent;

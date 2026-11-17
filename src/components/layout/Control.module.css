@@ -27,7 +27,7 @@
     min-width: max-content;
     padding-bottom: 2px;
     color: var(--color-text-muted);
-    font-size: 1.05rem;
+    font-size: 0.85rem;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -46,8 +46,8 @@
     align-items: center;
     justify-content: center;
 
-    width: var(--control-size);
-    height: var(--control-size);
+    width: 2.2rem;
+    height: 2.2rem;
     padding: 0 0 4px;
     border: 1px solid transparent;
     border-radius: 14px;
@@ -158,8 +158,8 @@
     }
 
     .actions button {
-        width: var(--control-size);
-        min-width: var(--control-size);
-        height: var(--control-size);
+        width: 2.2rem;
+        min-width: 2.2rem;
+        height: 2.2rem;
     }
 }

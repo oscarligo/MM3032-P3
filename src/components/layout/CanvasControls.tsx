@@ -27,7 +27,7 @@ export default function CanvasControls() {
                     aria-label="Alejar"
                     title="Alejar"
                 >
-                    <Minus size={22} strokeWidth={2.2} aria-hidden="true" />
+                    <Minus size={15} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <output aria-label="Nivel de zoom">{Math.round(scale * 100)}%</output>
                 <button
@@ -37,7 +37,7 @@ export default function CanvasControls() {
                     aria-label="Acercar"
                     title="Acercar"
                 >
-                    <Plus size={22} strokeWidth={2.2} aria-hidden="true" />
+                    <Plus size={15} strokeWidth={2.2} aria-hidden="true" />
                 </button>
             </div>
             <div className={`${styles.panel} ${styles.navigation}`} aria-label="Navegar por el lienzo">
@@ -48,7 +48,7 @@ export default function CanvasControls() {
                     aria-label="Mover arriba"
                     title="Mover arriba"
                 >
-                    <ChevronUp size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronUp size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -57,7 +57,7 @@ export default function CanvasControls() {
                     aria-label="Mover a la izquierda"
                     title="Mover a la izquierda"
                 >
-                    <ChevronLeft size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronLeft size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -66,7 +66,7 @@ export default function CanvasControls() {
                     aria-label="Centrar"
                     title="Centrar"
                 >
-                    <LocateFixed size={20} strokeWidth={2.2} aria-hidden="true" />
+                    <LocateFixed size={14} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -75,7 +75,7 @@ export default function CanvasControls() {
                     aria-label="Mover a la derecha"
                     title="Mover a la derecha"
                 >
-                    <ChevronRight size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronRight size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -84,7 +84,7 @@ export default function CanvasControls() {
                     aria-label="Mover abajo"
                     title="Mover abajo"
                 >
-                    <ChevronDown size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronDown size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
             </div>
         </div>
