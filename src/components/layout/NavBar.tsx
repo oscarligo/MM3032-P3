@@ -67,7 +67,7 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
                     </span>
                     <ChevronDown
                         className={styles.selectChevron}
-                        size={14}
+                        size={20}
                         strokeWidth={2.2}
                         aria-hidden="true"
                     />
@@ -103,7 +103,7 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
                     title={LL.navbar.qrCode()}
                     aria-expanded={showQr}
                 >
-                    <CircleExclamationPoint size={20} strokeWidth={2.1} aria-hidden="true" />
+                    <CircleExclamationPoint size={28} strokeWidth={2.1} aria-hidden="true" />
                 </button>
                 </div>
             </nav>

@@ -57,7 +57,7 @@
     align-items: center;
     justify-content: center;
 
-    height: 2.2rem;
+    height: var(--control-size);
     padding-top: 0;
     padding-bottom: 4px;
     border: 1px solid transparent;
@@ -82,9 +82,9 @@
 }
 
 .themeToggle {
-    width: 2.2rem;
+    width: var(--control-size);
     padding-inline: 0;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     line-height: 1;
     transition:
         color 300ms ease,
@@ -97,8 +97,9 @@
 }
 
 .helpButton {
-    width: 2.2rem;
+    width: var(--control-size);
     padding-inline: 0;
+    min-width: var(--control-size);
     color: var(--color-text-muted);
 }
 
@@ -205,8 +206,7 @@
 
 .flagIcon {
     display: block;
-    width: 1.2rem;
-    height: auto;
+    width: 1.6rem;
     filter: saturate(0.7);
 }
 

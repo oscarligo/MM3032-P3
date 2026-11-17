@@ -19,13 +19,13 @@ type ParseTreeProps = {
 const FAST_TEGAKI = { glyphGap: 0, stagger: { advance: 0.02, duration: 0.1 } } as const;
 
 const Chalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 2 }}>
+    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 3 }}>
         {String(children)}
     </TegakiRenderer>
 );
 
 const StaticChalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 2 }}>
+    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 3 }}>
         {String(children)}
     </TegakiRenderer>
 );
