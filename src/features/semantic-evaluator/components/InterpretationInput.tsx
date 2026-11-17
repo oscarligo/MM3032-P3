@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useFormulaStore } from "../../../store/store_formula";
 import { useInterpretationStore } from "../../../store/store_interpretation";
@@ -46,6 +46,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     // Elemento seleccionado para edición; sin selección explícita se edita el último agregado
     const [activeDomain, setActiveDomain] = useState<number>();
     const [activeTuples, setActiveTuples] = useState<Record<string, number | undefined>>({});
+    const domainInputRef = useRef<HTMLInputElement>(null);
     const activeDomainIndex = activeDomain !== undefined && activeDomain < domain.length
         ? activeDomain
         : domain.length - 1;
@@ -200,6 +201,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     const addDomainItem = () => {
         setActiveDomain(undefined);
         setDomain((values) => [...values, ""]);
+        window.requestAnimationFrame(() => domainInputRef.current?.focus());
     };
     const removeDomainItem = () => {
         setActiveDomain(undefined);
@@ -349,6 +351,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         <span key={index}>
                             {isEditing && index === (ENABLE_QUICK_EDIT ? activeDomainIndex : domain.length - 1) ? (
                                 <input
+                                    ref={domainInputRef}
                                     value={value}
                                     autoFocus={ENABLE_QUICK_EDIT && activeDomain !== undefined}
                                     onChange={(event) => handleDomainChange(index, event.target.value)}
@@ -474,7 +477,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                     <strong>𝒟<sup>{fn.arity}</sup></strong>
                     <span>→</span>
                     <strong>𝒟</strong>
-                    <span className={styles.functionDefinitionLabel}>definida por:</span>
+                    <span className={styles.functionDefinitionLabel}>{LL.interpretation.definedBy()}</span>
                     <span className={styles.functionMappings}>
                         {(functionRows[fn.key] ?? []).map((row, rowIndex) => (
                             <span className={styles.functionApplication} key={row.args.join("\u0000")}>

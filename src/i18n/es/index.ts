@@ -89,7 +89,7 @@ const es = {
 		determine: 'Determinar el valor de verdad de', inInterpretation: 'en ℐ', underEnvironment: 'bajo el entorno ℓ.',
 		edit: 'Editar', done: 'Listo', falseValue: 'Falso',
 		constants: 'Constantes', function: 'Función {symbol:string}', predicate: 'Predicado {symbol:string}',
-		environment: 'Entorno de variables libres', argument: 'argumento', result: 'resultado',
+		environment: 'Entorno de variables libres', argument: 'argumento', result: 'resultado', definedBy: 'definida por:',
 		selectValue: '-', emptyDomain: 'Agrega al menos un elemento al dominio.',
 		emptyDomainElement: 'El dominio contiene un elemento vacío.',
 		duplicateDomain: 'Los elementos del dominio no pueden repetirse.',

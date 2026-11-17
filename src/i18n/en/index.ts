@@ -89,7 +89,7 @@ const en = {
 		determine: 'Determine the truth value of', inInterpretation: 'in ℐ', underEnvironment: 'under environment ℓ.',
 		edit: 'Edit', done: 'Done', falseValue: 'False',
 		constants: 'Constants', function: 'Function {symbol}', predicate: 'Predicate {symbol}',
-		environment: 'Free-variable environment', argument: 'argument', result: 'result',
+		environment: 'Free-variable environment', argument: 'argument', result: 'result', definedBy: 'defined by:',
 		selectValue: '-', emptyDomain: 'Add at least one element to the domain.',
 		emptyDomainElement: 'The domain contains an empty element.',
 		duplicateDomain: 'Domain elements cannot be repeated.',

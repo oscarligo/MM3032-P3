@@ -584,6 +584,10 @@ type RootTranslation = {
 		 */
 		result: string
 		/**
+		 * d​e​f​i​n​i​d​a​ ​p​o​r​:
+		 */
+		definedBy: string
+		/**
 		 * -
 		 */
 		selectValue: string
@@ -1327,6 +1331,10 @@ export type TranslationFunctions = {
 		 * resultado
 		 */
 		result: () => LocalizedString
+		/**
+		 * definida por:
+		 */
+		definedBy: () => LocalizedString
 		/**
 		 * -
 		 */
