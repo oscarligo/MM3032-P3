@@ -653,6 +653,10 @@ type RootTranslation = {
 		 */
 		waiting: string
 		/**
+		 * I​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​c​o​m​p​l​e​t​a​.​ ​P​r​e​s​i​o​n​a​ ​S​i​g​u​i​e​n​t​e​ ​p​a​r​a​ ​c​o​n​s​t​r​u​i​r​ ​l​a​ ​t​a​b​l​a​.
+		 */
+		ready: string
+		/**
 		 * R​e​s​u​l​t​a​d​o
 		 */
 		result: string
@@ -1393,6 +1397,10 @@ export type TranslationFunctions = {
 		 * Completa el dominio y la interpretación para generar la tabla.
 		 */
 		waiting: () => LocalizedString
+		/**
+		 * Interpretación completa. Presiona Siguiente para construir la tabla.
+		 */
+		ready: () => LocalizedString
 		/**
 		 * Resultado
 		 */

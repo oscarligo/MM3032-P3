@@ -6,6 +6,7 @@ import caveat from "tegaki/fonts/caveat";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useLocaleStore } from "../../../store/store_local";
 import { useInterpretationStore } from "../../../store/store_interpretation";
+import { procedureOffset, useProcedureStore } from "../../../store/store_control";
 import {
     buildEvaluationMap,
     evaluateUnderInterpretation,
@@ -80,6 +81,15 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const locale = useLocaleStore((state) => state.locale);
     const interpretation = useInterpretationStore((state) => state.definition);
     const validationWarnings = useInterpretationStore((state) => state.validationWarnings);
+    const globalStep = useProcedureStore((state) => state.stepIndex);
+    const procedures = useProcedureStore((state) => state.procedures);
+    const registerProcedure = useProcedureStore((state) => state.registerProcedure);
+    const unregisterProcedure = useProcedureStore((state) => state.unregisterProcedure);
+    const localStep = procedures.evaluation
+        ? globalStep - procedureOffset(procedures, "evaluation")
+        : -1;
+    const showTable = Boolean(interpretation) && localStep >= 0;
+    const showConclusion = Boolean(interpretation) && localStep >= 1;
     const trueLabel = locale === "es" ? "V" : "T";
     const evaluationMap = useMemo(
         () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
@@ -93,6 +103,12 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
     const [truthTrace, setTruthTrace] = useState<TruthTrace>();
     const [activeTruthCell, setActiveTruthCell] = useState<string>();
+
+    useEffect(() => {
+        registerProcedure("evaluation", interpretation ? 2 : 0, 1, false);
+    }, [interpretation, registerProcedure]);
+
+    useEffect(() => () => unregisterProcedure("evaluation"), [unregisterProcedure]);
 
     useEffect(() => {
         setTruthTrace(undefined);
@@ -176,6 +192,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 1.1,
                     roughness: 1.3,
                     bowing: 0.9,
+                    seed: 101,
                     disableMultiStroke: true,
                 });
                 rc.line(offsetX - 1, headerBottomY + 2.5, offsetX + width + 1, headerBottomY + 2.5, {
@@ -183,11 +200,12 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 0.7,
                     roughness: 1.4,
                     bowing: 0.9,
+                    seed: 102,
                     disableMultiStroke: true,
                 });
 
                 const headerRows = Array.from(theadEl.querySelectorAll<HTMLElement>("tr"));
-                headerRows.slice(0, -1).forEach((row) => {
+                headerRows.slice(0, -1).forEach((row, rowIndex) => {
                     const box = getUnscaledBox(row, wrap);
                     const y = box.y + box.height;
                     rc.line(offsetX + 2, y, offsetX + width - 2, y, {
@@ -196,6 +214,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                         roughness: 1.2,
                         bowing: .7,
                         strokeLineDash: [5, 4],
+                        seed: 200 + rowIndex,
                         disableMultiStroke: true,
                     });
                 });
@@ -206,6 +225,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 strokeWidth: 1.1,
                 roughness: 1.35,
                 bowing: 0.9,
+                seed: 300,
                 disableMultiStroke: true,
             });
 
@@ -218,6 +238,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 1.1,
                     roughness: 1.25,
                     bowing: 0.8,
+                    seed: 301,
                     disableMultiStroke: true,
                 });
             }
@@ -233,7 +254,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 })()
                 : undefined;
 
-            bodyCells.slice(0, -1).forEach((cell) => {
+            bodyCells.slice(0, -1).forEach((cell, cellIndex) => {
                 const box = getUnscaledBox(cell, wrap);
                 const x = box.x + box.width;
                 if (axisSeparatorX !== undefined && Math.abs(x - axisSeparatorX) < 1) return;
@@ -243,12 +264,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     roughness: 1.2,
                     bowing: .7,
                     strokeLineDash: [5, 4],
+                    seed: 400 + cellIndex,
                     disableMultiStroke: true,
                 });
             });
 
             const bodyRows = Array.from(tableEl.querySelectorAll<HTMLElement>("tbody tr"));
-            bodyRows.slice(0, -1).forEach((row) => {
+            bodyRows.slice(0, -1).forEach((row, rowIndex) => {
                 const box = getUnscaledBox(row, wrap);
                 const y = box.y + box.height;
                 rc.line(offsetX + 2, y, offsetX + width - 2, y, {
@@ -257,26 +279,30 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     roughness: 1.2,
                     bowing: .7,
                     strokeLineDash: [5, 4],
+                    seed: 500 + rowIndex,
                     disableMultiStroke: true,
                 });
             });
 
             const emptyCells = Array.from(tableEl.querySelectorAll<HTMLElement>("[data-empty-cell]"));
-            emptyCells.forEach((cell) => {
+            emptyCells.forEach((cell, cellIndex) => {
                 const box = getUnscaledBox(cell, wrap);
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(box.x, box.y, box.width, box.height);
                 ctx.clip();
                 ctx.globalAlpha = .58;
+                let hatchIndex = 0;
                 for (let start = box.x - box.height; start < box.x + box.width; start += 9) {
                     rc.line(start, box.y + box.height, start + box.height, box.y, {
                         stroke: inkColor,
                         strokeWidth: .55,
                         roughness: 1.3,
                         bowing: .8,
+                        seed: 600 + cellIndex * 100 + hatchIndex,
                         disableMultiStroke: true,
                     });
+                    hatchIndex += 1;
                 }
                 ctx.restore();
             });
@@ -299,10 +325,10 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     {LL.evaluation.title()}
                 </TegakiRenderer>
             </h2>
-            {!evaluationMap ? (
+            {!evaluationMap || !showTable ? (
                 <div className={styles.waiting}>
                     <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
-                        {LL.evaluation.waiting()}
+                        {interpretation ? LL.evaluation.ready() : LL.evaluation.waiting()}
                     </TegakiRenderer>
                     {validationWarnings.length > 0 && (
                         <div className={`${styles.validationWarnings} subtle-scrollbar`} role="alert" aria-live="polite">
@@ -413,7 +439,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             columnCount={evaluationMap.columnAssignments.length}
                             procedureOpen={Boolean(truthTrace)}
                         />
-                        <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                        {showConclusion && <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
                             <span className={styles.semanticRelation}>
                                 <TegakiRenderer
                                     key={`${finalEvaluation}-${usesEnvironment}`}
@@ -433,7 +459,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             >
                                 {renderedFormula}
                             </TegakiRenderer>
-                        </div>
+                        </div>}
                         <TreeCanvasControls />
                     </TransformWrapper>
                 </div>

@@ -102,7 +102,7 @@ const en = {
 		incompletePredicate: 'There is an incomplete tuple in {predicate}. Select all its values before evaluating.',
 	},
 	evaluation: {
-		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', result: 'Result', value: 'Value',
+		title: 'Evaluation', waiting: 'Complete the domain and interpretation to generate the table.', ready: 'Interpretation complete. Press Next to build the table.', result: 'Result', value: 'Value',
 				justification: 'Justification', trueVerdict: 'True', falseVerdict: 'False',
 				left: 'left', right: 'right',
 				atomMember: '{tuple} belongs to {symbol}ᴵ', atomNotMember: '{tuple} does not belong to {symbol}ᴵ',

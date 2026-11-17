@@ -102,7 +102,7 @@ const es = {
 		incompletePredicate: 'Hay una tupla incompleta en {predicate:string}. Selecciona todos sus valores antes de evaluar.',
 	},
 	evaluation: {
-		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', result: 'Resultado', value: 'Valor',
+		title: 'Evaluación', waiting: 'Completa el dominio y la interpretación para generar la tabla.', ready: 'Interpretación completa. Presiona Siguiente para construir la tabla.', result: 'Resultado', value: 'Valor',
 				justification: 'Justificación', trueVerdict: 'Verdadero', falseVerdict: 'Falso',
 				left: 'izquierdo', right: 'derecho',
 				atomMember: '{tuple} pertenece a {symbol}ᴵ', atomNotMember: '{tuple} no pertenece a {symbol}ᴵ',
