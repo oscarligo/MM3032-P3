@@ -32,6 +32,21 @@
     text-align: center;
 }
 
+.validationWarnings {
+    width: min(32rem, 100%);
+    max-height: 11rem;
+    margin: var(--space-md) auto 0;
+    padding: 0 var(--space-sm);
+    overflow-y: auto;
+    color: var(--color-annotation);
+    font-size: 1.05rem;
+    text-align: left;
+}
+
+.validationWarning + .validationWarning {
+    margin-top: var(--space-xs);
+}
+
 .canvasPanel {
     display: flex;
     flex: 1;

@@ -592,9 +592,28 @@ type RootTranslation = {
 		 */
 		emptyDomain: string
 		/**
+		 * E​l​ ​d​o​m​i​n​i​o​ ​c​o​n​t​i​e​n​e​ ​u​n​ ​e​l​e​m​e​n​t​o​ ​v​a​c​í​o​.
+		 */
+		emptyDomainElement: string
+		/**
 		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​l​ ​d​o​m​i​n​i​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
 		 */
 		duplicateDomain: string
+		/**
+		 * A​s​i​g​n​a​ ​u​n​ ​v​a​l​o​r​ ​a​ ​l​a​ ​c​o​n​s​t​a​n​t​e​ ​{​s​y​m​b​o​l​}​.
+		 * @param {string} symbol
+		 */
+		emptyConstant: RequiredParams<'symbol'>
+		/**
+		 * C​o​m​p​l​e​t​a​ ​t​o​d​o​s​ ​l​o​s​ ​r​e​s​u​l​t​a​d​o​s​ ​d​e​ ​l​a​ ​f​u​n​c​i​ó​n​ ​{​s​y​m​b​o​l​}​.
+		 * @param {string} symbol
+		 */
+		emptyFunction: RequiredParams<'symbol'>
+		/**
+		 * A​s​i​g​n​a​ ​u​n​ ​v​a​l​o​r​ ​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​{​v​a​r​i​a​b​l​e​}​ ​e​n​ ​e​l​ ​e​n​t​o​r​n​o​ ​ℓ​.
+		 * @param {string} variable
+		 */
+		emptyEnvironment: RequiredParams<'variable'>
 		/**
 		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​ ​l​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
 		 */
@@ -604,10 +623,21 @@ type RootTranslation = {
 		 */
 		trueValue: string
 		/**
-		 * L​a​ ​r​e​l​a​c​i​ó​n​ ​d​e​ ​{​p​r​e​d​i​c​a​t​e​}​ ​n​o​ ​p​u​e​d​e​ ​e​s​t​a​r​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​a​ ​t​u​p​l​a​ ​c​o​m​p​l​e​t​a​.
+		 * L​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​ ​{​p​r​e​d​i​c​a​t​e​}​ ​e​s​t​á​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​ ​e​l​e​m​e​n​t​o​ ​d​e​l​ ​d​o​m​i​n​i​o​.
 		 * @param {string} predicate
 		 */
-		emptyPredicate: RequiredParams<'predicate'>
+		emptyUnaryPredicate: RequiredParams<'predicate'>
+		/**
+		 * L​a​ ​r​e​l​a​c​i​ó​n​ ​{​p​r​e​d​i​c​a​t​e​}​ ​e​s​t​á​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​a​ ​t​u​p​l​a​ ​d​e​ ​{​a​r​i​t​y​}​ ​e​l​e​m​e​n​t​o​s​.
+		 * @param {number} arity
+		 * @param {string} predicate
+		 */
+		emptyRelation: RequiredParams<'arity' | 'predicate'>
+		/**
+		 * H​a​y​ ​u​n​a​ ​t​u​p​l​a​ ​i​n​c​o​m​p​l​e​t​a​ ​e​n​ ​{​p​r​e​d​i​c​a​t​e​}​.​ ​S​e​l​e​c​c​i​o​n​a​ ​t​o​d​o​s​ ​s​u​s​ ​v​a​l​o​r​e​s​ ​a​n​t​e​s​ ​d​e​ ​e​v​a​l​u​a​r​.
+		 * @param {string} predicate
+		 */
+		incompletePredicate: RequiredParams<'predicate'>
 	}
 	evaluation: {
 		/**
@@ -1306,9 +1336,25 @@ export type TranslationFunctions = {
 		 */
 		emptyDomain: () => LocalizedString
 		/**
+		 * El dominio contiene un elemento vacío.
+		 */
+		emptyDomainElement: () => LocalizedString
+		/**
 		 * Los elementos del dominio no pueden repetirse.
 		 */
 		duplicateDomain: () => LocalizedString
+		/**
+		 * Asigna un valor a la constante {symbol}.
+		 */
+		emptyConstant: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * Completa todos los resultados de la función {symbol}.
+		 */
+		emptyFunction: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * Asigna un valor a la variable {variable} en el entorno ℓ.
+		 */
+		emptyEnvironment: (arg: { variable: string }) => LocalizedString
 		/**
 		 * Los elementos de la interpretación del predicado no pueden repetirse.
 		 */
@@ -1318,9 +1364,17 @@ export type TranslationFunctions = {
 		 */
 		trueValue: () => LocalizedString
 		/**
-		 * La relación de {predicate} no puede estar vacía. Agrega al menos una tupla completa.
+		 * La interpretación de {predicate} está vacía. Agrega al menos un elemento del dominio.
 		 */
-		emptyPredicate: (arg: { predicate: string }) => LocalizedString
+		emptyUnaryPredicate: (arg: { predicate: string }) => LocalizedString
+		/**
+		 * La relación {predicate} está vacía. Agrega al menos una tupla de {arity} elementos.
+		 */
+		emptyRelation: (arg: { arity: number, predicate: string }) => LocalizedString
+		/**
+		 * Hay una tupla incompleta en {predicate}. Selecciona todos sus valores antes de evaluar.
+		 */
+		incompletePredicate: (arg: { predicate: string }) => LocalizedString
 	}
 	evaluation: {
 		/**

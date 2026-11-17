@@ -7,9 +7,10 @@ type InterpretationCarouselProps = {
     nextLabel: string;
     pageSize?: number;
     className?: string;
+    reserveControlsSpace?: boolean;
 };
 
-export default function InterpretationCarousel({ children, previousLabel, nextLabel, pageSize = 3, className }: InterpretationCarouselProps) {
+export default function InterpretationCarousel({ children, previousLabel, nextLabel, pageSize = 3, className, reserveControlsSpace = false }: InterpretationCarouselProps) {
     const items = useMemo(() => Children.toArray(children), [children]);
     const [page, setPage] = useState(0);
     const viewportRef = useRef<HTMLDivElement>(null);
@@ -55,7 +56,7 @@ export default function InterpretationCarousel({ children, previousLabel, nextLa
                 </div>
             </div>
 
-            {pageCount > 1 && (
+            {(pageCount > 1 || reserveControlsSpace) && (
                 <div className={styles.controls}>
                     <button
                         type="button"

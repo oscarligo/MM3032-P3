@@ -19,7 +19,6 @@ import InterpretationCarousel from "./InterpretationCarousel";
 import styles from "./InterpretationInput.module.css";
 
 const ENABLE_QUICK_EDIT = false;
-const REQUIRE_NONEMPTY_PREDICATES = false;
 
 export default function InterpretationInput({ formula, isEditing, isConfirmed }: {
     formula: Formula;
@@ -29,12 +28,19 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
     const { LL } = useI18nContext();
     const formulaText = useFormulaStore((state) => state.formula);
     const setInterpretationDefinition = useInterpretationStore((state) => state.setDefinition);
+    const setValidationWarnings = useInterpretationStore((state) => state.setValidationWarnings);
+    const symbols = useMemo(() => analyzeFormula(formula), [formula]);
 
-    const [domain, setDomain] = useState(["0"]);
+    const [domain, setDomain] = useState([""]);
     const [constants, setConstants] = useState<Record<string, string>>({});
     const [environment, setEnvironment] = useState<Record<string, string>>({});
     const [functionRows, setFunctionRows] = useState<Record<string, FunctionRow[]>>({});
-    const [predicateRows, setPredicateRows] = useState<Record<string, string[][]>>({});
+    const [predicateRows, setPredicateRows] = useState<Record<string, string[][]>>(() =>
+        Object.fromEntries(symbols.predicates.map((predicate) => [
+            predicate.key,
+            predicate.arity > 0 ? [Array(predicate.arity).fill("")] : [],
+        ]))
+    );
     const [predicateTruth, setPredicateTruth] = useState<Record<string, boolean>>({});
     const [duplicatePredicates, setDuplicatePredicates] = useState<Record<string, boolean>>({});
     // Elemento seleccionado para edición; sin selección explícita se edita el último agregado
@@ -44,19 +50,26 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         ? activeDomain
         : domain.length - 1;
 
-    const symbols = useMemo(() => analyzeFormula(formula), [formula]);
-
     useEffect(() => {
-        if (isEditing) return;
+        if (isEditing) {
+            setPredicateRows((current) => Object.fromEntries(symbols.predicates.map((predicate) => [
+                predicate.key,
+                predicate.arity > 0 && (current[predicate.key]?.length ?? 0) === 0
+                    ? [Array(predicate.arity).fill("")]
+                    : current[predicate.key] ?? [],
+            ])));
+            return;
+        }
 
         setDomain(cleanDomain);
         setPredicateRows(cleanPredicateRows);
         setDuplicatePredicates({});
         setActiveDomain(undefined);
         setActiveTuples({});
-    }, [isEditing]);
+    }, [isEditing, symbols.predicates]);
 
     const { options, hasDuplicates: duplicateDomain } = domainState(domain);
+    const domainHasEmpty = domain.some((value) => value.trim() === "");
     const domainSignature = options.join("\u0000");
 
     const interpretationDefinition = useMemo<InterpretationDefinition | undefined>(() => {
@@ -68,14 +81,14 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         });
         const predicatesComplete = symbols.predicates.every((predicate) =>
             !duplicatePredicates[predicate.key]
-            && (!REQUIRE_NONEMPTY_PREDICATES || predicate.arity === 0 || (predicateRows[predicate.key]?.length ?? 0) > 0)
+            && (predicate.arity === 0 || (predicateRows[predicate.key]?.length ?? 0) > 0)
             && (predicateRows[predicate.key] ?? []).every((tuple) =>
                 tuple.length === predicate.arity && tuple.every((value) => options.includes(value))
             )
         );
         const environmentComplete = symbols.freeVariables.every((variable) => options.includes(environment[variable]));
 
-        if (options.length === 0 || duplicateDomain || !constantsComplete || !functionsComplete
+        if (options.length === 0 || domainHasEmpty || duplicateDomain || !constantsComplete || !functionsComplete
             || !predicatesComplete || !environmentComplete) return undefined;
 
         return {
@@ -92,25 +105,90 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
             }])),
             environment: Object.fromEntries(symbols.freeVariables.map((variable) => [variable, environment[variable]])),
         };
-    }, [constants, domainSignature, duplicateDomain, duplicatePredicates, environment, functionRows, predicateRows, predicateTruth, symbols]);
+    }, [constants, domainHasEmpty, domainSignature, duplicateDomain, duplicatePredicates, environment, functionRows, predicateRows, predicateTruth, symbols]);
+
+    const validationWarnings = useMemo(() => {
+        const warnings: string[] = [];
+
+        if (options.length === 0) warnings.push(LL.interpretation.emptyDomain());
+        else if (domainHasEmpty) warnings.push(LL.interpretation.emptyDomainElement());
+        if (duplicateDomain) warnings.push(LL.interpretation.duplicateDomain());
+
+        symbols.constants.forEach((symbol) => {
+            if (!options.includes(constants[symbol])) {
+                warnings.push(LL.interpretation.emptyConstant({ symbol }));
+            }
+        });
+        symbols.functions.forEach((fn) => {
+            const rows = functionRows[fn.key] ?? [];
+            if (rows.length !== options.length ** fn.arity
+                || rows.some((row) => !options.includes(row.result))) {
+                warnings.push(LL.interpretation.emptyFunction({ symbol: symbolLabel(fn, symbols.functions) }));
+            }
+        });
+        symbols.predicates.forEach((predicate) => {
+            if (predicate.arity === 0) return;
+            const rows = predicateRows[predicate.key] ?? [];
+            const label = symbolLabel(predicate, symbols.predicates);
+            if (rows.length === 0) {
+                warnings.push(predicate.arity === 1
+                    ? LL.interpretation.emptyUnaryPredicate({ predicate: label })
+                    : LL.interpretation.emptyRelation({ predicate: label, arity: predicate.arity }));
+            }
+            else if (rows.some((tuple) => tuple.length !== predicate.arity
+                || tuple.some((value) => !options.includes(value)))) {
+                warnings.push(LL.interpretation.incompletePredicate({ predicate: label }));
+            }
+            if (duplicatePredicates[predicate.key]) {
+                warnings.push(LL.interpretation.duplicatePredicate());
+            }
+        });
+        symbols.freeVariables.forEach((variable) => {
+            if (!options.includes(environment[variable])) {
+                warnings.push(LL.interpretation.emptyEnvironment({ variable }));
+            }
+        });
+
+        return warnings;
+    }, [LL.interpretation, constants, domainHasEmpty, duplicateDomain, duplicatePredicates, environment, functionRows, options, predicateRows, symbols]);
 
     useEffect(
         () => setInterpretationDefinition(isConfirmed ? interpretationDefinition : undefined),
         [interpretationDefinition, isConfirmed, setInterpretationDefinition]
     );
+    useEffect(
+        () => setValidationWarnings(validationWarnings),
+        [setValidationWarnings, validationWarnings]
+    );
     useEffect(() => () => setInterpretationDefinition(undefined), [setInterpretationDefinition]);
+    useEffect(() => () => setValidationWarnings([]), [setValidationWarnings]);
 
     useEffect(() => {
+        setConstants((current) => Object.fromEntries(
+            Object.entries(current).map(([key, value]) => [key, options.includes(value) ? value : ""])
+        ));
+        setEnvironment((current) => Object.fromEntries(
+            Object.entries(current).map(([key, value]) => [key, options.includes(value) ? value : ""])
+        ));
+        setPredicateRows((current) => Object.fromEntries(
+            Object.entries(current).map(([key, rows]) => [
+                key,
+                rows.map((tuple) => tuple.map((value) => options.includes(value) ? value : "")),
+            ])
+        ));
         setFunctionRows((current) => Object.fromEntries(symbols.functions.map((fn) => {
             const previousResults = new Map(
                 (current[fn.key] ?? []).map((row) => [row.args.join("\u0000"), row.result])
             );
             const rows = functionRowsForDomain(options, fn.arity).map((row) => ({
                 ...row,
-                result: previousResults.get(row.args.join("\u0000")) ?? "",
+                result: options.includes(previousResults.get(row.args.join("\u0000")) ?? "")
+                    ? previousResults.get(row.args.join("\u0000"))!
+                    : "",
             }));
             return [fn.key, rows];
         })));
+        setDuplicatePredicates({});
     }, [domainSignature, symbols.functions]);
 
     const handleDomainChange = (index: number, nextValue: string) => {
@@ -240,6 +318,15 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
         </span>
     ) : null;
 
+    const warningMark = (visible: boolean) => visible
+        ? <span className={styles.warningMark} aria-hidden="true">*</span>
+        : null;
+    const renderedFormula = formulaText.split(/([A-Za-z_][A-Za-z0-9_]*)/g).map((part, index) =>
+        symbols.functions.some((fn) => fn.name === part)
+            ? <span className={styles.formulaFunction} key={index}>{part}</span>
+            : part
+    );
+
     return (
         <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -277,22 +364,17 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                     {value || "—"}
                                 </button>
                             ) : (
-                                <span className={styles.plainValue}>{value || "—"}</span>
+                                <span className={styles.plainValue}>{value}</span>
                             )}
                             {index < domain.length - 1 && ","}
                         </span>
                     ))}
                     <span>{"}"}</span>
+                    {warningMark(domainHasEmpty || duplicateDomain)}
                 </span>
-                {actionButtons(addDomainItem, removeDomainItem, true, domain.length > 1)}
+                {actionButtons(addDomainItem, removeDomainItem, !domainHasEmpty && !duplicateDomain, domain.length > 1)}
             </div>
 
-            {options.length === 0 && (
-                <p className={styles.error}>{LL.interpretation.emptyDomain()}</p>
-            )}
-            {duplicateDomain && (
-                <p className={styles.error}>{LL.interpretation.duplicateDomain()}</p>
-            )}
             </div>
 
             {symbols.constants.map((constant) => (
@@ -308,6 +390,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         (value) => handleConstantChange(constant, value),
                         constant
                     )}
+                    {warningMark(!options.includes(constants[constant]))}
                 </div>
             ))}
             {symbols.predicates.map((predicate) => (
@@ -349,6 +432,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                                         `${predicate.name} ${LL.interpretation.argument()} ${valueIndex + 1}`,
                                                         () => setActiveTuples((current) => ({ ...current, [predicate.key]: rowIndex }))
                                                     )}
+                                                    {warningMark(!options.includes(value))}
                                                     {valueIndex < tuple.length - 1 && ","}
                                                 </span>
                                             ))}
@@ -358,6 +442,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                     )
                                 )}
                                 <span>{"}"}</span>
+                                {warningMark((predicateRows[predicate.key]?.length ?? 0) === 0 || Boolean(duplicatePredicates[predicate.key]))}
                             </span>
                             {actionButtons(
                                 () => addPredicateRow(predicate),
@@ -368,14 +453,6 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         </>
                     )}
                 </div>
-                {REQUIRE_NONEMPTY_PREDICATES && predicate.arity > 0 && (predicateRows[predicate.key]?.length ?? 0) === 0 && (
-                    <p className={styles.error} role="alert">
-                        {LL.interpretation.emptyPredicate({ predicate: symbolLabel(predicate, symbols.predicates) })}
-                    </p>
-                )}
-                {duplicatePredicates[predicate.key] && (
-                    <p className={styles.error}>{LL.interpretation.duplicatePredicate()}</p>
-                )}
                 </div>
             ))}
                 </InterpretationCarousel>
@@ -385,6 +462,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                     previousLabel={LL.procedure.previous()}
                     nextLabel={LL.procedure.next()}
                     pageSize={1}
+                    reserveControlsSpace
                 >
             {symbols.functions.map((fn) => (
                 <div className={`${styles.mathLine} ${styles.functionDefinition}`} key={fn.key}>
@@ -415,6 +493,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                     (value) => updateFunctionResult(fn.key, rowIndex, value),
                                     `${fn.name} ${LL.interpretation.result()}`
                                 )}
+                                {warningMark(!options.includes(row.result))}
                                 <span>]{rowIndex < (functionRows[fn.key]?.length ?? 0) - 1 && ","}</span>
                                 {rowIndex === (functionRows[fn.key]?.length ?? 0) - 1 && <span>{"}"}</span>}
                             </span>
@@ -429,7 +508,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                         <span className={styles.environmentSymbol}>
                             ℓ:
                         </span>
-                        <div className={styles.environmentList}>
+                        <div className={`${styles.environmentList} subtle-scrollbar`}>
                             {symbols.freeVariables.map((variable) => (
                                 <span className={styles.environmentEntry} key={variable}>
                                     <strong>{variable}</strong>
@@ -440,6 +519,7 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                                         (value) => handleEnvironmentChange(variable, value),
                                         variable
                                     )}
+                                    {warningMark(!options.includes(environment[variable]))}
                                 </span>
                             ))}
                         </div>
@@ -447,15 +527,17 @@ export default function InterpretationInput({ formula, isEditing, isConfirmed }:
                 )}
             </div>
 
-            <p className={styles.question}>
-                a){"  "}
-                {LL.interpretation.determine()} <span className={styles.formula}>{formulaText}</span>{" "}
-                {LL.interpretation.inInterpretation()}
-                {symbols.freeVariables.length > 0 ? (
-                    <> {LL.interpretation.underEnvironment()}</>
-                ) : (
-                    "."
-                )}
+            <p className={`${styles.question} subtle-scrollbar`}>
+                <span className={styles.questionMarker}>a)</span>
+                <span>
+                    {LL.interpretation.determine()} <span className={styles.formula}>{renderedFormula}</span>{" "}
+                    {LL.interpretation.inInterpretation()}
+                    {symbols.freeVariables.length > 0 ? (
+                        <> {LL.interpretation.underEnvironment()}</>
+                    ) : (
+                        "."
+                    )}
+                </span>
             </p>
         </div>
     );

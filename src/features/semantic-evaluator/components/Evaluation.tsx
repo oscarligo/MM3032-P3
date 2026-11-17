@@ -79,6 +79,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const { LL } = useI18nContext();
     const locale = useLocaleStore((state) => state.locale);
     const interpretation = useInterpretationStore((state) => state.definition);
+    const validationWarnings = useInterpretationStore((state) => state.validationWarnings);
     const trueLabel = locale === "es" ? "V" : "T";
     const evaluationMap = useMemo(
         () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
@@ -303,6 +304,17 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
                         {LL.evaluation.waiting()}
                     </TegakiRenderer>
+                    {validationWarnings.length > 0 && (
+                        <div className={`${styles.validationWarnings} subtle-scrollbar`} role="alert" aria-live="polite">
+                            {validationWarnings.map((warning, index) => (
+                                <div className={styles.validationWarning} key={`${index}-${warning}`}>
+                                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
+                                        {`• ${warning}`}
+                                    </TegakiRenderer>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className={styles.canvasPanel}>
