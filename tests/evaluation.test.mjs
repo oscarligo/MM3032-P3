@@ -145,6 +145,23 @@ test("conclusion evidence combines witnesses required by different branches", ()
     }));
 });
 
+test("a true implication marks its false antecedent with the correct polarity", () => {
+    const formula = parseFormula("(∀x P(x)) → R");
+    const implicationInterpretation = {
+        ...interpretation,
+        predicates: {
+            ...interpretation.predicates,
+            "R/0": { arity: 0, rows: [], truth: false },
+        },
+    };
+    const map = evaluation.buildEvaluationMap(formula, implicationInterpretation);
+    const selected = [...evaluation.selectConclusionCells(map, implicationInterpretation, true)];
+
+    assert.deepEqual(map.results, [[false], [true]]);
+    assert.deepEqual(selected, ["1:0"]);
+    assert.equal(map.results[1][0], true);
+});
+
 test("conclusion evidence can mark complete stripes or one witness per stripe", () => {
     const formula = parseFormula("∀x ∃y P(x,y)");
     const falseInterpretation = {

@@ -267,7 +267,9 @@ export const selectConclusionCells = (
                 );
         }
         return expected
-            ? selectEvidence(left === false ? current.left : current.right, candidates, true)
+            ? left === false
+                ? selectEvidence(current.left, candidates, false)
+                : selectEvidence(current.right, candidates, true)
             : combineEvidence(
                 current.left, selectEvidence(current.left, candidates, true),
                 current.right, selectEvidence(current.right, candidates, false),
