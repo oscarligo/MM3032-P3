@@ -76,11 +76,11 @@
   --whiteboard-depth-side: 10px;
   --whiteboard-side-angle: 3.5deg;
 
-  --wall-color: #d9dee6;
+  --wall-color: #f3f2ef;
   --wall-lighting: radial-gradient(
     ellipse 75% 55% at 50% 0%,
-    rgba(242, 247, 255, 0.55) 0%,
-    rgba(215, 229, 248, 0.2) 45%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(241, 239, 233, 0.2) 45%,
     transparent 80%
   );
 

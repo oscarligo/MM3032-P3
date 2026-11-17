@@ -1,18 +1,43 @@
+import { useEffect, useRef, useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import Whiteboard from "./components/Whiteboard";
 import Lexer from "./components/Lexer";
 import FormulaInput from "./components/FormulaInput";
 import ParseTree from "./components/ParseTree";
 import Evaluation from "./components/Evaluation";
+import ParticipantBadge from "./components/ParticipantBadge";
 import { useParserVisualization } from "./hooks/useParserVisualization";
 import { useI18nContext } from "../../i18n/i18n-react";
 import CanvasControls from "../../components/layout/CanvasControls";
 import styles from "./SemanticEvaluator.module.css";
+import { createParticipantAudio } from "../../lib/participant-audio";
 
 
 export default function SemanticEvaluator() {
     const { LL } = useI18nContext();
     const parser = useParserVisualization();
+    const [showParticipant, setShowParticipant] = useState(false);
+    const participantVisible = useRef(false);
+
+    useEffect(() => {
+        const sounds = createParticipantAudio();
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.defaultPrevented || event.repeat || event.isComposing
+                || event.ctrlKey || event.altKey || event.metaKey
+                || event.key.toLowerCase() !== "m") return;
+            const target = event.target;
+            if (target instanceof HTMLElement
+                && (target.isContentEditable || target.closest("input, textarea, select, [role='textbox']"))) return;
+            participantVisible.current = !participantVisible.current;
+            setShowParticipant(participantVisible.current);
+            sounds.play(participantVisible.current);
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+            sounds.stop();
+        };
+    }, []);
 
     return (
         <div className={styles.canvasShell}>
@@ -23,7 +48,7 @@ export default function SemanticEvaluator() {
                 centerOnInit
                 limitToBounds={false}
                 wheel={{ step: 0.005, excluded: ["nested-tree-canvas", "subtle-scrollbar"] }}
-                panning={{ velocityDisabled: true, excluded: ["nested-tree-canvas", "subtle-scrollbar", "button", "input", "textarea", "select", "a"] }}
+                panning={{ velocityDisabled: true, excluded: ["nested-tree-canvas", "subtle-scrollbar", "button", "summary", "input", "textarea", "select", "a"] }}
                 doubleClick={{ disabled: true }}
                 onInit={({ centerView }) => {
                     window.requestAnimationFrame(() => window.requestAnimationFrame(() => centerView(0.5, 0)));
@@ -61,6 +86,7 @@ export default function SemanticEvaluator() {
                                 formula={parser.formula}
                                 interpretationFormula={parser.isComplete ? parser.formula : undefined}
                             />
+                            {showParticipant && <ParticipantBadge />}
                         </Whiteboard>
                         <Whiteboard
                             width="40rem"

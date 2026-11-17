@@ -1,0 +1,46 @@
+.tile {
+    position: absolute;
+    top: .75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    width: 14rem;
+    height: 8rem;
+    background: #1b1b1b;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 20%);
+    pointer-events: none;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    background: #008c80;
+    font-size: 2.5rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.caption {
+    position: absolute;
+    bottom: .25rem;
+    left: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .15rem .3rem;
+    background: rgb(0 0 0 / 85%);
+    font-size: .8rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.mutedIcon {
+    flex: none;
+    color: #f45c62;
+}
