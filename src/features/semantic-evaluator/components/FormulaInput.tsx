@@ -6,6 +6,9 @@ import { analyzeFormula } from "../algorithms/interpretation";
 import InterpretationInput from "./InterpretationInput";
 import icon from "../../../assets/icon.svg";
 import styles from "./FormulaInput.module.css";
+import initialExamples from "../data/EjemplosInicial.txt?raw";
+
+const EXAMPLES = initialExamples.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 
 const LOGIC_SYMBOLS = ["∀", "∃", "¬", "∧", "∨", "→", "(", ")", ","];
 
@@ -18,6 +21,15 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
     const [isEditingInterpretation, setIsEditingInterpretation] = useState(false);
     const [isInterpretationConfirmed, setIsInterpretationConfirmed] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const examplesRef = useRef<HTMLDetailsElement>(null);
+    const loadExample = (example: string) => {
+        setFormula(example);
+        if (examplesRef.current) examplesRef.current.open = false;
+        window.requestAnimationFrame(() => {
+            inputRef.current?.focus();
+            inputRef.current?.setSelectionRange(example.length, example.length);
+        });
+    };
     const termSymbols = parsedFormula
         ? [...analyzeFormula(parsedFormula).freeVariables, ...analyzeFormula(parsedFormula).constants].sort()
         : [];
@@ -58,7 +70,35 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                         isConfirmed={isInterpretationConfirmed}
                     />
                 ) : <section className={styles.objective}>
-                    <h1>{LL.semanticEvaluator.objective()}</h1>
+                    <div className={styles.objectiveHeader}>
+                        <h1>{LL.semanticEvaluator.objective()}</h1>
+                        <details
+                            ref={examplesRef}
+                            className={styles.examplesDropdown}
+                            onKeyDown={(event) => {
+                                if (event.key === "Escape" && examplesRef.current) {
+                                    examplesRef.current.open = false;
+                                    examplesRef.current.querySelector("summary")?.focus();
+                                }
+                            }}
+                            onBlur={(event) => {
+                                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                                    event.currentTarget.open = false;
+                                }
+                            }}
+                        >
+                            <summary className={styles.topBarEdit}>Cargar Ejemplos</summary>
+                            <ul className={`${styles.examplesList} subtle-scrollbar`}>
+                                {EXAMPLES.map((example) => (
+                                    <li key={example}>
+                                        <button type="button" onClick={() => loadExample(example)}>
+                                            {example}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </details>
+                    </div>
                     <div className={styles.cardsRow}>
                         <div className={styles.card}>
                             <label className={styles.label} htmlFor="formula-input">{LL.semanticEvaluator.objectiveAnalyze()}</label>
