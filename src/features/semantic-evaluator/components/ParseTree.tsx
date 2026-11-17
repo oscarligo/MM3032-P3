@@ -147,7 +147,7 @@ function SketchTreeCanvas({ visualTree, boundLabel, freeLabel }: {
                         seed,
                     });
                 } else if (type === "operator" || type === "quantifier") {
-                    rc.ellipse(cx, cy, Math.max(w + 18, 42), Math.max(h + 12, 38), {
+                    rc.line(x - 2, y + h + 2, x + w + 2, y + h + 2, {
                         stroke: strokeColor,
                         strokeWidth,
                         roughness: 1.6,
