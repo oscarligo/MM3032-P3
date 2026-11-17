@@ -12,6 +12,7 @@ const es = {
 		leftBoard: 'Pizarrón izquierdo', centerBoard: 'Pizarrón central', rightBoard: 'Pizarrón derecho',
 		objective: 'Objetivo', objectiveAnalyze: 'Analizar la fórmula',
 		objectiveResult: 'y determinar si es verdadera o falsa en una interpretación finita ingresada.',
+		loadExamples: 'Cargar ejemplos',
 		logicKeyboard: 'Símbolos de lógica de predicados', insertSymbol: 'Insertar {symbol:string}',
 	},
 	procedure: {

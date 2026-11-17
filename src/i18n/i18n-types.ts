@@ -90,6 +90,10 @@ type RootTranslation = {
 		 */
 		objectiveResult: string
 		/**
+		 * C​a​r​g​a​r​ ​e​j​e​m​p​l​o​s
+		 */
+		loadExamples: string
+		/**
 		 * S​í​m​b​o​l​o​s​ ​d​e​ ​l​ó​g​i​c​a​ ​d​e​ ​p​r​e​d​i​c​a​d​o​s
 		 */
 		logicKeyboard: string
@@ -891,6 +895,10 @@ export type TranslationFunctions = {
 		 * y determinar si es verdadera o falsa en una interpretación finita ingresada.
 		 */
 		objectiveResult: () => LocalizedString
+		/**
+		 * Cargar ejemplos
+		 */
+		loadExamples: () => LocalizedString
 		/**
 		 * Símbolos de lógica de predicados
 		 */

@@ -12,6 +12,7 @@ const en = {
 		leftBoard: 'Left whiteboard', centerBoard: 'Center whiteboard', rightBoard: 'Right whiteboard',
 		objective: 'Objective', objectiveAnalyze: 'Analyze the formula',
 		objectiveResult: 'and determine whether it is true or false under a supplied finite interpretation.',
+		loadExamples: 'Load examples',
 		logicKeyboard: 'Predicate logic symbols', insertSymbol: 'Insert {symbol}',
 	},
 	procedure: {

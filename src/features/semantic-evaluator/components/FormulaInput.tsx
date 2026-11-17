@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { BookOpen } from "lucide-react";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useFormulaStore } from "../../../store/store_formula";
 import type { Formula } from "../types";
@@ -72,44 +73,51 @@ export default function FormulaInput({ formula: parsedFormula, interpretationFor
                 ) : <section className={styles.objective}>
                     <div className={styles.objectiveHeader}>
                         <h1>{LL.semanticEvaluator.objective()}</h1>
-                        <details
-                            ref={examplesRef}
-                            className={styles.examplesDropdown}
-                            onKeyDown={(event) => {
-                                if (event.key === "Escape" && examplesRef.current) {
-                                    examplesRef.current.open = false;
-                                    examplesRef.current.querySelector("summary")?.focus();
-                                }
-                            }}
-                            onBlur={(event) => {
-                                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                                    event.currentTarget.open = false;
-                                }
-                            }}
-                        >
-                            <summary className={styles.topBarEdit}>Cargar Ejemplos</summary>
-                            <ul className={`${styles.examplesList} subtle-scrollbar`}>
-                                {EXAMPLES.map((example) => (
-                                    <li key={example}>
-                                        <button type="button" onClick={() => loadExample(example)}>
-                                            {example}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </details>
                     </div>
                     <div className={styles.cardsRow}>
                         <div className={styles.card}>
                             <label className={styles.label} htmlFor="formula-input">{LL.semanticEvaluator.objectiveAnalyze()}</label>
-                            <input
-                                ref={inputRef}
-                                id="formula-input"
-                                className={styles.input}
-                                value={formula}
-                                onChange={(event) => setFormula(event.target.value)}
-                                spellCheck={false}
-                            />
+                            <div className={styles.inputRow}>
+                                <input
+                                    ref={inputRef}
+                                    id="formula-input"
+                                    className={styles.input}
+                                    value={formula}
+                                    onChange={(event) => setFormula(event.target.value)}
+                                    spellCheck={false}
+                                />
+                                <details
+                                    ref={examplesRef}
+                                    className={styles.examplesDropdown}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Escape" && examplesRef.current) {
+                                            examplesRef.current.open = false;
+                                            examplesRef.current.querySelector("summary")?.focus();
+                                        }
+                                    }}
+                                    onBlur={(event) => {
+                                        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                                            event.currentTarget.open = false;
+                                        }
+                                    }}
+                                >
+                                    <summary
+                                        aria-label={LL.semanticEvaluator.loadExamples()}
+                                        data-tooltip={LL.semanticEvaluator.loadExamples()}
+                                    >
+                                        <BookOpen aria-hidden="true" />
+                                    </summary>
+                                    <ul className={`${styles.examplesList} subtle-scrollbar`}>
+                                        {EXAMPLES.map((example) => (
+                                            <li key={example}>
+                                                <button type="button" onClick={() => loadExample(example)}>
+                                                    {example}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </details>
+                            </div>
                             <p className={styles.objectiveText}>{LL.semanticEvaluator.objectiveResult()}</p>
                         </div>
                         <div className={styles.toolsPanel}>
