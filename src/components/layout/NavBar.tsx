@@ -19,8 +19,18 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
     const locale = useLocaleStore((state) => state.locale);
     const setLocale = useLocaleStore((state) => state.setLocale);
     const theme = useUIStore((state) => state.theme);
+    const setTheme = useUIStore((state) => state.setTheme);
     const toggleTheme = useUIStore((state) => state.toggleTheme);
     const initializedTheme = useRef(false);
+
+    useEffect(() => {
+        const preference = window.matchMedia("(prefers-color-scheme: dark)");
+        const syncTheme = ({ matches }: MediaQueryList | MediaQueryListEvent) =>
+            setTheme(matches ? "dark" : "light");
+        syncTheme(preference);
+        preference.addEventListener("change", syncTheme);
+        return () => preference.removeEventListener("change", syncTheme);
+    }, [setTheme]);
 
     useEffect(() => {
         const root = document.documentElement;

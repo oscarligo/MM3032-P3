@@ -5,8 +5,24 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    background: var(--wall-color);
-    box-shadow: 0 0 0 100vmax var(--wall-color);
+    overflow: hidden;
+    isolation: isolate;
+    background-color: var(--wall-color);
+    transition: background-color 0.4s ease;
+}
+
+.canvasShell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--wall-lighting);
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 5rem, #000 calc(100% - 7rem), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 5rem, #000 calc(100% - 7rem), transparent 100%);
+    transition: background-image 0.4s ease;
 }
 
 @media (max-width: 620px) {
@@ -25,18 +41,8 @@
     cursor: grab;
     touch-action: none;
     user-select: none;
-    background-color: var(--wall-color);
-    transition: background-color 0.4s ease;
-}
-
-.canvasViewport::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none; 
-    background-image: var(--wall-lighting);
+    background: transparent;
     z-index: 1;
-    transition: background-image 0.4s ease;
 }
 
 .dragging {
@@ -47,7 +53,7 @@
     width: max-content;
     transform-origin: 0 0;
     will-change: transform;
-    z-index: 2;
+    z-index: 1;
 }
 
 .boards {

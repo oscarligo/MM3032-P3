@@ -169,11 +169,11 @@
   --whiteboard-joint-shadow: rgb(0 0 0 / 60%);
 
   --wall-color: #12161f;
-  --wall-lighting: linear-gradient(
-    115deg,
-    rgba(145, 185, 230, 0.18) 0%,
-    rgba(100, 140, 190, 0.08) 30%,
-    rgba(18, 22, 31, 0) 65%
+  --wall-lighting: radial-gradient(
+    ellipse 75% 85% at 0% 45%,
+    rgba(145, 185, 230, 0.2) 0%,
+    rgba(100, 140, 190, 0.09) 42%,
+    transparent 82%
   );
 
   --shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
@@ -234,11 +234,11 @@
     --whiteboard-joint-shadow: rgb(0 0 0 / 60%);
 
     --wall-color: #12161f;
-    --wall-lighting: linear-gradient(
-      115deg,
-      rgba(145, 185, 230, 0.18) 0%,
-      rgba(100, 140, 190, 0.08) 30%,
-      rgba(18, 22, 31, 0) 65%
+    --wall-lighting: radial-gradient(
+      ellipse 75% 85% at 0% 45%,
+      rgba(145, 185, 230, 0.2) 0%,
+      rgba(100, 140, 190, 0.09) 42%,
+      transparent 82%
     );
 
     --shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
