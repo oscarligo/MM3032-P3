@@ -94,11 +94,12 @@ pnpm dev
 | **Levantar con Docker** (`localhost:3000`) | `docker compose up --build` |
 
 ## Evidencia de funcionamiento del programa
-<img width="1812" height="730" alt="Screenshot 2026-11-17 222723" src="https://github.com/user-attachments/assets/1370862b-0e19-4201-8403-02e8cbc41683" />
-<img width="923" height="758" alt="Screenshot 2026-11-17 222812" src="https://github.com/user-attachments/assets/8f91140d-41b1-494c-8bc3-d288f52408f7" />
-<img width="906" height="750" alt="Screenshot 2026-11-17 222836" src="https://github.com/user-attachments/assets/c88df05e-7a31-4fc3-ba02-227262f21996" />
-<img width="1243" height="866" alt="Screenshot 2026-11-17 222855" src="https://github.com/user-attachments/assets/aa78311f-d597-4734-872c-15353024fddc" />
-
+<p align="center">
+  <img width="1812" height="730" alt="Screenshot 2026-11-17 222723" src="https://github.com/user-attachments/assets/1370862b-0e19-4201-8403-02e8cbc41683" />
+  <img width="923" height="758" alt="Screenshot 2026-11-17 222812" src="https://github.com/user-attachments/assets/8f91140d-41b1-494c-8bc3-d288f52408f7" />
+  <img width="906" height="750" alt="Screenshot 2026-11-17 222836" src="https://github.com/user-attachments/assets/c88df05e-7a31-4fc3-ba02-227262f21996" />
+  <img width="1243" height="866" alt="Screenshot 2026-11-17 222855" src="https://github.com/user-attachments/assets/aa78311f-d597-4734-872c-15353024fddc" />
+</p>
 
 
 
