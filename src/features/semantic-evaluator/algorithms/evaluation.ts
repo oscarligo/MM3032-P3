@@ -1,6 +1,24 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
 import { MAX_CARTESIAN_ENTRIES } from "./interpretation";
 
+/*
+    Núcleo de evaluación y construcción de la matriz semántica. Antes de enumerar casos,
+    cada cuantificador recibe un identificador interno único, así, variables ligadas con
+    el mismo nombre y variables libres con el mismo nombre permanecen independientes.
+    Las etiquetas visibles recuperan el nombre original y añaden subíndices solo 
+    cuando hace falta.
+
+    La matriz distribuye variables entre filas y columnas. Las ligadas recorren todo el
+    dominio, mientras que las variables libres presentes en ℓ conservan exclusivamente
+    su valor fijado. evaluateFormula propaga null cuando falta una interpretación y puede
+    evaluar cuantificadores completos o casos ya instanciados.
+
+    selectConclusionCells recorre de nuevo la estructura lógica para escoger la evidencia
+    mínima del veredicto: un testigo, un contraejemplo o franjas completas cuando todos los
+    valores son necesarios. Los candidatos se filtran defensivamente por ℓ y las evidencias
+    de ramas distintas se combinan solo si pertenecen a una misma asignación de la matriz.
+*/
+
 export type EvaluationMap = {
     caseFormula: Formula;
     variables: string[];
@@ -13,6 +31,7 @@ export type EvaluationMap = {
 };
 
 const scopeFormulaForCases = (formula: Formula) => {
+    // El nombre interno evita que una asignación de la matriz capture otra ocurrencia sombreada.
     let bindingIndex = 0;
     const rawLabels = new Map<string, string>();
 
@@ -133,6 +152,7 @@ const evaluateFormula = (
     }
 
     if (instantiateQuantifiers && environment.has(formula.variable)) {
+        // En una celda, la coordenada de la variable ligada ya representa esta instancia.
         return evaluateFormula(formula.inner, interpretation, environment, true);
     }
 
@@ -150,6 +170,7 @@ const assignments = (
     variables: string[],
     environment: Readonly<Record<string, string>>
 ): string[][] => {
+    // ℓ reduce una dimensión libre a una sola elección; las demás recorren el dominio.
     let values: string[][] = [[]];
     for (const variable of variables) {
         const choices = environment[variable] === undefined ? domain : [environment[variable]];
@@ -185,6 +206,7 @@ export const selectConclusionCells = (
     target: boolean
 ): Set<string> => {
     type CaseCell = { id: string; assignment: Map<string, string> };
+    // Aunque la matriz ya restringe variables libres, el filtro protege mapas construidos externamente.
     const cells: CaseCell[] = evaluationMap.results.flatMap((row, rowIndex) =>
         row.map((_, columnIndex) => ({
             id: `${rowIndex}:${columnIndex}`,

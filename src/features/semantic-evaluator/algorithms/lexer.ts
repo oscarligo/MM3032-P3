@@ -1,14 +1,17 @@
 
 /*
-Utilidad para tokenizar fórmulas lógicas de primer orden. 
-Convierte una cadena de entrada en una lista de tokens 
-que representan los elementos sintácticos de la fórmula, 
-como cuantificadores, operadores lógicos, paréntesis y 
-identificadores (variables, constantes y funciones).
+    Analizador léxico para fórmulas de lógica de primer orden. Recorre la entrada
+    una sola vez, ignora espacios y normaliza las variantes ASCII y LaTeX admitidas
+    al símbolo lógico Unicode correspondiente.
+
+    Cada token conserva la posición inicial en la cadena original para que el parser
+    pueda producir errores localizados. Los identificadores aceptan letras, dígitos y
+    guion bajo después del primer carácter. Al final siempre se agrega EOF; cualquier
+    carácter que no pertenezca al lenguaje detiene el recorrido con FormulaSyntaxError.
 */
 import { FormulaSyntaxError } from "./parse-errors";
 
-// Tipos de tokens en la formula lógica de primer orden.
+// Categorías léxicas consumidas por el parser descendente recursivo.
 export type TokenType =
     | "FORALL" | "EXISTS"
     | "AND" | "OR" | "IMPLIES" | "NOT"
@@ -21,7 +24,7 @@ export interface Token {
     position: number;
 }
 
-// Tokenizador para convertir una cadena de entrada en una lista de tokens.
+// Convierte la entrada en tokens normalizados sin decidir todavía el rol de los identificadores.
 export function tokenize(input: string): Token[] {
     const tokens: Token[] = [];
     let i = 0;

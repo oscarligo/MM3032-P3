@@ -3,20 +3,23 @@ import { Token, tokenize, TokenType } from "./lexer";
 import { FormulaSyntaxError, type ParseErrorPayload } from "./parse-errors";
 
 /*
-    Clase FormulaParser que implementa un parser para fórmulas de lógica
-    de primer orden usando descenso recursivo (Top-Down). Cada nivel de
-    precedencia de operadores está estratificado en métodos gramaticales dedicados:
+    Parser descendente recursivo para fórmulas de lógica de primer orden. Cada
+    nivel de precedencia se implementa en un método gramatical independiente:
       - parseImplication (→, asociativo a la derecha)
       - parseDisjunction (∨, asociativo a la izquierda)
       - parseConjunction (∧, asociativo a la izquierda)
       - parseUnary (¬, ∀, ∃)
       - parsePrimary (átomos predicativos y subexpresiones entre paréntesis)
 
-    La clase mantiene un cursor para recorrer la lista de tokens y un mapa
-    de conteo de variables ligadas (se obtienen al parsear los cuantificadores)
-    para manejar el alcance de los cuantificadores y soportar sombreado (shadowing).
-    Se incluye además un método de conveniencia para parsear directamente
-    desde una cadena de entrada.
+    Los cuantificadores abarcan una fórmula unaria; los paréntesis permiten ampliar
+    explícitamente ese alcance. Un contador por nombre mantiene los ámbitos activos
+    y permite sombrear una variable con otro cuantificador del mismo nombre.
+
+    Durante el recorrido también se registra el rol de cada identificador para impedir
+    que un símbolo cambie entre predicado, función, constante y variable. Los mapas de
+    tokens, la pila de llamadas y el callback onRead alimentan la visualización gradual
+    sin alterar el AST final. Los errores conservan posición y contexto mediante
+    FormulaSyntaxError para que la interfaz pueda producir mensajes específicos.
 */
 
 export type ParserCall = {
@@ -115,6 +118,7 @@ export class FormulaParser {
         return token.type === "IDENT" || this.isFormulaToken(token);
     }
 
+    // Comparte la validación de argumentos de predicados y funciones, incluidos separadores y paréntesis.
     private parseArguments(container: string, openPosition: number, allowEmpty: boolean): Term[] {
         if (this.peek().type === "RPAREN") {
             if (!allowEmpty) {
@@ -202,6 +206,7 @@ export class FormulaParser {
     }
 
     private registerSymbol(token: Token, role: SymbolRole): void {
+        // Un mismo nombre puede aparecer con distintas aridades, pero no cambiar de categoría sintáctica.
         const previousRole = this.symbolRoles.get(token.value);
         if (previousRole && previousRole !== role) {
             throw new FormulaSyntaxError({
@@ -213,8 +218,7 @@ export class FormulaParser {
         this.symbolRoles.set(token.value, role);
     }
 
-    // Parsear un término (variable, constante o función)
-    // Función recursiva que maneja la gramática de términos:
+    // Parsear recursivamente un término y clasificarlo según su uso y el ámbito activo.
     private parseTerm(): Term {
         return this.inRule("term", () => {
             const start = this.cursor;
@@ -458,7 +462,7 @@ export class FormulaParser {
     }
 }
 
-// Función helper de conveniencia para parsear directo desde un string
+// Punto de entrada de conveniencia para tokenizar y parsear una cadena completa.
 export function parseFormula(input: string, constantSymbols: ReadonlySet<string> = new Set()): Formula {
     const tokens = tokenize(input);
     const parser = new FormulaParser(tokens, undefined, constantSymbols);

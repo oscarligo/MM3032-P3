@@ -4,13 +4,24 @@ import type { Token, TokenType } from "./lexer";
 import { tokenizeWithSteps } from "./lexer-steps";
 import { buildVisualTree, type RenderTreeNode } from "./parser-tree";
 
+/*
+    Adaptador entre FormulaParser y la visualización paso a paso. Ejecuta el parser
+    normal con onRead, conserva una instantánea de la pila y transforma cada lectura
+    en una decisión pedagógica independiente de los textos traducidos de la interfaz.
+
+    Las llamadas de precedencia que no participan en la fórmula se ocultan para evitar
+    ruido. operatorCalls distingue la regla que realmente consumió cada conectivo y
+    nodeTokens permite reconstruir, para cada cursor, únicamente la parte del árbol que
+    ya fue descubierta. El resultado final sigue siendo el mismo AST del parser normal.
+*/
+
 export type CallStep = {
     rule: string;
     kind: "formula" | "implicationRoot" | "implicationBody" | "implicationGroup" | "implicationRight"
         | "disjunction" | "conjunction" | "negation"
         | "universal" | "existential" | "unary" | "group" | "predicate" | "term";
     token: string;
-    // Solo en niveles de operador binario: símbolo y si esta llamada lo consume
+    // Solo en niveles binarios: operador observado y si esta llamada fue la que lo consumió.
     operator?: string;
     consumes?: boolean;
 };
@@ -134,7 +145,7 @@ export function parseTokensWithSteps(tokens: Token[], constantSymbols: ReadonlyS
         callStack: relevantCalls(callStack, tokens, parser.operatorCalls),
         decision: decisionFor(token, callStack, tokens[cursor - 1]),
         activeScopeVars,
-        // The circled token is next to read; only earlier tokens belong in the tree.
+        // El token señalado es el siguiente por leer; solo los anteriores pertenecen al árbol visible.
         tree: buildVisualTree(formula, parser.nodeTokens, cursor),
     }));
 

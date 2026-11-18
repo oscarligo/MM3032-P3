@@ -1,6 +1,17 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
 import { evaluateFormulaForCase } from "./evaluation";
 
+/*
+    Desglose de una celda concreta de la matriz semántica. Las coordenadas de fila y
+    columna se combinan con el entorno inicial y fijan todas las variables del caso;
+    por ello los cuantificadores ya están instanciados y no aparecen como pasos.
+
+    El recorrido es postorden: primero resuelve constantes y aplicaciones funcionales,
+    después átomos y conectivos. Cada paso conserva su resultado para la animación, pero
+    originalExpression se genera desde la fórmula de presentación sin sustituir variables.
+    Los nombres internos de variables sombreadas se traducen con variableLabels.
+*/
+
 export type TruthStep = {
     expression: string;
     result: boolean | null;

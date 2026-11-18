@@ -1,5 +1,17 @@
 import type { Formula, Term } from "../types";
 
+/*
+    Construcción incremental del árbol sintáctico. El AST completo
+    se combina con el índice de token de cada nodo y el cursor actual para mostrar solo
+    las estructuras que el parser ya descubrió; los operandos pendientes se representan
+    temporalmente con marcadores.
+
+    El recorrido mantiene un conjunto de variables ligadas para clasificar cada aparición
+    como libre o ligada, incluso bajo cuantificadores anidados. Predicados con un mismo
+    nombre reciben subíndice únicamente cuando aparecen con aridades distintas. Los roles
+    de los hijos se etiquetan según el conectivo para apoyar la explicación visual.
+*/
+
 type NodeKind = "operator" | "quantifier" | "atom" | "variable" | "const" | "placeholder";
 
 export type RenderTreeNode = {
@@ -22,6 +34,7 @@ const toSubscript = (value: number) =>
     String(value).replace(/\d/g, (digit) => SUBSCRIPT_DIGITS[digit]);
 
 export const collectPredicateArities = (formula: Formula) => {
+    // La aridad forma parte de la identidad semántica, pero solo se muestra si evita ambigüedad visual.
     const predicateArities = new Map<string, Set<number>>();
     const visit = (current: Formula) => {
         if (current.kind === "atom") {
@@ -117,7 +130,7 @@ export function buildVisualTree(
     ): RenderTreeNode => {
         const currentIndex = nodeTokens.get(f)!;
         if (currentIndex >= cursor) {
-            // A binary operator is discovered only after its left operand.
+            // Un operador binario se descubre después de su operando izquierdo; hasta entonces se conserva ese subárbol.
             if (f.kind === "and" || f.kind === "or" || f.kind === "implies") {
                 return buildFormula(f.left, currentBound, roleTag);
             }

@@ -1,3 +1,13 @@
+/*
+    Contrato de errores compartido por lexer y parser. El código discriminante indica
+    el tipo de fallo y cada variante añade solo los datos necesarios para localizarlo
+    y traducirlo en la interfaz, sin acoplar los algoritmos a textos de presentación.
+
+    FormulaSyntaxError conserva el payload estructurado y usa el código como mensaje
+    base, de modo que los consumidores pueden distinguir errores sintácticos de fallos
+    inesperados mediante instanceof y payload.code.
+*/
+
 export type ParseErrorPayload =
     | { code: "EMPTY_INPUT" }
     | { code: "UNEXPECTED_CHARACTER"; character: string; position: number }
