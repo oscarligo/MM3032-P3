@@ -1,7 +1,7 @@
 # Evaluador semántico de lógica de primer orden
 ## Miembros
-Oscar Rompich - 24880
-Arturo Lima - 24683
+- Oscar Rompich - 24880
+- Arturo Lima - 24683
 
 ## Introduccion
 Aplicación educativa e interactiva para explorar cómo se analizan y evalúan fórmulas de lógica de primer orden sobre interpretaciones finitas. Acompaña todo el recorrido de forma visual: desde que se escribe la fórmula hasta que se construye la tabla de verdad y se resaltan los testigos o contraejemplos que justifican el resultado.
