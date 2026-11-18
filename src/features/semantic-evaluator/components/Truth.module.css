@@ -77,6 +77,10 @@
     color: var(--color-annotation);
 }
 
+.termValue {
+    color: var(--color-whiteboard-ink);
+}
+
 .controls {
     display: flex;
     justify-content: center;

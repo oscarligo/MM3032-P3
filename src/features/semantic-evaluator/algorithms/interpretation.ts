@@ -1,5 +1,16 @@
 import type { Formula, Term } from "../types";
 
+/*
+    Utilidades para construir y validar una interpretación finita. analyzeFormula recorre
+    el AST con sus ámbitos para separar constantes, variables libres, funciones y
+    predicados, las parejas nombre/aridad identifican símbolos funcionales y predicativos.
+
+    El resto de funciones normaliza el dominio y las filas editables, evita tuplas
+    duplicadas y materializa productos cartesianos para funciones. Antes de expandirlos
+    se aplica MAX_CARTESIAN_ENTRIES, que protege la interfaz frente a tablas demasiado
+    grandes sin imponer reglas adicionales sobre los valores del dominio.
+*/
+
 export type SymbolInfo = {
     key: string;
     name: string;
@@ -10,6 +21,11 @@ export type FunctionRow = {
     args: string[];
     result: string;
 };
+
+export const MAX_CARTESIAN_ENTRIES = 4096;
+
+export const cartesianSize = (domainSize: number, dimensions: number) =>
+    domainSize ** dimensions;
 
 const subscript = (value: number) =>
     String(value).replace(/\d/g, (digit) => "₀₁₂₃₄₅₆₇₈₉"[Number(digit)]);
@@ -44,6 +60,7 @@ export function analyzeFormula(formula: Formula) {
         }
         if (current.kind === "not") return visit(current.inner, bound);
         if (current.kind === "forall" || current.kind === "exists") {
+            // Cada rama recibe su propio conjunto para que el alcance no se filtre a fórmulas hermanas.
             const nested = new Set(bound);
             nested.add(current.variable);
             return visit(current.inner, nested);
@@ -84,6 +101,9 @@ export const cleanFunctionRows = (rows: Record<string, FunctionRow[]>) =>
     );
 
 export const functionRowsForDomain = (domain: string[], arity: number): FunctionRow[] => {
+    if (cartesianSize(domain.length, arity) > MAX_CARTESIAN_ENTRIES) {
+        throw new RangeError(`Function table exceeds ${MAX_CARTESIAN_ENTRIES} rows`);
+    }
     let tuples: string[][] = [[]];
     for (let index = 0; index < arity; index += 1) {
         tuples = tuples.flatMap((tuple) => domain.map((value) => [...tuple, value]));
@@ -105,6 +125,7 @@ export function updatePredicateTuple(
     valueIndex: number,
     nextValue: string
 ) {
+    // Una fila incompleta puede editarse; la duplicidad solo se comprueba cuando todos sus valores existen.
     const candidate = rows[rowIndex].map((entry, entryIndex) =>
         entryIndex === valueIndex ? nextValue : entry
     );

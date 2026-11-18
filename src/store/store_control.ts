@@ -7,7 +7,7 @@ type ProcedureStore = {
     totalSteps: number;
     stepIndex: number;
     isPlaying: boolean;
-    registerProcedure: (procedureId: string, totalSteps: number, order: number) => void;
+    registerProcedure: (procedureId: string, totalSteps: number, order: number, resetProgress?: boolean) => void;
     unregisterProcedure: (procedureId: string) => void;
     previous: () => void;
     next: () => void;
@@ -31,11 +31,17 @@ export const procedureOffset = (procedures: Record<string, ProcedureRegistration
 
 export const useProcedureStore = create<ProcedureStore>((set) => ({
     procedures: {}, totalSteps: 0, stepIndex: -1, isPlaying: false,
-    registerProcedure: (procedureId, count, order) => set((state) => {
+    registerProcedure: (procedureId, count, order, resetProgress = true) => set((state) => {
         const current = state.procedures[procedureId];
         if (current?.totalSteps === count && current.order === order) return state;
         const procedures = { ...state.procedures, [procedureId]: { totalSteps: count, order } };
-        return { procedures, totalSteps: sumSteps(procedures), stepIndex: -1, isPlaying: false };
+        const totalSteps = sumSteps(procedures);
+        return {
+            procedures,
+            totalSteps,
+            stepIndex: resetProgress ? -1 : Math.min(state.stepIndex, totalSteps - 1),
+            isPlaying: false,
+        };
     }),
     unregisterProcedure: (procedureId) => set((state) => {
         if (!state.procedures[procedureId]) return state;

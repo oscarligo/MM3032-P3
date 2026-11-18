@@ -17,15 +17,16 @@ type ParseTreeProps = {
 };
 
 const FAST_TEGAKI = { glyphGap: 0, stagger: { advance: 0.02, duration: 0.1 } } as const;
+const SHOW_CALL_TREE = false;
 
 const Chalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI}>
         {String(children)}
     </TegakiRenderer>
 );
 
 const StaticChalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="always">
         {String(children)}
     </TegakiRenderer>
 );
@@ -146,7 +147,7 @@ function SketchTreeCanvas({ visualTree, boundLabel, freeLabel }: {
                         seed,
                     });
                 } else if (type === "operator" || type === "quantifier") {
-                    rc.ellipse(cx, cy, Math.max(w + 18, 42), Math.max(h + 12, 38), {
+                    rc.line(x - 2, y + h + 2, x + w + 2, y + h + 2, {
                         stroke: strokeColor,
                         strokeWidth,
                         roughness: 1.6,
@@ -329,7 +330,7 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                     tabIndex={0}
                                     aria-label={LL.parser.functionHistory()}
                                 >
-                                    <ol className={styles.callTree}>
+                                    {SHOW_CALL_TREE ? <ol className={styles.callTree}>
                                         {step.callStack.map((call, index) => (
                                             <li className={styles.callNode} key={`${index}-${call.rule}`} tabIndex={0}>
                                                 <span className={styles.callName}><Chalk>{call.rule}</Chalk></span>
@@ -341,7 +342,11 @@ export default function ParseTree({ mode, visualization }: ParseTreeProps) {
                                                 </span>
                                             </li>
                                         ))}
-                                    </ol>
+                                    </ol> : (
+                                        <span className={styles.callPath}>
+                                            <Chalk>{step.callStack.map((call) => call.rule).join(" → ")}</Chalk>
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 

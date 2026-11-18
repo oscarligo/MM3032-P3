@@ -3,20 +3,23 @@ import { Token, tokenize, TokenType } from "./lexer";
 import { FormulaSyntaxError, type ParseErrorPayload } from "./parse-errors";
 
 /*
-    Clase FormulaParser que implementa un parser para fórmulas de lógica
-    de primer orden usando descenso recursivo (Top-Down). Cada nivel de
-    precedencia de operadores está estratificado en métodos gramaticales dedicados:
+    Parser descendente recursivo para fórmulas de lógica de primer orden. Cada
+    nivel de precedencia se implementa en un método gramatical independiente:
       - parseImplication (→, asociativo a la derecha)
       - parseDisjunction (∨, asociativo a la izquierda)
       - parseConjunction (∧, asociativo a la izquierda)
       - parseUnary (¬, ∀, ∃)
       - parsePrimary (átomos predicativos y subexpresiones entre paréntesis)
 
-    La clase mantiene un cursor para recorrer la lista de tokens y un mapa
-    de conteo de variables ligadas (se obtienen al parsear los cuantificadores)
-    para manejar el alcance de los cuantificadores y soportar sombreado (shadowing).
-    Se incluye además un método de conveniencia para parsear directamente
-    desde una cadena de entrada.
+    Los cuantificadores abarcan una fórmula unaria; los paréntesis permiten ampliar
+    explícitamente ese alcance. Un contador por nombre mantiene los ámbitos activos
+    y permite sombrear una variable con otro cuantificador del mismo nombre.
+
+    Durante el recorrido también se registra el rol de cada identificador para impedir
+    que un símbolo cambie entre predicado, función, constante y variable. Los mapas de
+    tokens, la pila de llamadas y el callback onRead alimentan la visualización gradual
+    sin alterar el AST final. Los errores conservan posición y contexto mediante
+    FormulaSyntaxError para que la interfaz pueda producir mensajes específicos.
 */
 
 export type ParserCall = {
@@ -32,11 +35,14 @@ export type ParserTrace = {
     activeScopeVars: string[];
 };
 
+type SymbolRole = "predicate" | "function" | "constant" | "variable";
+
 export class FormulaParser {
     public readonly nodeTokens = new WeakMap<Formula | Term, number>();
     // Llamadas ("regla:inicio") que consumieron su operador binario; se completa durante el parseo
     public readonly operatorCalls = new Set<string>();
     private callStack: ParserCall[] = [];
+    private symbolRoles = new Map<string, SymbolRole>();
 
     private inRule<T>(name: string, parse: () => T): T {
         this.callStack.push({ rule: name, start: this.cursor });
@@ -112,6 +118,7 @@ export class FormulaParser {
         return token.type === "IDENT" || this.isFormulaToken(token);
     }
 
+    // Comparte la validación de argumentos de predicados y funciones, incluidos separadores y paréntesis.
     private parseArguments(container: string, openPosition: number, allowEmpty: boolean): Term[] {
         if (this.peek().type === "RPAREN") {
             if (!allowEmpty) {
@@ -198,8 +205,20 @@ export class FormulaParser {
         return this.boundVarCounts.has(name);
     }
 
-    // Parsear un término (variable, constante o función)
-    // Función recursiva que maneja la gramática de términos:
+    private registerSymbol(token: Token, role: SymbolRole): void {
+        // Un mismo nombre puede aparecer con distintas aridades, pero no cambiar de categoría sintáctica.
+        const previousRole = this.symbolRoles.get(token.value);
+        if (previousRole && previousRole !== role) {
+            throw new FormulaSyntaxError({
+                code: "SYMBOL_ROLE_CONFLICT",
+                symbol: token.value,
+                position: token.position,
+            });
+        }
+        this.symbolRoles.set(token.value, role);
+    }
+
+    // Parsear recursivamente un término y clasificarlo según su uso y el ámbito activo.
     private parseTerm(): Term {
         return this.inRule("term", () => {
             const start = this.cursor;
@@ -230,12 +249,15 @@ export class FormulaParser {
                         position: identToken.position,
                     });
                 }
+                this.registerSymbol(identToken, "function");
                 const open = this.advance();
                 const args = this.parseArguments(ident, open.position, false);
                 return this.atToken({ kind: "func", name: ident, args }, start);
             }
 
-            if (this.isBound(ident) || !this.constantSymbols.has(ident)) {
+            const isVariable = this.isBound(ident) || !this.constantSymbols.has(ident);
+            this.registerSymbol(identToken, isVariable ? "variable" : "constant");
+            if (isVariable) {
                 return this.atToken({ kind: "var", name: ident }, start);
             }
             return this.atToken({ kind: "const", name: ident }, start);
@@ -360,8 +382,9 @@ export class FormulaParser {
                     throw new FormulaSyntaxError({ code: "MISSING_QUANTIFIER_BODY", quantifier: quantifier.value, variable, position: varToken.position });
                 }
 
+                this.registerSymbol(varToken, "variable");
                 this.pushBoundVar(variable);
-                const inner = this.parseImplication();
+                const inner = this.parseUnary();
                 this.popBoundVar(variable);
 
                 return this.atToken({ kind: "forall", variable, inner }, start);
@@ -381,8 +404,9 @@ export class FormulaParser {
                     throw new FormulaSyntaxError({ code: "MISSING_QUANTIFIER_BODY", quantifier: quantifier.value, variable, position: varToken.position });
                 }
 
+                this.registerSymbol(varToken, "variable");
                 this.pushBoundVar(variable);
-                const inner = this.parseImplication();
+                const inner = this.parseUnary();
                 this.popBoundVar(variable);
 
                 return this.atToken({ kind: "exists", variable, inner }, start);
@@ -417,6 +441,7 @@ export class FormulaParser {
                 this.advance();
                 const predicate = token.value;
                 const args: Term[] = [];
+                this.registerSymbol(token, "predicate");
 
                 if (this.peek().type === "LPAREN") {
                     const open = this.advance();
@@ -437,7 +462,7 @@ export class FormulaParser {
     }
 }
 
-// Función helper de conveniencia para parsear directo desde un string
+// Punto de entrada de conveniencia para tokenizar y parsear una cadena completa.
 export function parseFormula(input: string, constantSymbols: ReadonlySet<string> = new Set()): Formula {
     const tokens = tokenize(input);
     const parser = new FormulaParser(tokens, undefined, constantSymbols);

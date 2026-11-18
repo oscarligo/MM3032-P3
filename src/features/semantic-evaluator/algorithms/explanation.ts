@@ -2,9 +2,15 @@ import type { Formula, InterpretationDefinition, Term } from "../types";
 import { evaluateTerm } from "./evaluation";
 
 /*
-    Evaluación semántica con justificación. Cada cuantificador recorre todo el dominio
-    con un entorno nuevo (los cuantificadores internos ocultan a los externos) y
-    produce un árbol con las razones decisivas del valor de verdad.
+    Evaluación semántica con justificación. holds calcula el valor bajo una interpretación
+    finita y crea un entorno nuevo al ligar cada variable, por lo que los cuantificadores
+    internos sombrean a los externos sin mutar el entorno recibido.
+
+    explainFormula produce un árbol mínimo de evidencia: aprovecha el cortocircuito de
+    los conectivos y, para cuantificadores, conserva el primer testigo o contraejemplo
+    decisivo. Solo cuando ningún elemento decide por sí solo registra que se recorrió el
+    dominio completo. Las fórmulas mostradas sustituyen variables activas, pero preservan
+    el nombre ligado dentro del alcance de su propio cuantificador.
 */
 
 type Env = ReadonlyMap<string, string>;

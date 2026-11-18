@@ -41,7 +41,7 @@ export default function Control() {
                     aria-label={LL.procedure.previous()}
                     title={LL.procedure.previous()}
                 >
-                    <ChevronLeft size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronLeft size={17} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -50,7 +50,7 @@ export default function Control() {
                     aria-label={LL.procedure.restart()}
                     title={LL.procedure.restart()}
                 >
-                    <RotateCcw size={22} strokeWidth={2.2} aria-hidden="true" />
+                    <RotateCcw size={15} strokeWidth={2.2} aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -59,9 +59,9 @@ export default function Control() {
                     title={playPauseLabel}
                 >
                     {isPlaying ? (
-                        <Pause size={22} strokeWidth={2.2} aria-hidden="true" />
+                        <Pause size={15} strokeWidth={2.2} aria-hidden="true" />
                     ) : (
-                        <Play size={22} strokeWidth={2.2} aria-hidden="true" />
+                        <Play size={15} strokeWidth={2.2} aria-hidden="true" />
                     )}
                 </button>
                 <button
@@ -71,7 +71,7 @@ export default function Control() {
                     aria-label={LL.procedure.next()}
                     title={LL.procedure.next()}
                 >
-                    <ChevronRight size={24} strokeWidth={2.2} aria-hidden="true" />
+                    <ChevronRight size={17} strokeWidth={2.2} aria-hidden="true" />
                 </button>
             </div>
         </footer>

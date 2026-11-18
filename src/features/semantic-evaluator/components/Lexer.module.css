@@ -78,7 +78,6 @@
 }
 
 .error {
-    margin-block: 1em;
     color: var(--color-annotation);
 }
 

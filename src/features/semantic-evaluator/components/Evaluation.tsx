@@ -6,16 +6,17 @@ import caveat from "tegaki/fonts/caveat";
 import { useI18nContext } from "../../../i18n/i18n-react";
 import { useLocaleStore } from "../../../store/store_local";
 import { useInterpretationStore } from "../../../store/store_interpretation";
+import { procedureOffset, useProcedureStore } from "../../../store/store_control";
 import {
     buildEvaluationMap,
+    evaluateUnderInterpretation,
     fitEvaluationScale,
     formulaToText,
+    selectConclusionCells,
 } from "../algorithms/evaluation";
-import { explainFormula } from "../algorithms/explanation";
 import { buildTruthTrace, type TruthTrace } from "../algorithms/truth";
 import type { Formula } from "../types";
 import TreeCanvasControls from "./TreeCanvasControls";
-import Justification from "./Justification";
 import Truth from "./Truth";
 import styles from "./Evaluation.module.css";
 
@@ -60,15 +61,16 @@ function AutoCenter({ rowCount, columnCount, procedureOpen }: {
     return null;
 }
 
-function TruthCell({ value, trueLabel, active, onClick }: {
+function TruthCell({ value, trueLabel, active, onClick, conclusionMark }: {
     value: boolean | null;
     trueLabel: string;
     active: boolean;
     onClick: () => void;
+    conclusionMark?: "witness" | "counterexample";
 }) {
     const valueClass = value === null ? styles.pendingCell : value ? styles.trueCell : styles.falseCell;
     return (
-        <td className={`${valueClass} ${active ? styles.activeCell : ""}`}>
+        <td className={`${valueClass} ${active ? styles.activeCell : ""}`} data-conclusion-mark={conclusionMark}>
             <button className={styles.truthButton} data-truth-cell type="button" onClick={onClick}>
                 {value === null ? "-" : value ? trueLabel : "F"}
             </button>
@@ -80,24 +82,42 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
     const { LL } = useI18nContext();
     const locale = useLocaleStore((state) => state.locale);
     const interpretation = useInterpretationStore((state) => state.definition);
+    const validationWarnings = useInterpretationStore((state) => state.validationWarnings);
+    const globalStep = useProcedureStore((state) => state.stepIndex);
+    const procedures = useProcedureStore((state) => state.procedures);
+    const registerProcedure = useProcedureStore((state) => state.registerProcedure);
+    const unregisterProcedure = useProcedureStore((state) => state.unregisterProcedure);
+    const localStep = procedures.evaluation
+        ? globalStep - procedureOffset(procedures, "evaluation")
+        : -1;
+    const showTable = Boolean(interpretation) && localStep >= 0;
+    const showConclusion = Boolean(interpretation) && localStep >= 1;
     const trueLabel = locale === "es" ? "V" : "T";
     const evaluationMap = useMemo(
         () => formula && interpretation ? buildEvaluationMap(formula, interpretation) : undefined,
         [formula, interpretation]
     );
-    const explanation = useMemo(() => {
-        if (!formula || !interpretation) return undefined;
-        try {
-            return explainFormula(formula, interpretation);
-        } catch {
-            return undefined;
-        }
-    }, [formula, interpretation]);
-    const finalEvaluation = explanation ? explanation.value : null;
+    const finalEvaluation = useMemo(
+        () => formula && interpretation ? evaluateUnderInterpretation(formula, interpretation) : null,
+        [formula, interpretation]
+    );
     const renderedFormula = useMemo(() => formula ? formulaToText(formula) : "", [formula]);
     const usesEnvironment = Boolean(interpretation && Object.keys(interpretation.environment).length > 0);
     const [truthTrace, setTruthTrace] = useState<TruthTrace>();
     const [activeTruthCell, setActiveTruthCell] = useState<string>();
+    const conclusionCellIds = useMemo(
+        () => formula && evaluationMap && interpretation && finalEvaluation !== null
+            ? selectConclusionCells(evaluationMap, interpretation, finalEvaluation)
+            : new Set<string>(),
+        [evaluationMap, finalEvaluation, formula, interpretation]
+    );
+    const conclusionMark = finalEvaluation === true ? "witness" : "counterexample";
+
+    useEffect(() => {
+        registerProcedure("evaluation", interpretation ? 2 : 0, 1, false);
+    }, [interpretation, registerProcedure]);
+
+    useEffect(() => () => unregisterProcedure("evaluation"), [unregisterProcedure]);
 
     useEffect(() => {
         setTruthTrace(undefined);
@@ -117,19 +137,22 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
             return;
         }
         setTruthTrace(buildTruthTrace(
-            formula,
+            evaluationMap.caseFormula,
             interpretation,
             evaluationMap.rowVariables,
             evaluationMap.rowAssignments[rowIndex],
             evaluationMap.columnVariables,
             evaluationMap.columnAssignments[columnIndex],
-            trueLabel
+            trueLabel,
+            evaluationMap.variableLabels,
+            formula
         ));
         setActiveTruthCell(cellId);
     };
 
     const wrapRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const conclusionCanvasRef = useRef<HTMLCanvasElement>(null);
     const tableRef = useRef<HTMLTableElement>(null);
 
         useLayoutEffect(() => {
@@ -181,6 +204,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 1.1,
                     roughness: 1.3,
                     bowing: 0.9,
+                    seed: 101,
                     disableMultiStroke: true,
                 });
                 rc.line(offsetX - 1, headerBottomY + 2.5, offsetX + width + 1, headerBottomY + 2.5, {
@@ -188,11 +212,12 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 0.7,
                     roughness: 1.4,
                     bowing: 0.9,
+                    seed: 102,
                     disableMultiStroke: true,
                 });
 
                 const headerRows = Array.from(theadEl.querySelectorAll<HTMLElement>("tr"));
-                headerRows.slice(0, -1).forEach((row) => {
+                headerRows.slice(0, -1).forEach((row, rowIndex) => {
                     const box = getUnscaledBox(row, wrap);
                     const y = box.y + box.height;
                     rc.line(offsetX + 2, y, offsetX + width - 2, y, {
@@ -201,6 +226,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                         roughness: 1.2,
                         bowing: .7,
                         strokeLineDash: [5, 4],
+                        seed: 200 + rowIndex,
                         disableMultiStroke: true,
                     });
                 });
@@ -211,6 +237,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 strokeWidth: 1.1,
                 roughness: 1.35,
                 bowing: 0.9,
+                seed: 300,
                 disableMultiStroke: true,
             });
 
@@ -223,6 +250,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     strokeWidth: 1.1,
                     roughness: 1.25,
                     bowing: 0.8,
+                    seed: 301,
                     disableMultiStroke: true,
                 });
             }
@@ -238,7 +266,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                 })()
                 : undefined;
 
-            bodyCells.slice(0, -1).forEach((cell) => {
+            bodyCells.slice(0, -1).forEach((cell, cellIndex) => {
                 const box = getUnscaledBox(cell, wrap);
                 const x = box.x + box.width;
                 if (axisSeparatorX !== undefined && Math.abs(x - axisSeparatorX) < 1) return;
@@ -248,12 +276,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     roughness: 1.2,
                     bowing: .7,
                     strokeLineDash: [5, 4],
+                    seed: 400 + cellIndex,
                     disableMultiStroke: true,
                 });
             });
 
             const bodyRows = Array.from(tableEl.querySelectorAll<HTMLElement>("tbody tr"));
-            bodyRows.slice(0, -1).forEach((row) => {
+            bodyRows.slice(0, -1).forEach((row, rowIndex) => {
                 const box = getUnscaledBox(row, wrap);
                 const y = box.y + box.height;
                 rc.line(offsetX + 2, y, offsetX + width - 2, y, {
@@ -262,29 +291,34 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                     roughness: 1.2,
                     bowing: .7,
                     strokeLineDash: [5, 4],
+                    seed: 500 + rowIndex,
                     disableMultiStroke: true,
                 });
             });
 
             const emptyCells = Array.from(tableEl.querySelectorAll<HTMLElement>("[data-empty-cell]"));
-            emptyCells.forEach((cell) => {
+            emptyCells.forEach((cell, cellIndex) => {
                 const box = getUnscaledBox(cell, wrap);
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(box.x, box.y, box.width, box.height);
                 ctx.clip();
                 ctx.globalAlpha = .58;
+                let hatchIndex = 0;
                 for (let start = box.x - box.height; start < box.x + box.width; start += 9) {
                     rc.line(start, box.y + box.height, start + box.height, box.y, {
                         stroke: inkColor,
                         strokeWidth: .55,
                         roughness: 1.3,
                         bowing: .8,
+                        seed: 600 + cellIndex * 100 + hatchIndex,
                         disableMultiStroke: true,
                     });
+                    hatchIndex += 1;
                 }
                 ctx.restore();
             });
+
         };
 
         drawHandDrawnTable();
@@ -296,19 +330,110 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
         return () => observer.disconnect();
     }, [evaluationMap, formula, locale]);
 
+    useEffect(() => {
+        const wrap = wrapRef.current;
+        const tableEl = tableRef.current;
+        const canvas = conclusionCanvasRef.current;
+        if (!wrap || !tableEl || !canvas) return;
+
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        canvas.width = wrap.offsetWidth * dpr;
+        canvas.height = wrap.offsetHeight * dpr;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, wrap.offsetWidth, wrap.offsetHeight);
+        if (!showConclusion) return;
+
+        const getBox = (element: HTMLElement) => {
+            let x = 0;
+            let y = 0;
+            let current: HTMLElement | null = element;
+            while (current && current !== wrap) {
+                x += current.offsetLeft;
+                y += current.offsetTop;
+                current = current.offsetParent as HTMLElement | null;
+            }
+            return { x, y, width: element.offsetWidth, height: element.offsetHeight };
+        };
+        const style = getComputedStyle(wrap);
+        const successColor = style.getPropertyValue("--color-success").trim() || "#15803d";
+        const annotationColor = style.getPropertyValue("--color-annotation").trim() || "#e11d48";
+        const lines = Array.from(tableEl.querySelectorAll<HTMLElement>("[data-conclusion-mark]")).flatMap((cell, cellIndex) => {
+            const box = getBox(cell);
+            const color = cell.dataset.conclusionMark === "witness" ? successColor : annotationColor;
+            const cellLines = [];
+            let hatchIndex = 0;
+            for (let start = box.x - box.height; start < box.x + box.width; start += 8) {
+                const x1 = Math.max(start, box.x);
+                const x2 = Math.min(start + box.height, box.x + box.width);
+                cellLines.push({
+                    x1,
+                    y1: box.y + box.height - (x1 - start),
+                    x2,
+                    y2: box.y + box.height - (x2 - start),
+                    color,
+                    seed: 800 + cellIndex * 100 + hatchIndex,
+                });
+                hatchIndex += 1;
+            }
+            return cellLines;
+        });
+        const rc = rough.canvas(canvas);
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const drawLine = (line: typeof lines[number]) =>
+            rc.line(line.x1, line.y1, line.x2, line.y2, {
+                stroke: line.color,
+                strokeWidth: 1.2,
+                roughness: 1.1,
+                bowing: .6,
+                seed: line.seed,
+                disableMultiStroke: true,
+            });
+        if (reducedMotion || lines.length <= 1) {
+            lines.forEach(drawLine);
+            return;
+        }
+
+        const duration = Math.min(1200, Math.max(300, lines.length * 8));
+        const startedAt = performance.now();
+        let drawnCount = 0;
+        let animationFrame = 0;
+        const drawFrame = (now: number) => {
+            const progress = Math.min(1, (now - startedAt) / duration);
+            const targetCount = Math.ceil(lines.length * progress);
+            while (drawnCount < targetCount) drawLine(lines[drawnCount++]);
+            if (drawnCount < lines.length) animationFrame = window.requestAnimationFrame(drawFrame);
+        };
+        animationFrame = window.requestAnimationFrame(drawFrame);
+
+        return () => window.cancelAnimationFrame(animationFrame);
+    }, [conclusionCellIds, showConclusion]);
+
 
     return (
         <section className={styles.container}>
             <h2>
-                <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 2 }}>
+                <TegakiRenderer font={caveat} reducedMotion="always">
                     {LL.evaluation.title()}
                 </TegakiRenderer>
             </h2>
-            {!evaluationMap ? (
+            {!evaluationMap || !showTable ? (
                 <div className={styles.waiting}>
-                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }} quality={{ pixelRatio: 2 }}>
-                        {LL.evaluation.waiting()}
+                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
+                        {interpretation ? LL.evaluation.ready() : LL.evaluation.waiting()}
                     </TegakiRenderer>
+                    {validationWarnings.length > 0 && (
+                        <div className={`${styles.validationWarnings} subtle-scrollbar`} role="alert" aria-live="polite">
+                            {validationWarnings.map((warning, index) => (
+                                <div className={styles.validationWarning} key={`${index}-${warning}`}>
+                                    <TegakiRenderer font={caveat} reducedMotion="user" timing={{ glyphGap: 0, stagger: { advance: .02, duration: .1 } }}>
+                                        {`• ${warning}`}
+                                    </TegakiRenderer>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className={styles.canvasPanel}>
@@ -333,16 +458,20 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                 </div>
                                 <div ref={wrapRef} className={styles.tableCanvasWrap}>
                                 <canvas ref={canvasRef} className={styles.roughCanvas} />
+                                <canvas
+                                    ref={conclusionCanvasRef}
+                                    className={`${styles.conclusionCanvas} ${showConclusion ? styles.conclusionCanvasVisible : ""}`}
+                                />
                                 <table ref={tableRef} className={styles.table}>
                                     {evaluationMap.variables.length === 0 ? (
                                         <tbody>
-                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} active={activeTruthCell === "0:0"} onClick={() => openTruth(0, 0)} /></tr>
+                                            <tr><TruthCell value={evaluationMap.results[0][0]} trueLabel={trueLabel} active={activeTruthCell === "0:0"} onClick={() => openTruth(0, 0)} conclusionMark={showConclusion && conclusionCellIds.has("0:0") ? conclusionMark : undefined} /></tr>
                                         </tbody>
                                     ) : evaluationMap.variables.length === 1 ? (
                                         <>
                                             <thead>
                                                 <tr>
-                                                    <th data-axis-corner>{evaluationMap.variables[0]}</th>
+                                                    <th data-axis-corner>{evaluationMap.variableLabels.get(evaluationMap.variables[0])}</th>
                                                     <th>{LL.evaluation.value()}</th>
                                                 </tr>
                                             </thead>
@@ -350,7 +479,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                 {evaluationMap.rowAssignments.map((assignment, rowIndex) => (
                                                     <tr key={rowIndex}>
                                                         <th className={styles.rowValue}>{assignment[0]}</th>
-                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} active={activeTruthCell === `${rowIndex}:0`} onClick={() => openTruth(rowIndex, 0)} />
+                                                        <TruthCell value={evaluationMap.results[rowIndex][0]} trueLabel={trueLabel} active={activeTruthCell === `${rowIndex}:0`} onClick={() => openTruth(rowIndex, 0)} conclusionMark={showConclusion && conclusionCellIds.has(`${rowIndex}:0`) ? conclusionMark : undefined} />
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -363,7 +492,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                         {evaluationMap.rowVariables.map((rowVariable) => (
                                                             <th className={styles.rowAxisHeader} data-empty-cell key={rowVariable} />
                                                         ))}
-                                                        <th className={styles.axisCorner} data-axis-corner>{variable}</th>
+                                                        <th className={styles.axisCorner} data-axis-corner>{evaluationMap.variableLabels.get(variable)}</th>
                                                         {evaluationMap.columnAssignments.map((assignment, columnIndex) => (
                                                             <th className={styles.columnValue} key={columnIndex}>{assignment[variableIndex]}</th>
                                                         ))}
@@ -373,7 +502,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                             <tbody>
                                                 <tr className={styles.axisSpacerRow}>
                                                     {evaluationMap.rowVariables.map((variable) => (
-                                                        <th className={styles.rowAxisHeader} key={variable}>{variable}</th>
+                                                        <th className={styles.rowAxisHeader} key={variable}>{evaluationMap.variableLabels.get(variable)}</th>
                                                     ))}
                                                     <th className={styles.axisCorner} data-empty-cell />
                                                     {evaluationMap.columnAssignments.map((_, columnIndex) => <td data-empty-cell key={columnIndex} />)}
@@ -390,6 +519,7 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                                                 trueLabel={trueLabel}
                                                                 active={activeTruthCell === `${rowIndex}:${columnIndex}`}
                                                                 onClick={() => openTruth(rowIndex, columnIndex)}
+                                                                conclusionMark={showConclusion && conclusionCellIds.has(`${rowIndex}:${columnIndex}`) ? conclusionMark : undefined}
                                                                 key={columnIndex}
                                                             />
                                                         ))}
@@ -407,15 +537,13 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                             columnCount={evaluationMap.columnAssignments.length}
                             procedureOpen={Boolean(truthTrace)}
                         />
-                        <TreeCanvasControls />
-                        <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
+                        {showConclusion && <div className={`${styles.satisfaction} ${finalEvaluation === true ? styles.satisfied : styles.notSatisfied}`}>
                             <span className={styles.semanticRelation}>
                                 <TegakiRenderer
                                     key={`${finalEvaluation}-${usesEnvironment}`}
                                     font={caveat}
                                     reducedMotion="user"
                                     timing={WRITING_TIMING}
-                                    quality={{ pixelRatio: 3 }}
                                 >
                                     {`ℐ ${finalEvaluation === true ? "⊨" : "⊭"}`}
                                 </TegakiRenderer>
@@ -426,12 +554,11 @@ export default function Evaluation({ formula }: { formula?: Formula }) {
                                 font={caveat}
                                 reducedMotion="user"
                                 timing={WRITING_TIMING}
-                                quality={{ pixelRatio: 3 }}
                             >
                                 {renderedFormula}
                             </TegakiRenderer>
-                        </div>
-                        {explanation && <Justification explanation={explanation} />}
+                        </div>}
+                        <TreeCanvasControls />
                     </TransformWrapper>
                 </div>
             )}

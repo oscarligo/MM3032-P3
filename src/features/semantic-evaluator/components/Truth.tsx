@@ -28,7 +28,7 @@ export default function Truth({ trace, trueLabel, onClose }: {
 
             <section className={styles.summary}>
                 <span className={styles.originalFormula}>
-                    <TegakiRenderer font={caveat} reducedMotion="user" timing={WRITING_TIMING} quality={{ pixelRatio: 3 }}>
+                    <TegakiRenderer font={caveat} reducedMotion="user" timing={WRITING_TIMING}>
                         {trace.originalExpression}
                     </TegakiRenderer>
                 </span>
@@ -41,8 +41,8 @@ export default function Truth({ trace, trueLabel, onClose }: {
 
             <section className={styles.history}>
                 {visibleSteps.map((step, index) => (
-                    <span className={step.result === true ? styles.trueValue : styles.falseValue} key={`${step.expression}-${index}`}>
-                        {step.expression} = {truthLabel(step.result, trueLabel)}
+                    <span className={step.showTruthValue ? (step.result === true ? styles.trueValue : styles.falseValue) : styles.termValue} key={`${step.expression}-${index}`}>
+                        {step.expression}{step.showTruthValue && ` = ${truthLabel(step.result, trueLabel)}`}
                     </span>
                 ))}
             </section>

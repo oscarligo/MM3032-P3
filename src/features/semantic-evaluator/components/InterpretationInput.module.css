@@ -142,6 +142,17 @@
     color: var(--color-presentation-text);
 }
 
+.warningMark {
+    display: inline-block;
+    margin-left: .08rem;
+    color: var(--color-danger);
+    font-family: var(--font-family);
+    font-size: .8em;
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: super;
+}
+
 .activatable {
     border: 1px dashed transparent;
     border-radius: .3rem;
@@ -274,19 +285,42 @@
 .functionsPanel {
     grid-area: functions;
     padding-left: var(--space-md);
-    border-left: 1px solid var(--color-presentation-border-subtle);
 }
 
 .environmentPanel {
+    position: relative;
     grid-area: environment;
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: start;
     gap: .55rem;
+    height: calc(100% - 2.75rem);
     min-width: 0;
+    min-height: 0;
+    overflow: hidden;
     padding-left: var(--space-md);
-    border-left: 1px solid var(--color-presentation-border-subtle);
+    box-sizing: border-box;
     font-family: var(--font-family-math);
+}
+
+.functionsPanel::before,
+.environmentPanel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: var(--color-presentation-border-subtle);
+}
+
+.functionsPanel::before {
+    bottom: 2.75rem;
+}
+
+.environmentPanel::before {
+    bottom: 0;
 }
 
 .environmentSymbol {
@@ -299,6 +333,10 @@
 .environmentList {
     display: grid;
     gap: .1rem;
+    max-height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .environmentEntry {
@@ -310,8 +348,21 @@
 }
 
 .question {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: start;
+    gap: .35em;
+    max-height: 5.5rem;
+    margin: 1.5rem 0 0;
+    padding-right: var(--space-xs);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     font-size: 1.3em;
     font-weight: 410;
+}
+
+.questionMarker {
+    white-space: nowrap;
 }
 
 .formula {
@@ -319,10 +370,14 @@
     color: var(--color-presentation-text);
     font-family: var(--font-family-math);
     font-size: 1.08em;
-    font-style: italic;
+    font-style: normal;
     font-weight: 400;
     letter-spacing: .01em;
     overflow-wrap: anywhere;
+}
+
+.formulaFunction {
+    font-style: italic;
 }
 
 .error {

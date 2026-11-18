@@ -19,8 +19,18 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
     const locale = useLocaleStore((state) => state.locale);
     const setLocale = useLocaleStore((state) => state.setLocale);
     const theme = useUIStore((state) => state.theme);
+    const setTheme = useUIStore((state) => state.setTheme);
     const toggleTheme = useUIStore((state) => state.toggleTheme);
     const initializedTheme = useRef(false);
+
+    useEffect(() => {
+        const preference = window.matchMedia("(prefers-color-scheme: dark)");
+        const syncTheme = ({ matches }: MediaQueryList | MediaQueryListEvent) =>
+            setTheme(matches ? "dark" : "light");
+        syncTheme(preference);
+        preference.addEventListener("change", syncTheme);
+        return () => preference.removeEventListener("change", syncTheme);
+    }, [setTheme]);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -67,7 +77,7 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
                     </span>
                     <ChevronDown
                         className={styles.selectChevron}
-                        size={20}
+                        size={14}
                         strokeWidth={2.2}
                         aria-hidden="true"
                     />
@@ -103,7 +113,7 @@ export default function NavBar({ showQr, onToggleQr }: NavBarProps) {
                     title={LL.navbar.qrCode()}
                     aria-expanded={showQr}
                 >
-                    <CircleExclamationPoint size={28} strokeWidth={2.1} aria-hidden="true" />
+                    <CircleExclamationPoint size={20} strokeWidth={2.1} aria-hidden="true" />
                 </button>
                 </div>
             </nav>

@@ -90,6 +90,10 @@ type RootTranslation = {
 		 */
 		objectiveResult: string
 		/**
+		 * C​a​r​g​a​r​ ​e​j​e​m​p​l​o​s
+		 */
+		loadExamples: string
+		/**
 		 * S​í​m​b​o​l​o​s​ ​d​e​ ​l​ó​g​i​c​a​ ​d​e​ ​p​r​e​d​i​c​a​d​o​s
 		 */
 		logicKeyboard: string
@@ -391,6 +395,11 @@ type RootTranslation = {
 		 */
 		errorFormulaInTermPosition: RequiredParams<'token'>
 		/**
+		 * s​í​m​b​o​l​o​ ​a​m​b​i​g​u​o​:​ ​«​{​s​y​m​b​o​l​}​»​ ​n​o​ ​p​u​e​d​e​ ​u​t​i​l​i​z​a​r​s​e​ ​c​o​n​ ​m​á​s​ ​d​e​ ​u​n​ ​r​o​l​ ​s​i​n​t​á​c​t​i​c​o​.
+		 * @param {string} symbol
+		 */
+		errorSymbolRoleConflict: RequiredParams<'symbol'>
+		/**
 		 * t​é​r​m​i​n​o​ ​f​a​l​t​a​n​t​e​:​ ​s​e​ ​e​s​p​e​r​a​b​a​ ​u​n​ ​i​d​e​n​t​i​f​i​c​a​d​o​r​,​ ​p​e​r​o​ ​s​e​ ​e​n​c​o​n​t​r​ó​ ​«​{​f​o​u​n​d​}​»​.
 		 * @param {string} found
 		 */
@@ -584,6 +593,10 @@ type RootTranslation = {
 		 */
 		result: string
 		/**
+		 * d​e​f​i​n​i​d​a​ ​p​o​r​:
+		 */
+		definedBy: string
+		/**
 		 * -
 		 */
 		selectValue: string
@@ -592,9 +605,39 @@ type RootTranslation = {
 		 */
 		emptyDomain: string
 		/**
+		 * E​l​ ​d​o​m​i​n​i​o​ ​c​o​n​t​i​e​n​e​ ​u​n​ ​e​l​e​m​e​n​t​o​ ​v​a​c​í​o​.
+		 */
+		emptyDomainElement: string
+		/**
 		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​l​ ​d​o​m​i​n​i​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
 		 */
 		duplicateDomain: string
+		/**
+		 * A​s​i​g​n​a​ ​u​n​ ​v​a​l​o​r​ ​a​ ​l​a​ ​c​o​n​s​t​a​n​t​e​ ​{​s​y​m​b​o​l​}​.
+		 * @param {string} symbol
+		 */
+		emptyConstant: RequiredParams<'symbol'>
+		/**
+		 * C​o​m​p​l​e​t​a​ ​t​o​d​o​s​ ​l​o​s​ ​r​e​s​u​l​t​a​d​o​s​ ​d​e​ ​l​a​ ​f​u​n​c​i​ó​n​ ​{​s​y​m​b​o​l​}​.
+		 * @param {string} symbol
+		 */
+		emptyFunction: RequiredParams<'symbol'>
+		/**
+		 * L​a​ ​f​u​n​c​i​ó​n​ ​{​s​y​m​b​o​l​}​ ​r​e​q​u​i​e​r​e​ ​m​á​s​ ​d​e​ ​{​l​i​m​i​t​}​ ​f​i​l​a​s​.​ ​R​e​d​u​c​e​ ​e​l​ ​d​o​m​i​n​i​o​ ​o​ ​l​a​ ​a​r​i​d​a​d​.
+		 * @param {number} limit
+		 * @param {string} symbol
+		 */
+		functionTooLarge: RequiredParams<'limit' | 'symbol'>
+		/**
+		 * L​a​ ​m​a​t​r​i​z​ ​r​e​q​u​i​e​r​e​ ​m​á​s​ ​d​e​ ​{​l​i​m​i​t​}​ ​c​e​l​d​a​s​.​ ​R​e​d​u​c​e​ ​e​l​ ​d​o​m​i​n​i​o​ ​o​ ​l​a​ ​c​a​n​t​i​d​a​d​ ​d​e​ ​v​a​r​i​a​b​l​e​s​.
+		 * @param {number} limit
+		 */
+		evaluationTooLarge: RequiredParams<'limit'>
+		/**
+		 * A​s​i​g​n​a​ ​u​n​ ​v​a​l​o​r​ ​a​ ​l​a​ ​v​a​r​i​a​b​l​e​ ​{​v​a​r​i​a​b​l​e​}​ ​e​n​ ​e​l​ ​e​n​t​o​r​n​o​ ​ℓ​.
+		 * @param {string} variable
+		 */
+		emptyEnvironment: RequiredParams<'variable'>
 		/**
 		 * L​o​s​ ​e​l​e​m​e​n​t​o​s​ ​d​e​ ​l​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​l​ ​p​r​e​d​i​c​a​d​o​ ​n​o​ ​p​u​e​d​e​n​ ​r​e​p​e​t​i​r​s​e​.
 		 */
@@ -604,10 +647,21 @@ type RootTranslation = {
 		 */
 		trueValue: string
 		/**
-		 * L​a​ ​r​e​l​a​c​i​ó​n​ ​d​e​ ​{​p​r​e​d​i​c​a​t​e​}​ ​n​o​ ​p​u​e​d​e​ ​e​s​t​a​r​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​a​ ​t​u​p​l​a​ ​c​o​m​p​l​e​t​a​.
+		 * L​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​d​e​ ​{​p​r​e​d​i​c​a​t​e​}​ ​e​s​t​á​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​ ​e​l​e​m​e​n​t​o​ ​d​e​l​ ​d​o​m​i​n​i​o​.
 		 * @param {string} predicate
 		 */
-		emptyPredicate: RequiredParams<'predicate'>
+		emptyUnaryPredicate: RequiredParams<'predicate'>
+		/**
+		 * L​a​ ​r​e​l​a​c​i​ó​n​ ​{​p​r​e​d​i​c​a​t​e​}​ ​e​s​t​á​ ​v​a​c​í​a​.​ ​A​g​r​e​g​a​ ​a​l​ ​m​e​n​o​s​ ​u​n​a​ ​t​u​p​l​a​ ​d​e​ ​{​a​r​i​t​y​}​ ​e​l​e​m​e​n​t​o​s​.
+		 * @param {number} arity
+		 * @param {string} predicate
+		 */
+		emptyRelation: RequiredParams<'arity' | 'predicate'>
+		/**
+		 * H​a​y​ ​u​n​a​ ​t​u​p​l​a​ ​i​n​c​o​m​p​l​e​t​a​ ​e​n​ ​{​p​r​e​d​i​c​a​t​e​}​.​ ​S​e​l​e​c​c​i​o​n​a​ ​t​o​d​o​s​ ​s​u​s​ ​v​a​l​o​r​e​s​ ​a​n​t​e​s​ ​d​e​ ​e​v​a​l​u​a​r​.
+		 * @param {string} predicate
+		 */
+		incompletePredicate: RequiredParams<'predicate'>
 	}
 	evaluation: {
 		/**
@@ -618,6 +672,10 @@ type RootTranslation = {
 		 * C​o​m​p​l​e​t​a​ ​e​l​ ​d​o​m​i​n​i​o​ ​y​ ​l​a​ ​i​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​p​a​r​a​ ​g​e​n​e​r​a​r​ ​l​a​ ​t​a​b​l​a​.
 		 */
 		waiting: string
+		/**
+		 * I​n​t​e​r​p​r​e​t​a​c​i​ó​n​ ​c​o​m​p​l​e​t​a​.​ ​P​r​e​s​i​o​n​a​ ​S​i​g​u​i​e​n​t​e​ ​p​a​r​a​ ​c​o​n​s​t​r​u​i​r​ ​l​a​ ​t​a​b​l​a​.
+		 */
+		ready: string
 		/**
 		 * R​e​s​u​l​t​a​d​o
 		 */
@@ -837,6 +895,10 @@ export type TranslationFunctions = {
 		 * y determinar si es verdadera o falsa en una interpretación finita ingresada.
 		 */
 		objectiveResult: () => LocalizedString
+		/**
+		 * Cargar ejemplos
+		 */
+		loadExamples: () => LocalizedString
 		/**
 		 * Símbolos de lógica de predicados
 		 */
@@ -1114,6 +1176,10 @@ export type TranslationFunctions = {
 		 */
 		errorFormulaInTermPosition: (arg: { token: string }) => LocalizedString
 		/**
+		 * símbolo ambiguo: «{symbol}» no puede utilizarse con más de un rol sintáctico.
+		 */
+		errorSymbolRoleConflict: (arg: { symbol: string }) => LocalizedString
+		/**
 		 * término faltante: se esperaba un identificador, pero se encontró «{found}».
 		 */
 		errorExpectedTermIdentifier: (arg: { found: string }) => LocalizedString
@@ -1298,6 +1364,10 @@ export type TranslationFunctions = {
 		 */
 		result: () => LocalizedString
 		/**
+		 * definida por:
+		 */
+		definedBy: () => LocalizedString
+		/**
 		 * -
 		 */
 		selectValue: () => LocalizedString
@@ -1306,9 +1376,33 @@ export type TranslationFunctions = {
 		 */
 		emptyDomain: () => LocalizedString
 		/**
+		 * El dominio contiene un elemento vacío.
+		 */
+		emptyDomainElement: () => LocalizedString
+		/**
 		 * Los elementos del dominio no pueden repetirse.
 		 */
 		duplicateDomain: () => LocalizedString
+		/**
+		 * Asigna un valor a la constante {symbol}.
+		 */
+		emptyConstant: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * Completa todos los resultados de la función {symbol}.
+		 */
+		emptyFunction: (arg: { symbol: string }) => LocalizedString
+		/**
+		 * La función {symbol} requiere más de {limit} filas. Reduce el dominio o la aridad.
+		 */
+		functionTooLarge: (arg: { limit: number, symbol: string }) => LocalizedString
+		/**
+		 * La matriz requiere más de {limit} celdas. Reduce el dominio o la cantidad de variables.
+		 */
+		evaluationTooLarge: (arg: { limit: number }) => LocalizedString
+		/**
+		 * Asigna un valor a la variable {variable} en el entorno ℓ.
+		 */
+		emptyEnvironment: (arg: { variable: string }) => LocalizedString
 		/**
 		 * Los elementos de la interpretación del predicado no pueden repetirse.
 		 */
@@ -1318,9 +1412,17 @@ export type TranslationFunctions = {
 		 */
 		trueValue: () => LocalizedString
 		/**
-		 * La relación de {predicate} no puede estar vacía. Agrega al menos una tupla completa.
+		 * La interpretación de {predicate} está vacía. Agrega al menos un elemento del dominio.
 		 */
-		emptyPredicate: (arg: { predicate: string }) => LocalizedString
+		emptyUnaryPredicate: (arg: { predicate: string }) => LocalizedString
+		/**
+		 * La relación {predicate} está vacía. Agrega al menos una tupla de {arity} elementos.
+		 */
+		emptyRelation: (arg: { arity: number, predicate: string }) => LocalizedString
+		/**
+		 * Hay una tupla incompleta en {predicate}. Selecciona todos sus valores antes de evaluar.
+		 */
+		incompletePredicate: (arg: { predicate: string }) => LocalizedString
 	}
 	evaluation: {
 		/**
@@ -1331,6 +1433,10 @@ export type TranslationFunctions = {
 		 * Completa el dominio y la interpretación para generar la tabla.
 		 */
 		waiting: () => LocalizedString
+		/**
+		 * Interpretación completa. Presiona Siguiente para construir la tabla.
+		 */
+		ready: () => LocalizedString
 		/**
 		 * Resultado
 		 */

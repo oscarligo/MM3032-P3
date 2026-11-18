@@ -1,6 +1,16 @@
 import { Token, TokenType } from "./lexer";
 import { FormulaSyntaxError } from "./parse-errors";
 
+/*
+    Variante pedagógica del lexer que reproduce sus mismas reglas y, además de los
+    tokens, registra un paso por cada fragmento leído. Cada paso guarda el cursor,
+    el texto reconocido, lo que queda de la entrada y una descripción para la UI.
+
+    Los espacios aparecen en la traza aunque no produzcan tokens. Las formas ASCII
+    y LaTeX se registran como texto reconocido, pero generan el mismo valor Unicode
+    normalizado que tokenize. EOF también genera un paso para cerrar la animación.
+*/
+
 export type LexerStep = {
     stage: "lexer";
     cursor: number;
@@ -35,6 +45,7 @@ export function tokenizeWithSteps(input: string): LexerStepsResult {
     });
 
     const addToken = (token: Omit<Token, "position">, cursor: number, matchedText: string) => {
+        // Crear el token y su explicación en una sola operación evita que ambas secuencias diverjan.
         tokens.push({ ...token, position: cursor });
         collect(cursor, matchedText, token.type, `Se reconoció ${token.type}: '${token.value}'`);
     };

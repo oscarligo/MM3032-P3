@@ -13,6 +13,7 @@ type ParserErrorTranslations = {
     errorExpectedQuantifierVariable: (args: { quantifier: string }) => string;
     errorMissingQuantifierBody: (args: { quantifier: string; variable: string }) => string;
     errorFormulaInTermPosition: (args: { token: string }) => string;
+    errorSymbolRoleConflict: (args: { symbol: string }) => string;
     errorExpectedTermIdentifier: (args: { found: string }) => string;
     errorUnexpectedToken: (args: { value: string; type: string }) => string;
     errorUnknown: () => string;
@@ -35,6 +36,7 @@ export function localizeParserError(error: unknown, LL: ParserErrorTranslations)
         case "EXPECTED_QUANTIFIER_VARIABLE": return LL.errorExpectedQuantifierVariable(payload);
         case "MISSING_QUANTIFIER_BODY": return LL.errorMissingQuantifierBody(payload);
         case "FORMULA_IN_TERM_POSITION": return LL.errorFormulaInTermPosition(payload);
+        case "SYMBOL_ROLE_CONFLICT": return LL.errorSymbolRoleConflict(payload);
         case "EXPECTED_TERM_IDENTIFIER": return LL.errorExpectedTermIdentifier(payload);
         case "UNEXPECTED_TOKEN": return LL.errorUnexpectedToken(payload);
     }

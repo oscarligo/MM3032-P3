@@ -7,13 +7,13 @@ import styles from "./Lexer.module.css";
 const FAST_TEGAKI = { glyphGap: 0, stagger: { advance: 0.025, duration: 0.12 } } as const;
 
 const Chalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI} quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="user" timing={FAST_TEGAKI}>
         {String(children)}
     </TegakiRenderer>
 );
 
 const StaticChalk = ({ children }: { children: string | number }) => (
-    <TegakiRenderer font={caveat} reducedMotion="always" quality={{ pixelRatio: 3 }}>
+    <TegakiRenderer font={caveat} reducedMotion="always">
         {String(children)}
     </TegakiRenderer>
 );

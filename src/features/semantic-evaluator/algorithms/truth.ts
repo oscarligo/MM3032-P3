@@ -1,10 +1,21 @@
 import type { Formula, InterpretationDefinition, Term } from "../types";
-import { evaluateFormulaInEnvironment, formulaToText as originalFormulaToText } from "./evaluation";
+import { evaluateFormulaForCase } from "./evaluation";
+
+/*
+    Desglose de una celda concreta de la matriz semántica. Las coordenadas de fila y
+    columna se combinan con el entorno inicial y fijan todas las variables del caso;
+    por ello los cuantificadores ya están instanciados y no aparecen como pasos.
+
+    El recorrido es postorden: primero resuelve constantes y aplicaciones funcionales,
+    después átomos y conectivos. Cada paso conserva su resultado para la animación, pero
+    originalExpression se genera desde la fórmula de presentación sin sustituir variables.
+    Los nombres internos de variables sombreadas se traducen con variableLabels.
+*/
 
 export type TruthStep = {
     expression: string;
     result: boolean | null;
-    isAtom: boolean;
+    showTruthValue: boolean;
 };
 
 export type TruthTrace = {
@@ -26,11 +37,7 @@ const formulaToText = (formula: Formula, environment: ReadonlyMap<string, string
             : formula.predicate;
     }
     if (formula.kind === "not") return `¬${formulaToText(formula.inner, environment)}`;
-    if (formula.kind === "forall" || formula.kind === "exists") {
-        const nested = new Map(environment);
-        nested.delete(formula.variable);
-        return `${formula.kind === "forall" ? "∀" : "∃"}${formula.variable} ${formulaToText(formula.inner, nested)}`;
-    }
+    if (formula.kind === "forall" || formula.kind === "exists") return formulaToText(formula.inner, environment);
     const operator = formula.kind === "and" ? "∧" : formula.kind === "or" ? "∨" : "→";
     return `(${formulaToText(formula.left, environment)} ${operator} ${formulaToText(formula.right, environment)})`;
 };
@@ -42,22 +49,58 @@ export const buildTruthTrace = (
     rowAssignment: string[],
     columnVariables: string[],
     columnAssignment: string[],
-    trueLabel: string
+    trueLabel: string,
+    variableLabels: ReadonlyMap<string, string> = new Map(),
+    displayFormula: Formula = formula
 ): TruthTrace => {
-    const assignment = [
+    const cases = [
         ...rowVariables.map((variable, index) => ({ variable, value: rowAssignment[index] })),
         ...columnVariables.map((variable, index) => ({ variable, value: columnAssignment[index] })),
     ];
+    const assignment = cases.map(({ variable, value }) => ({
+        variable: variableLabels.get(variable) ?? variable,
+        value,
+    }));
     const environment = new Map(Object.entries(interpretation.environment));
-    assignment.forEach(({ variable, value }) => environment.set(variable, value));
+    cases.forEach(({ variable, value }) => environment.set(variable, value));
     const steps: TruthStep[] = [];
 
     const valueLabel = (value: boolean | null) => value === null ? "-" : value ? trueLabel : "F";
 
+    const resolveTerm = (term: Term): string | null => {
+        if (term.kind === "var") return environment.get(term.name) ?? null;
+        if (term.kind === "const") {
+            const value = interpretation.constants[term.name] ?? null;
+            steps.push({
+                expression: `${term.name} = ${value ?? "-"}`,
+                result: null,
+                showTruthValue: false,
+            });
+            return value;
+        }
+
+        const args = term.args.map(resolveTerm);
+        const value = args.some((argument) => argument === null)
+            ? null
+            : interpretation.functions[`${term.name}/${term.args.length}`]?.rows
+                .find((row) => row.args.every((argument, index) => argument === args[index]))?.result ?? null;
+        steps.push({
+            expression: `${term.name}(${args.map((argument) => argument ?? "-").join(", ")}) = ${value ?? "-"}`,
+            result: null,
+            showTruthValue: false,
+        });
+        return value;
+    };
+
     const visit = (current: Formula): boolean | null => {
+        if (current.kind === "forall" || current.kind === "exists") return visit(current.inner);
+
         let expression: string;
-        if (current.kind === "atom" || current.kind === "forall" || current.kind === "exists") {
-            expression = formulaToText(current, environment);
+        if (current.kind === "atom") {
+            const args = current.args.map(resolveTerm);
+            expression = args.length > 0
+                ? `${current.predicate}(${args.map((argument) => argument ?? "-").join(", ")})`
+                : current.predicate;
         } else if (current.kind === "not") {
             expression = `¬${valueLabel(visit(current.inner))}`;
         } else {
@@ -66,15 +109,15 @@ export const buildTruthTrace = (
             const operator = current.kind === "and" ? "∧" : current.kind === "or" ? "∨" : "→";
             expression = `(${valueLabel(left)} ${operator} ${valueLabel(right)})`;
         }
-        const result = evaluateFormulaInEnvironment(current, interpretation, environment);
+        const result = evaluateFormulaForCase(current, interpretation, environment);
         steps.push({
             expression,
             result,
-            isAtom: current.kind === "atom",
+            showTruthValue: true,
         });
         return result;
     };
 
     visit(formula);
-    return { originalExpression: originalFormulaToText(formula), assignment, steps };
+    return { originalExpression: formulaToText(displayFormula, new Map()), assignment, steps };
 };
