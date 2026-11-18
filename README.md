@@ -1,20 +1,16 @@
 # Evaluador semántico de lógica de primer orden
-## Miembros
+## Autores
 - Oscar Rompich - 24880
 - Arturo Lima - 24683
 
 ## Introduccion
 Aplicación educativa e interactiva para explorar cómo se analizan y evalúan fórmulas de lógica de primer orden sobre interpretaciones finitas. Acompaña todo el recorrido de forma visual: desde que se escribe la fórmula hasta que se construye la tabla de verdad y se resaltan los testigos o contraejemplos que justifican el resultado.
 
-<table align="center" cellpadding="12">
-  <tr>
-    <td align="center" bgcolor="#ffffff">
-      <a href="https://logic.rompich.me">
-        <img src="src/assets/qr.svg" width="180" alt="Código QR para abrir el evaluador semántico" />
-      </a>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <a href="https://logic.rompich.me"><img src="docs/qr-readme.svg" width="180" alt="Código QR para abrir el evaluador semántico" /></a>
+  &nbsp;&nbsp;
+  <a href="https://logic.rompich.me"><img src="public/favicon.svg" width="180" alt="Ícono del evaluador semántico" /></a>
+</p>
 <p align="center"><a href="https://logic.rompich.me"><strong>logic.rompich.me</strong></a></p>
 
 ## Cómo está organizado el proyecto
